@@ -16,10 +16,6 @@ Institut Pertanian Bogor (IPB University)
 
 ---
 
-**Mata Kuliah**: Analisis dan Desain Sistem  
-**Tahun**: 2026  
-**Universitas**: IPB University
-
 ## Tentang
 
 IPB Internship & Career Tracker adalah sistem informasi berbasis web yang dirancang untuk:
