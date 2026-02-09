@@ -16,9 +16,9 @@ Institut Pertanian Bogor (IPB University)
 
 ---
 
-**Course**: Analisis dan Desain Sistem  
-**Year**: 2026  
-**Institution**: IPB University
+**Mata Kuliah**: Analisis dan Desain Sistem  
+**Tahun**: 2026  
+**Universitas**: IPB University
 
 ## Tentang
 
@@ -149,37 +149,6 @@ cp .env.example .env
 npm run dev
 ```
 Frontend running di: **http://localhost:3000**
-
----
-
-
-## User Roles
-
-### Admin
-- **No public registration** - Account created via database seeding
-- **Separate login portal** at `/admin` route
-- Full system access:
-  - Manage all users (activate/deactivate)
-  - Oversee all applications and activities
-  - System configuration
-  - Generate reports
-
-### Student
-- Public registration with NIM IPB (format: G6401231040)
-- Features:
-  - Apply for internship positions
-  - Track application status
-  - Record internship activities
-  - Submit reports
-  - Manage MBKM credits
-
-### Company
-- Public registration with company details
-- Features:
-  - Post internship vacancies
-  - Review and manage applicants
-  - Track internship progress
-  - Provide feedback
 
 ---
 
