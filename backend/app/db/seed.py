@@ -3,38 +3,36 @@ Database Seeder - Create default admin account
 Run: python -m app.db.seed
 """
 from sqlalchemy.orm import Session
-from app.db.database import SessionLocal, engine
-from app.models.user import UserORM, AdminORM
-from app.core.security import get_password_hash
+from app.db.database import SessionLocal
+from app.repositories.user_repository import UserRepository
+from app.services.user_service import UserService
 
 
 def create_default_admin(db: Session):
+    """Create default admin user using repository pattern"""
+    repo = UserRepository(db)
+
     # Check if admin already exists
-    existing_admin = db.query(UserORM).filter(UserORM.email == "admin@ipb.ac.id").first()
-    if existing_admin:
+    if repo.email_exists("admin@ipb.ac.id"):
         print("Default admin already exists: admin@ipb.ac.id")
         return
-    
-    # Create admin user
-    admin_user = UserORM(
-        email="admin@ipb.ac.id",
-        full_name="IPB Admin",
-        hashed_password=get_password_hash("admin123"), 
-        is_active=True,
-        is_verified=True
-    )
-    db.add(admin_user)
-    db.flush()
-    
-    # Create admin profile
-    admin_profile = AdminORM(user_id=admin_user.id)
-    db.add(admin_profile)
-    
-    db.commit()
-    print(f"Default admin created!")
-    print(f"   Email: admin@ipb.ac.id")
-    print(f"   Password: admin123")
-    print(f"   CHANGE PASSWORD IN PRODUCTION!")
+
+    # Use service layer to create admin
+    user_service = UserService(repo)
+    try:
+        user_service.create_admin(
+            email="admin@ipb.ac.id",
+            password="admin123",
+            full_name="IPB Admin"
+        )
+
+        print(f"Default admin created!")
+        print(f"   Email: admin@ipb.ac.id")
+        print(f"   Password: admin123")
+        print(f"   CHANGE PASSWORD IN PRODUCTION!")
+    except ValueError as e:
+        print(f"Error creating admin: {e}")
+        raise
 
 
 def seed_database():

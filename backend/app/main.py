@@ -24,3 +24,9 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.get("/")
 def root():
     return {"message": "IPB Internship & Career Tracker API", "version": settings.VERSION}
+
+@app.get("/health")
+@app.get("/api/v1/health")
+def health_check():
+    """Health check endpoint for Docker"""
+    return {"status": "healthy", "service": "IPB Internship Tracker API"}

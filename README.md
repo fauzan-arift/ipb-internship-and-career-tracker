@@ -21,7 +21,7 @@ Institut Pertanian Bogor (IPB University)
 IPB Internship & Career Tracker adalah sistem informasi berbasis web yang dirancang untuk:
 
 - **Mahasiswa**: Melacak status lamaran magang, mencatat aktivitas MBKM, dan mengelola deadline laporan
-- **Perusahaan**: Memposting lowongan magang dan mengelola pelamar
+- **HR**: Memposting lowongan magang dan mengelola pelamar
 - **Admin**: Mengawasi seluruh proses dan manajemen pengguna
 
 ### Permasalahan yang Diselesaikan
@@ -75,6 +75,7 @@ ipb-internship-and-career-tracker/
 │   │   ├── db/             # Database connection
 │   │   ├── domain/         # Domain models (business logic)
 │   │   ├── models/         # ORM models (database)
+│   │   ├── repositories/   # Repository layer (data access)
 │   │   ├── schemas/        # Pydantic schemas
 │   │   ├── services/       # Service layer
 │   │   └── main.py         # App entry point
@@ -91,8 +92,7 @@ ipb-internship-and-career-tracker/
 │   │   └── App.jsx
 │   ├── package.json
 │   └── README.md           # Frontend documentation
-│
-├── README.md             
+└── README.md
 ```
 
 ---
