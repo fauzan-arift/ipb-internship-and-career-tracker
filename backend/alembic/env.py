@@ -3,8 +3,9 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-from app.db.database import Base
-from app.models import user 
+# Import Base and all models from infrastructure layer for Alembic autogenerate
+from app.infrastructure.database import Base  # noqa: F401
+import app.infrastructure.models  # noqa: F401 — registers all ORM models
 
 config = context.config
 
@@ -23,7 +24,6 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
-
     with context.begin_transaction():
         context.run_migrations()
 
@@ -32,7 +32,7 @@ def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
     from app.core.config import settings
     config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
-    
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
@@ -42,9 +42,8 @@ def run_migrations_online() -> None:
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=target_metadata
+            target_metadata=target_metadata,
         )
-
         with context.begin_transaction():
             context.run_migrations()
 
