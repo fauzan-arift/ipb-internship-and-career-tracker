@@ -173,6 +173,8 @@ Aturan Utama: Dependency/Ketergantungan **HANYA BISA** mengarah ke dalam (menuju
 - **Repository Pattern**: Abstraksi akses database menggunakan *Interfaces* (memisahkan query DB dari logika).
 - **Dependency Injection**: *Loosely coupled components* (mudah untuk keperluan testing).
 - **External Client Isolation**: Alat 3rd party seperti *Brevo* dan *Cloudinary* tidak masuk ke layer aplikasi, melainkan masuk ke *Infrastructure* yang digunakan lewat abstraksi.
+### Referensi Arsitektur
+- Pembangunan *Clean Architecture* Backend ini disusun mengacu pada: [How to Implement Clean Architecture in FastAPI: A Step-by-Step Guide](https://medium.com/@bhagyasithumini/how-to-implement-clean-architecture-in-fastapi-a-step-by-step-guide-8b73a75c650b)
 
 ---
 
