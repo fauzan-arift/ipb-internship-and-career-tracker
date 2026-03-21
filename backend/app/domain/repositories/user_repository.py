@@ -1,0 +1,60 @@
+from abc import ABC, abstractmethod
+from typing import List, Optional
+from uuid import UUID
+
+from app.domain.entities.user import User
+from app.domain.entities.student import Student
+from app.domain.entities.hr import HR
+from app.domain.entities.email_notification import EmailNotification
+from app.domain.entities.verification_token import VerificationToken
+
+
+class IUserRepository(ABC):
+
+    @abstractmethod
+    async def get_by_id(self, id: UUID) -> Optional[User]:
+        ...
+
+    @abstractmethod
+    async def get_by_email(self, email: str) -> Optional[User]:
+        ...
+
+    @abstractmethod
+    async def save(self, user: User) -> User:
+        ...
+
+    @abstractmethod
+    async def save_student(self, student: Student) -> Student:
+        ...
+
+    @abstractmethod
+    async def save_hr(self, hr: HR) -> HR:
+        ...
+
+    @abstractmethod
+    async def get_hr_by_id(self, hr_id: UUID) -> Optional[HR]:
+        ...
+
+    @abstractmethod
+    async def get_hr_by_user_id(self, user_id: UUID) -> Optional[HR]:
+        ...
+
+    @abstractmethod
+    async def get_pending_hrs(self) -> List[HR]:
+        ...
+
+    @abstractmethod
+    async def save_verification_token(self, token: VerificationToken) -> VerificationToken:
+        ...
+
+    @abstractmethod
+    async def get_verification_token(self, token_hash: str) -> Optional[VerificationToken]:
+        ...
+
+    @abstractmethod
+    async def invalidate_old_tokens(self, user_id: UUID) -> None:
+        ...
+
+    @abstractmethod
+    async def save_email_notification(self, notif: EmailNotification) -> EmailNotification:
+        ...

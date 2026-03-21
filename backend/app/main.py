@@ -1,15 +1,29 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.core.config import settings
-from app.api.v1.api import api_router
+from app.infrastructure.cloudinary import configure_cloudinary
+
+from app.presentation.api.auth import router as auth_router
+from app.presentation.api.admin import router as admin_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if settings.CLOUDINARY_CLOUD_NAME:
+        configure_cloudinary()
+    yield
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="IPB Internship & Career Tracker API"
+    description="IPB Internship & Career Tracker API",
+    lifespan=lifespan,
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -18,15 +32,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API router
-app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
+app.include_router(admin_router, prefix=f"{settings.API_V1_STR}/admin", tags=["Admin"])
 
-@app.get("/")
+
+@app.get("/", tags=["default"])
 def root():
     return {"message": "IPB Internship & Career Tracker API", "version": settings.VERSION}
-
-@app.get("/health")
-@app.get("/api/v1/health")
-def health_check():
-    """Health check endpoint for Docker"""
-    return {"status": "healthy", "service": "IPB Internship Tracker API"}
