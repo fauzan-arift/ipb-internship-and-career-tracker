@@ -35,11 +35,11 @@ IPB Internship & Career Tracker adalah sistem informasi berbasis web yang diranc
 ## Fitur Utama
 
 ### Saat Ini 
-- **Multi-role Authentication**: Admin, Student, Company
-- **JWT-based Security**: Token authentication dengan bcrypt
-- **Role-based Access Control**: Setiap role punya akses berbeda
-- **Clean Architecture**: Domain-driven design dengan separation of concerns
-
+- **Clean Architecture & DDD**: Strict separation of concerns (Domain, Application, Infrastructure, Presentation)
+- **Multi-role Authentication**: Admin, Student, HR
+- **Async Database Operations**: Performa tinggi dengan *asyncpg*
+- **External Integrations**: Brevo (Email Verification & Notifications) & Cloudinary (Cloud Document Storage)
+- **Role-based Access Control & JWT Security**: Akses berdasarkan spesifik role pengguna
 
 ## Teknologi
 
@@ -47,11 +47,12 @@ IPB Internship & Career Tracker adalah sistem informasi berbasis web yang diranc
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | **FastAPI** | 0.109.0 | REST API framework |
-| **PostgreSQL** | 14+ | Database |
-| **SQLAlchemy** | 2.0.25 | ORM |
+| **PostgreSQL & asyncpg** | 14+ | Async Database Driver |
+| **SQLAlchemy** | 2.0.25 | Async ORM |
 | **Pydantic** | 2.5.3 | Data validation |
-| **JWT** | - | Authentication |
-| **Bcrypt** | - | Password hashing |
+| **Brevo API** | - | Transactional Emails |
+| **Cloudinary API**| - | Cloud File Storage |
+| **JWT & Bcrypt** | - | Authentication & Security |
 
 ### Frontend
 | Technology | Version | Purpose |
@@ -69,15 +70,14 @@ IPB Internship & Career Tracker adalah sistem informasi berbasis web yang diranc
 ```
 ipb-internship-and-career-tracker/
 ├── backend/                 # FastAPI Backend
+│   ├── alembic/            # Database Migrations (Async)
 │   ├── app/
-│   │   ├── api/            # API endpoints & routes
+│   │   ├── application/    # Business services (Use Cases)
 │   │   ├── core/           # Config & security
-│   │   ├── db/             # Database connection
-│   │   ├── domain/         # Domain models (business logic)
-│   │   ├── models/         # ORM models (database)
-│   │   ├── repositories/   # Repository layer (data access)
-│   │   ├── schemas/        # Pydantic schemas
-│   │   ├── services/       # Service layer
+│   │   ├── db/             # Database Seeder
+│   │   ├── domain/         # Entities, Enums, Interfaces, UoW
+│   │   ├── infrastructure/ # DB connections, SQLAlchemy ORMs, Cloudinary, Brevo
+│   │   ├── presentation/   # FastAPI Routes, Schemas, Dependencies
 │   │   └── main.py         # App entry point
 │   ├── .env.example
 │   ├── requirements.txt
@@ -150,29 +150,29 @@ Frontend running di: **http://localhost:3000**
 
 ## Architecture
 
-Project ini menggunakan **Clean Architecture** dengan **Domain-Driven Design**:
+Project ini menggunakan **Clean Architecture** dengan **Domain-Driven Design (DDD)**:
+
+Aturan Utama: Dependency/Ketergantungan **HANYA BISA** mengarah ke dalam (menuju Core Domain Layer).
 
 ### Layer Architecture
 ```
-┌─────────────────────────────────┐
-│     API Layer (FastAPI)         │  ← Endpoints
-├─────────────────────────────────┤
-│     Service Layer               │  ← Business orchestration
-├─────────────────────────────────┤
-│     Domain Layer                │  ← Business logic & validation
-├─────────────────────────────────┤
-│     ORM Layer (SQLAlchemy)      │  ← Database mapping
-├─────────────────────────────────┤
-│     Database (PostgreSQL)       │  ← Persistence
-└─────────────────────────────────┘
+┌───────────────────────────────────────────────┐
+│              Presentation Layer               │  ← FastAPI Routes, Pydantic Schemas, Dependencies
+├───────────────────────────────────────────────┤
+│              Application Layer                │  ← Use case flow orchestration (Services)
+├───────────────────────────────────────────────┤
+│                 Domain Layer                  │  ← Pure Python Entities & Interfaces
+├───────────────────────────────────────────────┤
+│             Infrastructure Layer              │  ← SQLAlchemy ORMs, Brevo, Cloudinary
+└───────────────────────────────────────────────┘
 ```
 
 ### Key Patterns
-- **Domain Model**: Pure Python untuk business logic
-- **ORM Model**: SQLAlchemy untuk database
-- **Service Layer**: Orchestration & use cases
-- **Mapper Pattern**: Convert Domain ↔ ORM
-- **User + Profile Pattern**: Separation of auth and role-specific data
+- **Rich Domain Model**: *Business logic* & validasi berada di dalam *Entity* murni Pydantic (tidak ada SQLAlchemy).
+- **Unit of Work (UoW)**: Mengontrol integritas dan *rollback transactions* secara *asynchronous* dari service hingga model.
+- **Repository Pattern**: Abstraksi akses database menggunakan *Interfaces* (memisahkan query DB dari logika).
+- **Dependency Injection**: *Loosely coupled components* (mudah untuk keperluan testing).
+- **External Client Isolation**: Alat 3rd party seperti *Brevo* dan *Cloudinary* tidak masuk ke layer aplikasi, melainkan masuk ke *Infrastructure* yang digunakan lewat abstraksi.
 
 ---
 
