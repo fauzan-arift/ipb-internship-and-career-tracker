@@ -5,6 +5,7 @@ from uuid import UUID
 from app.domain.entities.user import User
 from app.domain.entities.student import Student
 from app.domain.entities.hr import HR
+from app.domain.entities.admin import Admin
 from app.domain.entities.email_notification import EmailNotification
 from app.domain.entities.verification_token import VerificationToken
 
@@ -40,7 +41,19 @@ class IUserRepository(ABC):
         ...
 
     @abstractmethod
+    async def get_admin_by_user_id(self, user_id: UUID) -> Optional[Admin]:
+        ...
+
+    @abstractmethod
     async def get_pending_hrs(self) -> List[HR]:
+        ...
+
+    @abstractmethod
+    async def get_processed_hrs(self) -> List[HR]:
+        ...
+
+    @abstractmethod
+    async def save_admin(self, admin: Admin) -> Admin:
         ...
 
     @abstractmethod
