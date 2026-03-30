@@ -1,60 +1,46 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { authService } from '../services/authService'
+import { createContext, useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
-const AuthContext = createContext(null)
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on mount
-    const token = localStorage.getItem('token')
-    const userData = localStorage.getItem('user')
-    
-    if (token && userData) {
-      setUser(JSON.parse(userData))
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        // Check expiration
+        if (decoded.exp * 1000 < Date.now()) {
+          logout();
+        } else {
+          setUser({ userId: decoded.sub, role: decoded.role, email: decoded.email });
+        }
+      } catch (err) {
+        logout();
+      }
+    } else {
+      setUser(null);
     }
-    setLoading(false)
-  }, [])
+    setIsLoading(false);
+  }, [token]);
 
-  const login = async (email, password) => {
-    const response = await authService.login(email, password)
-    
-    localStorage.setItem('token', response.access_token)
-    localStorage.setItem('user', JSON.stringify(response.user))
-    setUser(response.user)
-    
-    return response
-  }
-
-  const register = async (userData, role) => {
-    const response = await authService.register(userData, role)
-    return response
-  }
+  const login = (newToken) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+  };
 
   const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    setUser(null)
-  }
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
+  };
 
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    isAuthenticated: !!user,
-    loading
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
-}
+  return (
+    <AuthContext.Provider value={{ token, user, isAuthenticated: !!token, login, logout, isLoading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};

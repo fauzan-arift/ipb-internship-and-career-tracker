@@ -1,6 +1,3 @@
-"""
-Infrastructure — SQLAlchemy implementation of IDocumentRepository.
-"""
 from typing import Optional
 from uuid import UUID
 

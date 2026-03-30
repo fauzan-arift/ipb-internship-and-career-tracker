@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from typing import Optional
 
 from app.domain.unit_of_work import IUnitOfWork
 from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
@@ -10,7 +11,7 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
 
     def __init__(self, session_factory: async_sessionmaker):
         self._session_factory = session_factory
-        self._session: AsyncSession | None = None
+        self._session: Optional[AsyncSession] = None
 
     async def __aenter__(self) -> "SQLAlchemyUnitOfWork":
         self._session = self._session_factory()

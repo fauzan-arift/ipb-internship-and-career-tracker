@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 
 class PendingHRItem(BaseModel):
+    hr_profile_id: Optional[UUID] = None
     hr_id: Optional[UUID] = None
     user_id: Optional[UUID] = None
     full_name: str
@@ -17,7 +18,9 @@ class PendingHRItem(BaseModel):
 
 
 class HRInfo(BaseModel):
+    hr_profile_id: Optional[UUID] = None
     hr_id: Optional[UUID] = None
+    user_id: Optional[UUID] = None
     full_name: str
     email: str
     position: Optional[str] = None

@@ -2,17 +2,12 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
-
 from app.domain.entities.enums import UserRole, UserStatus
+from app.domain.entities.user import User
 
 
-class Student(BaseModel):
-    id: Optional[UUID] = None
-    user_id: Optional[UUID] = None
-    full_name: str
-    email: str
-    password_hash: str
+class Student(User):
+    profile_id: Optional[UUID] = None
     role: UserRole = UserRole.STUDENT
     status: UserStatus = UserStatus.UNVERIFIED
     nim: str
@@ -24,5 +19,3 @@ class Student(BaseModel):
     skills: List[str] = []
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-
-    model_config = {"from_attributes": True}

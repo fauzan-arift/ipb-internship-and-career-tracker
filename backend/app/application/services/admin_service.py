@@ -22,11 +22,12 @@ class AdminService:
             hrs = await uow.users.get_pending_hrs()
             result = []
             for hr in hrs:
-                company = await uow.companies.get_by_hr_id(hr.id)
-                user = await uow.users.get_by_id(hr.user_id)
+                company = await uow.companies.get_by_hr_id(hr.profile_id)
+                user = await uow.users.get_by_id(hr.id)
                 result.append({
-                    "hr_id": hr.id,
-                    "user_id": hr.user_id,
+                    "hr_profile_id": hr.profile_id,
+                    "hr_id": hr.profile_id,
+                    "user_id": hr.id,
                     "full_name": hr.full_name,
                     "email": hr.email,
                     "position": hr.position,
@@ -38,14 +39,37 @@ class AdminService:
                 })
         return result
 
+    async def get_processed_registrations(self) -> List[dict]:
+        async with self.uow as uow:
+            hrs = await uow.users.get_processed_hrs()
+            result = []
+            for hr in hrs:
+                company = await uow.companies.get_by_hr_id(hr.profile_id)
+                user = await uow.users.get_by_id(hr.id)
+                result.append({
+                    "hr_profile_id": hr.profile_id,
+                    "hr_id": hr.profile_id,
+                    "user_id": hr.id,
+                    "full_name": hr.full_name,
+                    "email": hr.email,
+                    "position": hr.position,
+                    "company_name": company.company_name if company else None,
+                    "status": user.status.value if user else None,
+                    "verified_at": (
+                        company.verified_at.isoformat()
+                        if company and company.verified_at else None
+                    ),
+                })
+        return result
+
     async def get_hr_detail(self, hr_id: UUID) -> dict:
         async with self.uow as uow:
             hr = await uow.users.get_hr_by_id(hr_id)
             if not hr:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="HR tidak ditemukan.")
 
-            company = await uow.companies.get_by_hr_id(hr.id)
-            user = await uow.users.get_by_id(hr.user_id)
+            company = await uow.companies.get_by_hr_id(hr.profile_id)
+            user = await uow.users.get_by_id(hr.id)
 
             npwp_doc = None
             download_url = None
@@ -56,10 +80,13 @@ class AdminService:
 
         return {
             "hr": {
-                "hr_id": hr.id,
+                "hr_profile_id": hr.profile_id,
+                "hr_id": hr.profile_id,
+                "user_id": hr.id,
                 "full_name": hr.full_name,
                 "email": hr.email,
                 "position": hr.position,
+                "status": user.status.value if user else None,
             },
             "company": {
                 "company_id": company.id if company else None,
@@ -85,7 +112,7 @@ class AdminService:
             if not hr:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="HR tidak ditemukan.")
 
-            user = await uow.users.get_by_id(hr.user_id)
+            user = await uow.users.get_by_id(hr.id)
             if not user:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User tidak ditemukan.")
 
@@ -98,7 +125,7 @@ class AdminService:
             user = user.model_copy(update={"status": UserStatus.VERIFIED})
             await uow.users.save(user)
 
-            company = await uow.companies.get_by_hr_id(hr.id)
+            company = await uow.companies.get_by_hr_id(hr.profile_id)
             if company:
                 company = company.model_copy(update={
                     "verification_status": CompanyVerificationStatus.VERIFIED,
@@ -117,7 +144,7 @@ class AdminService:
             if not hr:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="HR tidak ditemukan.")
 
-            user = await uow.users.get_by_id(hr.user_id)
+            user = await uow.users.get_by_id(hr.id)
             if not user:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User tidak ditemukan.")
 
@@ -130,7 +157,7 @@ class AdminService:
             user = user.model_copy(update={"status": UserStatus.REJECTED})
             await uow.users.save(user)
 
-            company = await uow.companies.get_by_hr_id(hr.id)
+            company = await uow.companies.get_by_hr_id(hr.profile_id)
             if company:
                 company = company.model_copy(update={
                     "verification_status": CompanyVerificationStatus.REJECTED,

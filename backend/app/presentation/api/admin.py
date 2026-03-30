@@ -18,28 +18,35 @@ async def list_pending_hr(svc: AdminService = Depends(get_admin_service)):
     return {"success": True, "message": "OK", "data": items}
 
 
-@router.get("/hr/{hr_id}", dependencies=_admin_dep,
+@router.get("/hr/history", dependencies=_admin_dep,
+            summary="List HR yang sudah diproses (VERIFIED/REJECTED)")
+async def list_processed_hr(svc: AdminService = Depends(get_admin_service)):
+    items = await svc.get_processed_registrations()
+    return {"success": True, "message": "OK", "data": items}
+
+
+@router.get("/hr/profile/{hr_profile_id}", dependencies=_admin_dep,
             summary="Detail HR + Perusahaan + NPWP")
-async def get_hr_detail(hr_id: UUID, svc: AdminService = Depends(get_admin_service)):
-    detail = await svc.get_hr_detail(hr_id)
+async def get_hr_detail(hr_profile_id: UUID, svc: AdminService = Depends(get_admin_service)):
+    detail = await svc.get_hr_detail(hr_profile_id)
     return {"success": True, "message": "OK", "data": detail}
 
 
-@router.post("/hr/{hr_id}/approve", dependencies=_admin_dep,
+@router.post("/hr/profile/{hr_profile_id}/approve", dependencies=_admin_dep,
              summary="Approve registrasi HR")
-async def approve_hr(hr_id: UUID, svc: AdminService = Depends(get_admin_service)):
-    await svc.approve_hr(hr_id)
+async def approve_hr(hr_profile_id: UUID, svc: AdminService = Depends(get_admin_service)):
+    await svc.approve_hr(hr_profile_id)
     return {"success": True, "message": f"HR berhasil diapprove.", "data": None}
 
 
-@router.post("/hr/{hr_id}/reject", dependencies=_admin_dep,
+@router.post("/hr/profile/{hr_profile_id}/reject", dependencies=_admin_dep,
              summary="Tolak registrasi HR")
 async def reject_hr(
-    hr_id: UUID,
+    hr_profile_id: UUID,
     body: RejectRequest,
     svc: AdminService = Depends(get_admin_service),
 ):
-    await svc.reject_hr(hr_id, body.reason)
+    await svc.reject_hr(hr_profile_id, body.reason)
     return {"success": True, "message": "HR telah ditolak.", "data": None}
 
 

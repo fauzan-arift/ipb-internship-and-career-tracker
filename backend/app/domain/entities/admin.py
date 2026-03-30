@@ -6,10 +6,10 @@ from app.domain.entities.enums import UserRole, UserStatus
 from app.domain.entities.user import User
 
 
-class HR(User):
+class Admin(User):
+    id: Optional[UUID] = None
     profile_id: Optional[UUID] = None
-    role: UserRole = UserRole.HR
-    status: UserStatus = UserStatus.PENDING
-    position: Optional[str] = None
+    role: UserRole = UserRole.ADMIN
+    status: UserStatus = UserStatus.VERIFIED
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

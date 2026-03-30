@@ -40,11 +40,14 @@ class FileService:
 
         await file.seek(0)
 
+        res_type = "image" if ext in {".jpg", ".jpeg", ".png"} else "raw"
+        pub_id = f"{uuid4()}{ext}" if res_type == "raw" else str(uuid4())
+
         result = cloudinary.uploader.upload(
             file.file,
             folder=f"internship/{document_type}",
-            resource_type="auto",
-            public_id=str(uuid4()),
+            resource_type=res_type,
+            public_id=pub_id,
         )
 
         file_url = result["secure_url"]
