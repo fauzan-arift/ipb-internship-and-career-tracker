@@ -1,7 +1,3 @@
-"""
-Infrastructure — SQLAlchemy implementation of IUserRepository.
-Maps ORM models ↔ domain entities. Never returns ORM objects outside the repository.
-"""
 from typing import List, Optional
 from uuid import UUID
 
@@ -12,6 +8,7 @@ from sqlalchemy.orm import selectinload
 from app.domain.entities.user import User
 from app.domain.entities.student import Student
 from app.domain.entities.hr import HR
+from app.domain.entities.admin import Admin
 from app.domain.entities.email_notification import EmailNotification
 from app.domain.entities.verification_token import VerificationToken
 from app.domain.entities.enums import UserRole, UserStatus
@@ -19,6 +16,7 @@ from app.domain.repositories.user_repository import IUserRepository
 from app.infrastructure.models.user import UserORM
 from app.infrastructure.models.student import StudentORM
 from app.infrastructure.models.hr import HrORM
+from app.infrastructure.models.admin import AdminORM
 from app.infrastructure.models.email_notification import EmailNotificationORM
 from app.infrastructure.models.verification_token import VerificationTokenORM
 
@@ -44,8 +42,8 @@ class SQLAlchemyUserRepository(IUserRepository):
 
     def _student_to_domain(self, user_orm: UserORM, student_orm: StudentORM) -> Student:
         return Student(
-            id=student_orm.id,
-            user_id=user_orm.id,
+            id=user_orm.id,
+            profile_id=student_orm.id,
             full_name=user_orm.full_name,
             email=user_orm.email,
             password_hash=user_orm.hashed_password,
@@ -64,8 +62,8 @@ class SQLAlchemyUserRepository(IUserRepository):
 
     def _hr_to_domain(self, user_orm: UserORM, hr_orm: HrORM) -> HR:
         return HR(
-            id=hr_orm.id,
-            user_id=user_orm.id,
+            id=user_orm.id,
+            profile_id=hr_orm.id,
             full_name=user_orm.full_name,
             email=user_orm.email,
             password_hash=user_orm.hashed_password,
@@ -76,12 +74,21 @@ class SQLAlchemyUserRepository(IUserRepository):
             updated_at=user_orm.updated_at,
         )
 
+    def _admin_to_domain(self, user_orm: UserORM, admin_orm: AdminORM) -> Admin:
+        return Admin(
+            id=user_orm.id,
+            profile_id=admin_orm.id,
+            full_name=user_orm.full_name,
+            email=user_orm.email,
+            password_hash=user_orm.hashed_password,
+            role=user_orm.role,
+            status=user_orm.status,
+            created_at=user_orm.created_at,
+            updated_at=user_orm.updated_at,
+        )
+
     def _resolve_user_orm(self, orm: UserORM) -> User:
-        """Pick the richest domain entity that matches the user's role."""
-        if orm.role == UserRole.STUDENT and orm.student:
-            return self._student_to_domain(orm, orm.student)
-        if orm.role == UserRole.HR and orm.hr:
-            return self._hr_to_domain(orm, orm.hr)
+        """Returns the base User entity. Use specific methods for HR/Student profiles."""
         return self._user_to_domain(orm)
 
     # ==================== Queries ====================
@@ -90,6 +97,7 @@ class SQLAlchemyUserRepository(IUserRepository):
         stmt = stmt.options(
             selectinload(UserORM.student),
             selectinload(UserORM.hr),
+            selectinload(UserORM.admin),
         )
         return stmt
 
@@ -119,6 +127,20 @@ class SQLAlchemyUserRepository(IUserRepository):
                 hrs.append(self._hr_to_domain(row, row.hr))
         return hrs
 
+    async def get_processed_hrs(self) -> List[HR]:
+        stmt = await self._base_query(
+            select(UserORM)
+            .where(UserORM.role == UserRole.HR, UserORM.status != UserStatus.PENDING)
+            .order_by(UserORM.updated_at.desc())
+        )
+        result = await self._session.execute(stmt)
+        rows = result.scalars().all()
+        hrs = []
+        for row in rows:
+            if row.hr:
+                hrs.append(self._hr_to_domain(row, row.hr))
+        return hrs
+
     async def get_hr_by_id(self, hr_id: UUID) -> Optional[HR]:
         stmt = (
             select(HrORM)
@@ -126,10 +148,8 @@ class SQLAlchemyUserRepository(IUserRepository):
             .where(HrORM.id == hr_id)
         )
         result = await self._session.execute(stmt)
-        hr_orm = result.scalars().first()
-        if not hr_orm or not hr_orm.user:
-            return None
-        return self._hr_to_domain(hr_orm.user, hr_orm)
+        orm = result.scalars().first()
+        return self._hr_to_domain(orm.user, orm) if orm and orm.user else None
 
     async def get_hr_by_user_id(self, user_id: UUID) -> Optional[HR]:
         stmt = (
@@ -143,18 +163,27 @@ class SQLAlchemyUserRepository(IUserRepository):
             return None
         return self._hr_to_domain(hr_orm.user, hr_orm)
 
+    async def get_admin_by_user_id(self, user_id: UUID) -> Optional[Admin]:
+        stmt = (
+            select(AdminORM)
+            .options(selectinload(AdminORM.user))
+            .where(AdminORM.user_id == user_id)
+        )
+        result = await self._session.execute(stmt)
+        admin_orm = result.scalars().first()
+        if not admin_orm or not admin_orm.user:
+            return None
+        return self._admin_to_domain(admin_orm.user, admin_orm)
+
     # ==================== Writes ====================
 
     async def save(self, user: User) -> User:
         """
         Upsert the users table row.
-        Handles both User entities (id = users.id) and Student/HR entities
-        (user_id = users.id, id = profile table id).
+        Domain identity is users.id for all account entities.
         """
         existing = None
-        # Student/HR entities carry user_id pointing to users.id;
-        # plain User entities carry id pointing to users.id.
-        users_table_id = getattr(user, 'user_id', None) or user.id
+        users_table_id = user.id
 
         if users_table_id:
             result = await self._session.execute(
@@ -182,14 +211,13 @@ class SQLAlchemyUserRepository(IUserRepository):
             self._session.add(orm)
 
         await self._session.flush()
-        # Return with users.id set correctly
         return user.model_copy(update={"id": orm.id})
 
     async def save_student(self, student: Student) -> Student:
         # Upsert user record first
         user_result = await self._session.execute(
-            select(UserORM).where(UserORM.id == student.user_id)
-        ) if student.user_id else None
+            select(UserORM).where(UserORM.id == student.id)
+        ) if student.id else None
 
         if user_result:
             user_orm = user_result.scalars().first()
@@ -227,13 +255,13 @@ class SQLAlchemyUserRepository(IUserRepository):
         s_orm.skills = student.skills
 
         await self._session.flush()
-        return student.model_copy(update={"id": s_orm.id, "user_id": user_orm.id})
+        return student.model_copy(update={"id": user_orm.id, "profile_id": s_orm.id})
 
     async def save_hr(self, hr: HR) -> HR:
         # Upsert user record
         user_orm = None
-        if hr.user_id:
-            r = await self._session.execute(select(UserORM).where(UserORM.id == hr.user_id))
+        if hr.id:
+            r = await self._session.execute(select(UserORM).where(UserORM.id == hr.id))
             user_orm = r.scalars().first()
 
         if not user_orm:
@@ -261,7 +289,41 @@ class SQLAlchemyUserRepository(IUserRepository):
 
         h_orm.position = hr.position
         await self._session.flush()
-        return hr.model_copy(update={"id": h_orm.id, "user_id": user_orm.id})
+        return hr.model_copy(update={"id": user_orm.id, "profile_id": h_orm.id})
+
+    async def save_admin(self, admin: Admin) -> Admin:
+        user_orm = None
+        if admin.id:
+            result = await self._session.execute(select(UserORM).where(UserORM.id == admin.id))
+            user_orm = result.scalars().first()
+
+        if not user_orm:
+            user_orm = UserORM(
+                email=admin.email,
+                hashed_password=admin.password_hash,
+                full_name=admin.full_name,
+                role=admin.role,
+                status=admin.status,
+            )
+            self._session.add(user_orm)
+            await self._session.flush()
+        else:
+            user_orm.email = admin.email
+            user_orm.hashed_password = admin.password_hash
+            user_orm.full_name = admin.full_name
+            user_orm.role = admin.role
+            user_orm.status = admin.status
+
+        admin_result = await self._session.execute(
+            select(AdminORM).where(AdminORM.user_id == user_orm.id)
+        )
+        admin_orm = admin_result.scalars().first()
+        if not admin_orm:
+            admin_orm = AdminORM(user_id=user_orm.id)
+            self._session.add(admin_orm)
+
+        await self._session.flush()
+        return admin.model_copy(update={"id": user_orm.id, "profile_id": admin_orm.id})
 
     async def save_verification_token(self, token: VerificationToken) -> VerificationToken:
         existing = None

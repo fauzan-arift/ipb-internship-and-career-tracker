@@ -1,6 +1,3 @@
-"""
-Infrastructure — SQLAlchemy implementation of ICompanyRepository.
-"""
 from typing import Optional
 from uuid import UUID
 
