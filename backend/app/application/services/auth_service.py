@@ -38,6 +38,12 @@ class AuthService:
             if existing:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email sudah terdaftar.")
 
+            if not data.email.lower().endswith("@apps.ipb.ac.id"):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email student harus menggunakan domain @apps.ipb.ac.id."
+                )
+
             student = Student(
                 full_name=data.full_name,
                 email=data.email,
@@ -60,7 +66,7 @@ class AuthService:
                 role=student.role,
                 status=student.status,
             ))
-            student = student.model_copy(update={"user_id": user.id})
+            student = student.model_copy(update={"id": user.id})
             await uow.users.save_student(student)
 
             plain_token = generate_verification_token()
@@ -78,14 +84,23 @@ class AuthService:
     async def register_hr(self, data, npwp_file: UploadFile = None) -> User:
         async with self.uow as uow:
             existing = await uow.users.get_by_email(data.email)
+            existing_hr = None
+            existing_company = None
+            
             if existing:
-                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email sudah terdaftar.")
+                if existing.role == UserRole.HR and existing.status == UserStatus.REJECTED:
+                    existing_hr = await uow.users.get_hr_by_user_id(existing.id)
+                    if existing_hr:
+                        existing_company = await uow.companies.get_by_hr_id(existing_hr.profile_id)
+                else:
+                    raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email sudah terdaftar.")
 
             doc = None
             if npwp_file and npwp_file.filename:
                 doc = await self.file_service.upload_document(npwp_file, DocumentType.NPWP.value, uow)
 
             user = await uow.users.save(User(
+                id=existing.id if existing else None,
                 full_name=data.full_name,
                 email=data.email,
                 password_hash=get_password_hash(data.password),
@@ -94,7 +109,8 @@ class AuthService:
             ))
 
             hr = HR(
-                user_id=user.id,
+                id=user.id,
+                profile_id=existing_hr.profile_id if existing_hr else None,
                 full_name=data.full_name,
                 email=data.email,
                 password_hash=user.password_hash,
@@ -105,14 +121,15 @@ class AuthService:
             hr = await uow.users.save_hr(hr)
 
             company = Company(
-                hr_id=hr.id,
+                id=existing_company.id if existing_company else None,
+                hr_id=hr.profile_id,
                 company_name=data.company_name,
                 address=data.address,
                 industry=data.industry,
                 website=data.website,
                 description=data.description,
                 email=str(data.company_email) if data.company_email else None,
-                npwp_document_id=doc.id if doc else None,
+                npwp_document_id=doc.id if doc else (existing_company.npwp_document_id if existing_company else None),
                 verification_status=CompanyVerificationStatus.PENDING,
             )
             company = await uow.companies.save(company)
