@@ -25,8 +25,8 @@ class Settings(BaseSettings):
         return v
 
     BACKEND_URL: str = "http://localhost:8000"
-    BASE_URL: str = "http://localhost:5173"
-    FRONTEND_URL: str = "http://localhost:5173"
+    BASE_URL: str = "http://localhost:3000"
+    FRONTEND_URL: str = "http://localhost:3000"
     BREVO_API_KEY: str
     BREVO_SENDER_EMAIL: str = "noreply@ipb.ac.id"
     BREVO_SENDER_NAME: str = "IPB Internship Tracker"
