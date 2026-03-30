@@ -30,6 +30,13 @@ class StudentRegisterRequest(BaseModel):
             raise ValueError("NIM harus berformat 1 huruf + 10 digit (contoh: G6401231040).")
         return v.upper()
 
+    @field_validator("email")
+    @classmethod
+    def validate_student_email_domain(cls, v: EmailStr) -> EmailStr:
+        if not str(v).lower().endswith("@apps.ipb.ac.id"):
+            raise ValueError("Email student harus menggunakan domain @apps.ipb.ac.id.")
+        return v
+
 
 class HRRegisterRequest(BaseModel):
     full_name: str = Field(..., min_length=2, max_length=255)
