@@ -133,6 +133,26 @@ python -m app.db.seed
 # Run server
 uvicorn app.main:app --reload
 ```
+
+### 2a. Setup Backend (Docker Compose)
+```bash
+# dari folder backend
+cd backend
+cp .env.example .env
+# edit .env dan set DATABASE_URL ke host db
+# contoh: postgresql://ipb:ipb@db:5432/ipb_internship_tracker
+
+docker compose up --build
+```
+Pastikan variabel ini terisi: SECRET_KEY, BREVO_API_KEY, ADMIN_PASSWORD.
+
+```bash
+# Run migration (create tables)
+docker compose exec backend alembic upgrade head
+
+# Seed default admin account
+docker compose exec backend python -m app.db.seed
+```
 Backend running di: **http://localhost:8000**  
 API Docs: **http://localhost:8000/docs**
 
