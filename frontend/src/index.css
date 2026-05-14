@@ -30,3 +30,13 @@ label {
 .btn-secondary {
   @apply w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-300 disabled:opacity-50;
 }
+
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-strong-password-auto-fill-button {
+  display: none;
+}
