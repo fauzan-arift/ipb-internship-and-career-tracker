@@ -92,7 +92,7 @@ function Login() {
             </h1>
           </div>
 
-          <div onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <TextInput
               label="Email"
               type="email"
@@ -128,7 +128,7 @@ function Login() {
             <Button type="submit" variant="primary" fullWidth>
               Login
             </Button>
-          </div>
+          </form>
 
           <div
             style={{
