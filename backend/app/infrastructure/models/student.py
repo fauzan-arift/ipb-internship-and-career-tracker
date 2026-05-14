@@ -25,3 +25,4 @@ class StudentORM(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     user = relationship("UserORM", back_populates="student")
+    applications = relationship("ApplicationORM", back_populates="student", cascade="all, delete-orphan")
