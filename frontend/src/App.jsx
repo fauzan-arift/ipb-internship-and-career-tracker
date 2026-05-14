@@ -54,10 +54,10 @@ function App() {
           <Route path="/admin/perusahaan/:id" element={<HRDetail />} />
 
           <Route
-            path="/admin/pending"
+            path="/admin/dashboard"
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AppLayout><PendingList /></AppLayout>
+                <PendingList />
               </ProtectedRoute>
             }
           />
@@ -65,7 +65,7 @@ function App() {
             path="/admin/hr/profile/:hr_profile_id"
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AppLayout><HRDetail /></AppLayout>
+                <HRDetail />
               </ProtectedRoute>
             }
           />

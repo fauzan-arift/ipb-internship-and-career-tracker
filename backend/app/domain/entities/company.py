@@ -20,6 +20,7 @@ class Company(BaseModel):
     description: Optional[str] = None
     email: Optional[str] = None
     npwp_document_id: Optional[UUID] = None
+    photo_profile_id: Optional[UUID] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
