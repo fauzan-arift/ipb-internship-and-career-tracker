@@ -29,7 +29,7 @@ function getTagLabel(status) {
   return normalized;
 }
 
-function CariLowongan() {
+function InternshipSearch() {
   const navigate = useNavigate();
   const {
     internships,
@@ -101,7 +101,7 @@ function CariLowongan() {
                 location={item.location}
                 duration={item.duration}
                 deadline={item.deadline}
-                onDetailClick={() => navigate(`/lowongan/${item.id}`)}
+                onDetailClick={() => navigate(`/internship/${item.id}`)}
               />
             ))}
           </div>
@@ -111,4 +111,4 @@ function CariLowongan() {
   );
 }
 
-export default CariLowongan;
+export default InternshipSearch;

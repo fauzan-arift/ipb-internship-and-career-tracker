@@ -48,7 +48,7 @@ const Home = () => {
             {user.role === 'STUDENT' && (
               <div 
                 className="flex flex-col items-center p-6 bg-green-50 rounded-lg border border-green-200 cursor-pointer hover:bg-green-100 transition-colors"
-                onClick={() => navigate('/lowongan')}
+                onClick={() => navigate('/internship')}
               >
                 <span className="text-2xl mb-2">🎓</span>
                 <span className="font-semibold text-green-800">Cari Lowongan Magang</span>

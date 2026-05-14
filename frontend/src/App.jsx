@@ -11,7 +11,7 @@ import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
-import CariLowongan from '@/pages/mahasiswa/CariLowongan';
+import InternshipSearch from '@/pages/mahasiswa/InternshipSearch';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -71,10 +71,10 @@ function App() {
           />
 
           <Route
-            path="/lowongan"
+            path="/internship"
             element={
               <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
-                <AppLayout><CariLowongan /></AppLayout>
+                <AppLayout><InternshipSearch /></AppLayout>
               </ProtectedRoute>
             }
           />
