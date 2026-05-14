@@ -35,12 +35,23 @@ class InternshipService:
         company = await uow.companies.get_by_id(company_id)
         if not company:
             return None
+
+        photo_url = None
+        if company.photo_profile_id:
+            doc = await uow.documents.get_by_id(company.photo_profile_id)
+            if doc:
+                photo_url = doc.file_url
+
         return CompanySummary(
             id=company.id,
             company_name=company.company_name,
             industry=company.industry,
             address=company.address,
             website=company.website,
+            description=company.description,
+            email=company.email,
+            photo_profile_id=company.photo_profile_id,
+            photo_profile_url=photo_url,
         )
 
     # ==================== Student-facing ====================
@@ -86,6 +97,7 @@ class InternshipService:
     async def apply_to_internship(
         self,
         internship_id: UUID,
+        student_user_id: UUID,
         student_profile_id: UUID,
         submitted_cv_id: UUID,
     ) -> ApplicationResponse:
@@ -102,6 +114,14 @@ class InternshipService:
                     detail="Lowongan sudah melewati batas pendaftaran.",
                 )
 
+            # Critical business rule: student MUST have uploaded a CV to their profile
+            student = await uow.users.get_student_profile_by_user_id(student_user_id)
+            if not student or not student.cv_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Kamu harus mengupload CV di profil sebelum melamar lowongan.",
+                )
+
             # Check duplicate application
             existing = await uow.applications.get_by_student_and_internship(
                 student_profile_id, internship_id
@@ -112,7 +132,7 @@ class InternshipService:
                     detail="Kamu sudah mendaftar ke lowongan ini.",
                 )
 
-            # Validate the CV document belongs to the student
+            # Validate the submitted CV document exists
             cv_doc = await uow.documents.get_by_id(submitted_cv_id)
             if not cv_doc:
                 raise HTTPException(
