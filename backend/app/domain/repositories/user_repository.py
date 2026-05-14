@@ -41,6 +41,10 @@ class IUserRepository(ABC):
         ...
 
     @abstractmethod
+    async def get_student_profile_by_user_id(self, user_id: UUID) -> Optional[Student]:
+        ...
+
+    @abstractmethod
     async def get_admin_by_user_id(self, user_id: UUID) -> Optional[Admin]:
         ...
 
