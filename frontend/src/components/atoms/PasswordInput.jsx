@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
-function PasswordInput({ label, placeholder, value, onChange, hint, error, disabled = false }) {
+function PasswordInput({ label, placeholder, value, onChange, hint, error, disabled = false, ...rest }) {
   const [show, setShow] = useState(false);
 
   return (
@@ -32,6 +32,7 @@ function PasswordInput({ label, placeholder, value, onChange, hint, error, disab
             width: '100%',
             boxSizing: 'border-box',
           }}
+          {...rest}
         />
         <button
           type="button"

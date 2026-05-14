@@ -1,6 +1,6 @@
 import React from 'react';
 
-function TextInput({ label, placeholder, value, onChange, hint, error, type = 'text', disabled = false }) {
+function TextInput({ label, placeholder, value, onChange, hint, error, type = 'text', disabled = false, ...rest }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
@@ -28,6 +28,7 @@ function TextInput({ label, placeholder, value, onChange, hint, error, type = 't
           width: '100%',
           boxSizing: 'border-box',
         }}
+        {...rest}
       />
       {hint && !error && (
         <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
