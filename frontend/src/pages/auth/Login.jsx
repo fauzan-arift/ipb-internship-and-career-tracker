@@ -1,58 +1,160 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '@/api/axios';
-import { useAuth } from '@/hooks/useAuth';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Briefcase } from 'lucide-react';
+import Navbar from '@/components/organisms/Navbar';
+import PageFooter from '@/components/organisms/PageFooter';
+import TextInput from '@/components/atoms/TextInput';
+import PasswordInput from '@/components/atoms/PasswordInput';
+import Button from '@/components/atoms/Button';
 
-const Login = () => {
+function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      const res = await api.post('/auth/login', { email, password });
-      if (res.data.success) {
-        login(res.data.data.access_token);
-        // Force reload or redirect will happen in App.jsx based on role later
-        window.location.href = '/'; 
-      }
-    } catch (err) {
-      setError(err.response?.data?.detail || err.message || "Gagal Login");
-    } finally {
-      setIsLoading(false);
+  function validate() {
+    const newErrors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email) {
+      newErrors.email = 'Email wajib diisi';
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = 'Format email tidak valid';
     }
-  };
+
+    if (!password) {
+      newErrors.password = 'Password wajib diisi';
+    } else if (password.length < 6) {
+      newErrors.password = 'Password minimal 6 karakter';
+    }
+
+    return newErrors;
+  }
+
+  function onSubmitHandler(event) {
+    event.preventDefault();
+    const newErrors = validate();
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+
+    if (email === 'admin@ipb.ac.id') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/dashboard');
+    }
+  }
 
   return (
-    <div className="flex justify-center items-center min-h-[80vh]">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
-        
-        {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm">{error}</div>}
-        
-        <form onSubmit={handleSubmit} className="!p-0 !shadow-none !space-y-4">
-          <div>
-            <label>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+    <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
+      <Navbar variant="auth" />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '12px',
+            border: '1px solid #CBD0E0',
+            padding: '40px',
+            width: '100%',
+            maxWidth: '440px',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px', gap: '12px' }}>
+            <div
+              style={{
+                backgroundColor: '#EEF0FF',
+                borderRadius: '10px',
+                padding: '12px',
+                color: '#3D3FA8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Briefcase size={24} />
+            </div>
+            <h1
+              style={{
+                fontSize: '22px',
+                fontWeight: '700',
+                color: '#3D3FA8',
+                fontFamily: 'Inter, sans-serif',
+                margin: 0,
+              }}
+            >
+              IPB Internship Portal
+            </h1>
           </div>
-          <div>
-            <label>Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+
+          <form onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <TextInput
+              label="Email"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={errors.email}
+            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <PasswordInput
+                label="Password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
+              />
+              <div style={{ textAlign: 'right' }}>
+                {/* <Link
+                  to="/forgot-password"
+                  style={{
+                    fontSize: '13px',
+                    color: '#3D3FA8',
+                    fontFamily: 'Inter, sans-serif',
+                    textDecoration: 'none',
+                    fontWeight: '500',
+                  }}
+                >
+                  Lupa password?
+                </Link> */}
+              </div>
+            </div>
+
+            <Button type="submit" variant="primary" fullWidth>
+              Login
+            </Button>
+          </form>
+
+          <div
+            style={{
+              margin: '24px 0',
+              borderTop: '1px solid #CBD0E0',
+            }}
+          />
+
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+            <span style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+              Belum punya akun? Daftar sebagai
+            </span>
+            <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
+              <Button variant="primary" fullWidth onClick={() => navigate('/register/mahasiswa')}>
+                Mahasiswa
+              </Button>
+              <Button variant="primary" fullWidth onClick={() => navigate('/register/hr')}>
+                HR Perusahaan
+              </Button>
+            </div>
           </div>
-          <button type="submit" disabled={isLoading} className="btn-primary mt-4">
-            {isLoading ? 'Loading...' : 'Login'}
-          </button>
-        </form>
+        </div>
       </div>
+      <PageFooter />
     </div>
   );
-};
+}
 
 export default Login;
