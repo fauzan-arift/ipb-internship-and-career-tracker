@@ -1,6 +1,6 @@
 import api from '@/api/axios';
 
-const BASE_PATH = '/internships';
+const BASE_PATH = '/internships/';
 
 export const internshipService = {
   listActiveInternships: async ({ page = 1, limit = 20, search = '' } = {}) => {
