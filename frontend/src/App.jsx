@@ -11,7 +11,7 @@ import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
-import InternshipSearch from '@/pages/mahasiswa/InternshipSearch';
+import InternshipSearch from '@/pages/student/InternshipSearch';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
