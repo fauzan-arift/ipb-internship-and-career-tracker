@@ -75,6 +75,7 @@ async def apply_to_internship(
 
     return await svc.apply_to_internship(
         internship_id=internship_id,
+        student_user_id=current_user.id,
         student_profile_id=student.profile_id,
         submitted_cv_id=body.submitted_cv_id,
     )
