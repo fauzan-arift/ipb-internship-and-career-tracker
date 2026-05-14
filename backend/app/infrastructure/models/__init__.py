@@ -9,8 +9,11 @@ from app.infrastructure.models.company import CompanyORM
 from app.infrastructure.models.document import DocumentORM
 from app.infrastructure.models.email_notification import EmailNotificationORM
 from app.infrastructure.models.verification_token import VerificationTokenORM
+from app.infrastructure.models.internship import InternshipORM
+from app.infrastructure.models.application import ApplicationORM, ApplicationStatusHistoryORM
 
 __all__ = [
     "UserORM", "StudentORM", "HrORM", "AdminORM",
     "CompanyORM", "DocumentORM", "EmailNotificationORM", "VerificationTokenORM",
+    "InternshipORM", "ApplicationORM", "ApplicationStatusHistoryORM",
 ]
