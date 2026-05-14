@@ -85,7 +85,7 @@ const RegisterStudent = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionTitle}>Data Pribadi</p>
 
             <TextInput label="Nama Lengkap *" placeholder="Nama lengkap sesuai KTP"
@@ -136,7 +136,7 @@ const RegisterStudent = () => {
                 Login di sini
               </span>
             </p>
-          </form>
+          </div>
         </div>
       </div>
       <PageFooter />

@@ -88,7 +88,7 @@ const RegisterHR = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {/* Akun HR */}
             <p style={sectionTitle}>Data Akun HR</p>
             <div style={{ display: 'flex', gap: '12px' }}>
@@ -168,7 +168,7 @@ const RegisterHR = () => {
                 Login di sini
               </span>
             </p>
-          </form>
+          </div>
         </div>
       </div>
       <PageFooter />

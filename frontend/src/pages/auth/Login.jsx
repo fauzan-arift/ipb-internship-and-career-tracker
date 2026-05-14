@@ -48,7 +48,7 @@ function Login() {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       const role = payload?.role;
 
-      if (role === 'ADMIN') navigate('/admin/pending');
+      if (role === 'ADMIN') navigate('/admin/dashboard');
       else if (role === 'HR') navigate('/');
       else navigate('/');
     } catch (err) {
@@ -73,7 +73,7 @@ function Login() {
             </h1>
           </div>
 
-          <form onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <TextInput label="Email" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} error={errors.email} />
             <PasswordInput label="Password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
 
@@ -86,7 +86,7 @@ function Login() {
             <Button type="submit" variant="primary" fullWidth disabled={loading}>
               {loading ? 'Memproses...' : 'Login'}
             </Button>
-          </form>
+          </div>
 
           <div style={{ margin: '24px 0', borderTop: '1px solid #CBD0E0' }} />
 

@@ -10,8 +10,7 @@ import RegisterStudent from '@/pages/auth/RegisterStudent';
 import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
-import HRDetail from '@/pages/admin/HRDetail';
-import HistoryList from '@/pages/admin/HistoryList';
+import HRDetail from '@/pages/admin/HRDetail';import HistoryList from '@/pages/admin/HistoryList';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -50,6 +49,8 @@ function App() {
 
           {/* App Routes — dengan Navbar & footer */}
           <Route path="/" element={<AppLayout><Home /></AppLayout>} />
+          <Route path="/admin/dashboard" element={<PendingList />} />
+          <Route path="/admin/perusahaan/:id" element={<HRDetail />} />
 
           <Route
             path="/admin/pending"
