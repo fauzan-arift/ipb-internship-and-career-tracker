@@ -10,7 +10,7 @@ import RegisterStudent from '@/pages/auth/RegisterStudent';
 import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
-import HRDetail from '@/pages/admin/HRDetail';import HistoryList from '@/pages/admin/HistoryList';
+import HRDetail from '@/pages/admin/HRDetail';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -68,14 +68,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
+          {/* <Route
             path="/admin/history"
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
                 <AppLayout><HistoryList /></AppLayout>
               </ProtectedRoute>
             }
-          />
+          /> */}
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
