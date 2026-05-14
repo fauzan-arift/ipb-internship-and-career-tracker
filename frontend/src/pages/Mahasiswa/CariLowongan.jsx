@@ -1,60 +1,60 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '@/components/organisms/Sidebar';
-import SearchBar from '@/components/molecules/SearchBar'; 
+import SearchBar from '@/components/molecules/SearchBar';
 import InternshipCard from '@/components/molecules/InternshipCard';
+import { useInternships } from '@/hooks/useInternships';
 
-const dummyInternships = [
-  {
-    id: 1,
-    tags: ['Hybrid', 'Unpaid Internship'],
-    companyName: 'PT Tech Nusantara',
-    companyInitial: 'PTN',
-    position: 'Data Analyst',
-    location: 'Jakarta Selatan',
-    duration: '3 - 6 Bulan',
-    deadline: '12 Okt'
-  },
-  {
-    id: 2,
-    tags: ['WFH', 'Paid Internship'],
-    companyName: 'Agri Indo Group',
-    companyInitial: 'AIG',
-    position: 'Agronomy Researcher',
-    location: 'Jakarta Selatan',
-    duration: '3 - 6 Bulan',
-    deadline: '12 Okt'
-  },
-  {
-    id: 3,
-    tags: ['WFO', 'Unpaid Internship'],
-    companyName: 'Bank Sejahtera Bersama',
-    companyInitial: 'BSB',
-    position: 'Digital Marketing',
-    location: 'Jakarta Selatan',
-    duration: '3 - 6 Bulan',
-    deadline: '12 Okt'
-  },
-  {
-    id: 4,
-    tags: ['Hybrid', 'Unpaid Internship'],
-    companyName: 'PT Tech Nusantara',
-    companyInitial: 'PTN',
-    position: 'UI/UX Designer',
-    location: 'Jakarta Selatan',
-    duration: '3 - 6 Bulan',
-    deadline: '12 Okt'
-  }
-];
+function formatDateLabel(dateString) {
+  if (!dateString) return 'TBD';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+}
+
+function getCompanyInitial(name) {
+  if (!name) return '??';
+  return name
+    .split(' ')
+    .map((word) => word[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
+function getTagLabel(status) {
+  if (!status) return null;
+  const normalized = String(status).toUpperCase();
+  if (normalized === 'PAID') return 'Paid Internship';
+  if (normalized === 'UNPAID') return 'Unpaid Internship';
+  return normalized;
+}
 
 function CariLowongan() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const {
+    internships,
+    searchQuery,
+    setSearchQuery,
+    isLoading,
+    error,
+  } = useInternships();
 
-  const filteredData = dummyInternships.filter(item =>
-    item.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.companyName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const mappedInternships = internships.map((item) => ({
+    id: item.id,
+    tags: [
+      item.work_status || 'Unknown',
+      getTagLabel(item.payment_status),
+    ].filter(Boolean),
+    companyName: item.company?.company_name || 'Perusahaan Tidak Diketahui',
+    companyInitial: getCompanyInitial(item.company?.company_name || item.title),
+    position: item.title,
+    location: item.location || 'Lokasi tidak tersedia',
+    duration:
+      item.start_date && item.end_date
+        ? `${formatDateLabel(item.start_date)} - ${formatDateLabel(item.end_date)}`
+        : 'Durasi tidak tersedia',
+    deadline: formatDateLabel(item.close_date),
+  }));
 
   return (
     <div className="w-screen ml-[calc(50%-50vw)] overflow-x-hidden bg-[#F3F4FF]">
@@ -65,14 +65,33 @@ function CariLowongan() {
         <div className="flex-1 h-full overflow-y-auto p-6">
           <h1 className="text-2xl font-bold mb-4 text-gray-900">Cari Lowongan Magang</h1>
           <div className="mb-6 w-full">
-            <SearchBar 
-              value={searchQuery} 
-              onChange={(e) => setSearchQuery(e.target.value)} 
-              placeholder="Deskripsi search" 
+            <SearchBar
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari judul, perusahaan, atau lokasi"
             />
           </div>
+
+          {isLoading && (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-600 shadow-sm">
+              Memuat lowongan magang...
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 mb-6">
+              {error}
+            </div>
+          )}
+
+          {!isLoading && !error && mappedInternships.length === 0 && (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
+              Tidak ada lowongan magang yang sesuai.
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredData.map((item) => (
+            {mappedInternships.map((item) => (
               <InternshipCard
                 key={item.id}
                 tags={item.tags}
