@@ -1,5 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
+import logoIPB from '@/assets/logo-ipb.png';
 
 function Navbar({ variant = 'app', user, onLogout }) {
   if (variant === 'auth') {
@@ -14,9 +15,12 @@ function Navbar({ variant = 'app', user, onLogout }) {
           justifyContent: 'center',
         }}
       >
-        <span style={{ fontSize: '18px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif' }}>
-          IPB Internship Portal
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src={logoIPB} alt="IPB Logo" style={{ height: '28px', width: 'auto' }} />
+          <span style={{ fontSize: '18px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif' }}>
+            IPB Internship Portal
+          </span>
+        </div>
       </nav>
     );
   }
@@ -32,9 +36,12 @@ function Navbar({ variant = 'app', user, onLogout }) {
         justifyContent: 'space-between',
       }}
     >
-      <span style={{ fontSize: '18px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif' }}>
-        IPB Internship Portal
-      </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <img src={logoIPB} alt="IPB Logo" style={{ height: '28px', width: 'auto' }} />
+        <span style={{ fontSize: '18px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif' }}>
+          IPB Internship Portal
+        </span>
+      </div>
       {user && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
