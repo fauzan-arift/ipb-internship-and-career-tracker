@@ -5,6 +5,8 @@ from app.domain.unit_of_work import IUnitOfWork
 from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
 from app.infrastructure.repositories.company_repository import SQLAlchemyCompanyRepository
 from app.infrastructure.repositories.document_repository import SQLAlchemyDocumentRepository
+from app.infrastructure.repositories.internship_repository import SQLAlchemyInternshipRepository
+from app.infrastructure.repositories.application_repository import SQLAlchemyApplicationRepository
 
 
 class SQLAlchemyUnitOfWork(IUnitOfWork):
@@ -18,6 +20,8 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self.users = SQLAlchemyUserRepository(self._session)
         self.companies = SQLAlchemyCompanyRepository(self._session)
         self.documents = SQLAlchemyDocumentRepository(self._session)
+        self.internships = SQLAlchemyInternshipRepository(self._session)
+        self.applications = SQLAlchemyApplicationRepository(self._session)
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
