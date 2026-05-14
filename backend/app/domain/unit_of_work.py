@@ -9,12 +9,16 @@ if TYPE_CHECKING:
     from app.domain.repositories.user_repository import IUserRepository
     from app.domain.repositories.company_repository import ICompanyRepository
     from app.domain.repositories.document_repository import IDocumentRepository
+    from app.domain.repositories.internship_repository import IInternshipRepository
+    from app.domain.repositories.application_repository import IApplicationRepository
 
 
 class IUnitOfWork(ABC):
     users: "IUserRepository"
     companies: "ICompanyRepository"
     documents: "IDocumentRepository"
+    internships: "IInternshipRepository"
+    applications: "IApplicationRepository"
 
     @abstractmethod
     async def commit(self) -> None:

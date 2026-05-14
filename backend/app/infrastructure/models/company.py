@@ -35,3 +35,4 @@ class CompanyORM(Base):
 
     hr = relationship("HrORM", back_populates="company")
     npwp_document = relationship("DocumentORM", foreign_keys=[npwp_document_id])
+    internships = relationship("InternshipORM", back_populates="company", cascade="all, delete-orphan")

@@ -34,3 +34,22 @@ class EmailNotificationStatus(str, Enum):
 class TokenType(str, Enum):
     EMAIL_VERIFICATION = "EMAIL_VERIFICATION"
     PASSWORD_RESET = "PASSWORD_RESET"
+
+
+class WorkStatus(str, Enum):
+    WFO = "WFO"
+    WFA = "WFA"
+    HYBRID = "Hybrid"
+
+
+class PaymentStatus(str, Enum):
+    PAID = "Paid"
+    UNPAID = "Unpaid"
+
+
+class ApplicationStatus(str, Enum):
+    PENDING = "Pending"
+    REVIEWED = "Reviewed"
+    INTERVIEW = "Interview"
+    ACCEPTED = "Accepted"
+    REJECTED = "Rejected"
