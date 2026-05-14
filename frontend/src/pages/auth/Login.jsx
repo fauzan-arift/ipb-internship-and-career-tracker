@@ -92,7 +92,7 @@ function Login() {
             </h1>
           </div>
 
-          <form onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <TextInput
               label="Email"
               type="email"
@@ -109,8 +109,8 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 error={errors.password}
               />
-              <div style={{ textAlign: 'right' }}>
-                {/* <Link
+              {/* <div style={{ textAlign: 'right' }}>
+                <Link
                   to="/forgot-password"
                   style={{
                     fontSize: '13px',
@@ -121,14 +121,14 @@ function Login() {
                   }}
                 >
                   Lupa password?
-                </Link> */}
-              </div>
+                </Link>
+              </div> */}
             </div>
 
             <Button type="submit" variant="primary" fullWidth>
               Login
             </Button>
-          </form>
+          </div>
 
           <div
             style={{
