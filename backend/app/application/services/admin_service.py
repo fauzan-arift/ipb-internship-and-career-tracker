@@ -55,6 +55,10 @@ class AdminService:
                     "position": hr.position,
                     "company_name": company.company_name if company else None,
                     "status": user.status.value if user else None,
+                    "registered_at": (
+                        company.registration_date.isoformat()
+                        if company and company.registration_date else None
+                    ),
                     "verified_at": (
                         company.verified_at.isoformat()
                         if company and company.verified_at else None

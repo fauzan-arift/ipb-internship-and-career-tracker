@@ -6,6 +6,8 @@ import PageFooter from '@/components/organisms/PageFooter';
 import Button from '@/components/atoms/Button';
 import TextInput from '@/components/atoms/TextInput';
 import PasswordInput from '@/components/atoms/PasswordInput';
+import SelectInput from '@/components/atoms/SelectInput';
+import { IPB_FACULTIES } from '@/constants/ipbData';
 
 const RegisterStudent = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +20,17 @@ const RegisterStudent = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleFacultyChange = (e) => {
+    setFormData({ ...formData, faculty: e.target.value, major: '' });
+  };
+
+  const facultyOptions = IPB_FACULTIES.map(f => ({ label: f.name, value: f.name }));
+  
+  const selectedFaculty = IPB_FACULTIES.find(f => f.name === formData.faculty);
+  const majorOptions = selectedFaculty 
+    ? selectedFaculty.majors.map(m => ({ label: m, value: m }))
+    : [];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,11 +107,23 @@ const RegisterStudent = () => {
             <TextInput label="NIM * (contoh: G6401231040)" placeholder="G6401231040"
               value={formData.nim} onChange={handleChange} name="nim" required />
 
-            <TextInput label="Program Studi *" placeholder="Ilmu Komputer"
-              value={formData.major} onChange={handleChange} name="major" required />
+            <SelectInput 
+              label="Fakultas *" 
+              placeholder="Pilih Fakultas"
+              value={formData.faculty} 
+              onChange={handleFacultyChange} 
+              options={facultyOptions}
+            />
 
-            <TextInput label="Fakultas" placeholder="FMIPA"
-              value={formData.faculty} onChange={handleChange} name="faculty" />
+            <SelectInput 
+              label="Program Studi *" 
+              placeholder={formData.faculty ? "Pilih Program Studi" : "Pilih Fakultas terlebih dahulu"}
+              value={formData.major} 
+              onChange={handleChange} 
+              name="major"
+              options={majorOptions}
+              disabled={!formData.faculty}
+            />
 
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ flex: 1 }}>

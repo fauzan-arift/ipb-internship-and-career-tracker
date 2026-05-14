@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
-function SelectInput({ label, value, onChange, options = [], placeholder, hint, error, disabled = false }) {
+function SelectInput({ label, value, onChange, options = [], placeholder, hint, error, disabled = false, name }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
@@ -11,6 +11,7 @@ function SelectInput({ label, value, onChange, options = [], placeholder, hint, 
       )}
       <div style={{ position: 'relative' }}>
         <select
+          name={name}
           value={value}
           onChange={onChange}
           disabled={disabled}
