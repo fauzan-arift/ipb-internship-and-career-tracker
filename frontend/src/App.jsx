@@ -12,6 +12,7 @@ import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
 import CariLowongan from '@/pages/mahasiswa/CariLowongan';
+import InternshipDetail from '@/pages/mahasiswa/InternshipDetail'; 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -79,6 +80,15 @@ function App() {
             }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
+          
+          <Route
+            path="/lowongan/:internship_id"
+            element={
+              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
+                <AppLayout><InternshipDetail /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
