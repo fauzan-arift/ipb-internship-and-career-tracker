@@ -11,6 +11,7 @@ import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
+import InternshipSearch from '@/pages/student/InternshipSearch';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -26,7 +27,7 @@ function AppLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="grow container mx-auto px-4 sm:px-6 lg:px-8">
         {children}
       </main>
       <footer className="bg-white text-center py-4 text-sm text-gray-500 mt-auto border-t">
@@ -46,7 +47,7 @@ function App() {
           <Route path="/register/student" element={<RegisterStudent />} />
           <Route path="/register/hr" element={<RegisterHR />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-
+          
           {/* App Routes — dengan Navbar & footer */}
           <Route path="/" element={<AppLayout><Home /></AppLayout>} />
           <Route path="/admin/dashboard" element={<PendingList />} />
@@ -69,6 +70,14 @@ function App() {
             }
           />
 
+          <Route
+            path="/internship"
+            element={
+              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
+                <AppLayout><InternshipSearch /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom'; 
 
 const Home = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <div className="text-center py-12">Loading...</div>;
@@ -43,19 +45,22 @@ const Home = () => {
             </>
           )}
 
-          {user.role === 'STUDENT' && (
-            <div className="flex flex-col items-center p-6 bg-green-50 rounded-lg border border-green-200">
-              <span className="text-2xl mb-2">🎓</span>
-              <span className="font-semibold text-green-800">Cari Lowongan Magang (Coming Soon)</span>
-            </div>
-          )}
+            {user.role === 'STUDENT' && (
+              <div 
+                className="flex flex-col items-center p-6 bg-green-50 rounded-lg border border-green-200 cursor-pointer hover:bg-green-100 transition-colors"
+                onClick={() => navigate('/internship')}
+              >
+                <span className="text-2xl mb-2">🎓</span>
+                <span className="font-semibold text-green-800">Cari Lowongan Magang</span>
+              </div>
+            )}
 
-          {user.role === 'HR' && (
-            <div className="flex flex-col items-center p-6 bg-purple-50 rounded-lg border border-purple-200">
-              <span className="text-2xl mb-2">🏢</span>
-              <span className="font-semibold text-purple-800">Pasang Lowongan (Coming Soon)</span>
-            </div>
-          )}
+            {user.role === 'HR' && (
+              <div className="flex flex-col items-center p-6 bg-purple-50 rounded-lg border border-purple-200 cursor-pointer hover:bg-purple-100 transition-colors">
+                <span className="text-2xl mb-2">🏢</span>
+                <span className="font-semibold text-purple-800">Pasang Lowongan (Coming Soon)</span>
+              </div>
+            )}
         </div>
       </div>
     </div>
