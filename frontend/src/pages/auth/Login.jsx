@@ -1,16 +1,36 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Briefcase } from 'lucide-react';
 import Navbar from '@/components/organisms/Navbar';
 import PageFooter from '@/components/organisms/PageFooter';
 import TextInput from '@/components/atoms/TextInput';
 import PasswordInput from '@/components/atoms/PasswordInput';
 import Button from '@/components/atoms/Button';
+import api from '@/api/axios';
+
+// Decode JWT payload tanpa library eksternal
+function parseJwt(token) {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(
+      decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+    );
+  } catch {
+    return null;
+  }
+}
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   function validate() {
@@ -32,7 +52,7 @@ function Login() {
     return newErrors;
   }
 
-  function onSubmitHandler(event) {
+  async function onSubmitHandler(event) {
     event.preventDefault();
     const newErrors = validate();
 
@@ -42,11 +62,33 @@ function Login() {
     }
 
     setErrors({});
+    setApiError('');
+    setLoading(true);
 
-    if (email === 'admin@ipb.ac.id') {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/dashboard');
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const token = response.data.data.access_token;
+
+      // Simpan token ke localStorage
+      localStorage.setItem('token', token);
+
+      // Decode role dari JWT
+      const payload = parseJwt(token);
+      const role = payload?.role;
+
+      // Navigasi berdasarkan role
+      if (role === 'ADMIN') {
+        navigate('/admin/dashboard');
+      } else if (role === 'HR') {
+        navigate('/hr/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      const msg = err.response?.data?.detail || 'Terjadi kesalahan. Coba lagi.';
+      setApiError(msg);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -109,24 +151,27 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 error={errors.password}
               />
-              {/* <div style={{ textAlign: 'right' }}>
-                <Link
-                  to="/forgot-password"
-                  style={{
-                    fontSize: '13px',
-                    color: '#3D3FA8',
-                    fontFamily: 'Inter, sans-serif',
-                    textDecoration: 'none',
-                    fontWeight: '500',
-                  }}
-                >
-                  Lupa password?
-                </Link>
-              </div> */}
             </div>
 
-            <Button type="submit" variant="primary" fullWidth>
-              Login
+            {/* API Error */}
+            {apiError && (
+              <div
+                style={{
+                  backgroundColor: '#FEE2E2',
+                  border: '1px solid #FECACA',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  color: '#DC2626',
+                  fontSize: '13px',
+                  fontFamily: 'Inter, sans-serif',
+                }}
+              >
+                {apiError}
+              </div>
+            )}
+
+            <Button type="submit" variant="primary" fullWidth disabled={loading}>
+              {loading ? 'Memproses...' : 'Login'}
             </Button>
           </form>
 
