@@ -2,93 +2,99 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
 
-// Components
-import Navbar from '@/components/Navbar';
-import Home from '@/pages/Home';
+// Layouts
+import DashboardLayout from '@/layouts/DashboardLayout';
+import PublicLayout from '@/layouts/PublicLayout';
+
+// Pages — Auth
 import Login from '@/pages/auth/Login';
 import RegisterStudent from '@/pages/auth/RegisterStudent';
 import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
+
+// Pages — Public/Home
+import Home from '@/pages/Home';
+
+// Pages — Admin
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
+
+// Pages — Student
 import CariLowongan from '@/pages/mahasiswa/CariLowongan';
-import InternshipDetail from '@/pages/mahasiswa/InternshipDetail'; 
+import InternshipDetail from '@/pages/mahasiswa/InternshipDetail';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) return <div className="text-center mt-10">Loading auth state...</div>;
+  if (isLoading) return <div className="text-center mt-10">Loading...</div>;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
-
   return children;
 };
-
-function AppLayout({ children }) {
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
-      <Navbar />
-      <main className="grow container mx-auto px-4 sm:px-6 lg:px-8">
-        {children}
-      </main>
-      <footer className="bg-white text-center py-4 text-sm text-gray-500 mt-auto border-t">
-        &copy; 2026 IPB Internship Portal
-      </footer>
-    </div>
-  );
-}
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Auth Routes — tanpa Navbar & footer App */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register/student" element={<RegisterStudent />} />
-          <Route path="/register/hr" element={<RegisterHR />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          
-          {/* App Routes — dengan Navbar & footer */}
-          <Route path="/" element={<AppLayout><Home /></AppLayout>} />
-          <Route path="/admin/dashboard" element={<PendingList />} />
-          <Route path="/admin/perusahaan/:id" element={<HRDetail />} />
 
-          <Route
-            path="/admin/dashboard"
+          {/* ── Auth pages (no sidebar, centered header) ── */}
+          <Route path="/login"              element={<PublicLayout><Login /></PublicLayout>} />
+          <Route path="/register/student"   element={<PublicLayout><RegisterStudent /></PublicLayout>} />
+          <Route path="/register/hr"        element={<PublicLayout><RegisterHR /></PublicLayout>} />
+          <Route path="/verify-email"       element={<PublicLayout><VerifyEmail /></PublicLayout>} />
+
+          {/* ── Public home (header + footer, no sidebar) ── */}
+          <Route path="/"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <PendingList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/hr/profile/:hr_profile_id"
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <HRDetail />
-              </ProtectedRoute>
+              <PublicLayout>
+                <Home />
+              </PublicLayout>
             }
           />
 
-          <Route
-            path="/lowongan"
+          {/* ── Admin pages ── */}
+          <Route path="/admin/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
-                <AppLayout><CariLowongan /></AppLayout>
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <DashboardLayout role="admin">
+                  <PendingList />
+                </DashboardLayout>
               </ProtectedRoute>
             }
           />
+          <Route path="/admin/hr/profile/:hr_profile_id"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <DashboardLayout role="admin">
+                  <HRDetail />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ── Student pages ── */}
+          <Route path="/lowongan"
+            element={
+              // <ProtectedRoute allowedRoles={['MAHASISWA']}>
+                <DashboardLayout role="student">
+                  <CariLowongan />
+                </DashboardLayout>
+              // </ProtectedRoute>
+            }
+          />
+          <Route path="/lowongan/:internship_id"
+            element={
+              // <ProtectedRoute allowedRoles={['MAHASISWA']}>
+                <DashboardLayout role="student">
+                  <InternshipDetail />
+                </DashboardLayout>
+              // </ProtectedRoute>
+            }
+          />
+
+          {/* ── Fallback ── */}
           <Route path="*" element={<Navigate to="/" replace />} />
-          
-          <Route
-            path="/lowongan/:internship_id"
-            element={
-              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
-                <AppLayout><InternshipDetail /></AppLayout>
-              </ProtectedRoute>
-            }
-          />
+
         </Routes>
       </AuthProvider>
     </BrowserRouter>

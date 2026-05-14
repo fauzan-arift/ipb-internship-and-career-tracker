@@ -1,114 +1,88 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '@/components/organisms/Sidebar';
 import SearchBar from '@/components/molecules/SearchBar';
 import InternshipCard from '@/components/molecules/InternshipCard';
 import { useInternships } from '@/hooks/useInternships';
 
 function formatDateLabel(dateString) {
   if (!dateString) return 'TBD';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+  return new Date(dateString).toLocaleDateString('id-ID', {
+    day: '2-digit', month: 'short',
+  });
 }
 
 function getCompanyInitial(name) {
   if (!name) return '??';
-  return name
-    .split(' ')
-    .map((word) => word[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  return name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
 function getTagLabel(status) {
   if (!status) return null;
-  const normalized = String(status).toUpperCase();
-  if (normalized === 'PAID') return 'Paid Internship';
-  if (normalized === 'UNPAID') return 'Unpaid Internship';
-  return normalized;
+  const n = String(status).toUpperCase();
+  if (n === 'PAID')   return 'Paid Internship';
+  if (n === 'UNPAID') return 'Unpaid Internship';
+  return n;
 }
 
-function CariLowongan() {
+export default function CariLowongan() {
   const navigate = useNavigate();
-  const {
-    internships,
-    searchQuery,
-    setSearchQuery,
-    isLoading,
-    error,
-  } = useInternships();
+  const { internships, searchQuery, setSearchQuery, isLoading, error } = useInternships();
 
   const mappedInternships = internships.map((item) => ({
-    id: item.id,
-    tags: [
-      item.work_status || 'Unknown',
-      getTagLabel(item.payment_status),
-    ].filter(Boolean),
-    companyName: item.company?.company_name || 'Perusahaan Tidak Diketahui',
+    id:             item.id,
+    tags:           [item.work_status, getTagLabel(item.payment_status)].filter(Boolean),
+    companyName:    item.company?.company_name || 'Perusahaan Tidak Diketahui',
     companyInitial: getCompanyInitial(item.company?.company_name || item.title),
-    position: item.title,
-    location: item.location || 'Lokasi tidak tersedia',
-    duration:
-      item.start_date && item.end_date
-        ? `${formatDateLabel(item.start_date)} - ${formatDateLabel(item.end_date)}`
-        : 'Durasi tidak tersedia',
-    deadline: formatDateLabel(item.close_date),
+    position:       item.title,
+    location:       item.location || 'Lokasi tidak tersedia',
+    duration:       item.start_date && item.end_date
+                      ? `${formatDateLabel(item.start_date)} - ${formatDateLabel(item.end_date)}`
+                      : 'Durasi tidak tersedia',
+    deadline:       formatDateLabel(item.close_date),
   }));
 
   return (
-    <div className="w-screen ml-[calc(50%-50vw)] overflow-x-hidden bg-[#F3F4FF]">
-      <div className="flex w-full h-screen">
-        <div className="hidden md:block w-64 shrink-0 bg-[#F8F9FE] border-r border-gray-200 h-full">
-          <Sidebar activeMenu="Lowongan Magang" />
+    // ✅ Just content — no sidebar, no h-screen, no overflow-y-auto
+    <div>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px', color: '#111827' }}>
+        Cari Lowongan Magang
+      </h1>
+
+      <div style={{ marginBottom: '24px' }}>
+        <SearchBar
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Cari judul, perusahaan, atau lokasi"
+        />
+      </div>
+
+      {isLoading && (
+        <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px', textAlign: 'center', color: '#6B7280' }}>
+          Memuat lowongan magang...
         </div>
-        <div className="flex-1 h-full overflow-y-auto p-6">
-          <h1 className="text-2xl font-bold mb-4 text-gray-900">Cari Lowongan Magang</h1>
-          <div className="mb-6 w-full">
-            <SearchBar
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari judul, perusahaan, atau lokasi"
-            />
-          </div>
+      )}
 
-          {isLoading && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-600 shadow-sm">
-              Memuat lowongan magang...
-            </div>
-          )}
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 mb-6">
-              {error}
-            </div>
-          )}
-
-          {!isLoading && !error && mappedInternships.length === 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
-              Tidak ada lowongan magang yang sesuai.
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {mappedInternships.map((item) => (
-              <InternshipCard
-                key={item.id}
-                tags={item.tags}
-                companyName={item.companyName}
-                companyInitial={item.companyInitial}
-                position={item.position}
-                location={item.location}
-                duration={item.duration}
-                deadline={item.deadline}
-                onDetailClick={() => navigate(`/lowongan/${item.id}`)}
-              />
-            ))}
-          </div>
+      {error && (
+        <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#B91C1C', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+          {error}
         </div>
+      )}
+
+      {!isLoading && !error && mappedInternships.length === 0 && (
+        <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px', textAlign: 'center', color: '#6B7280' }}>
+          Tidak ada lowongan magang yang sesuai.
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
+        {mappedInternships.map((item) => (
+          <InternshipCard
+            key={item.id}
+            {...item}
+            onDetailClick={() => navigate(`/lowongan/${item.id}`)}
+          />
+        ))}
       </div>
     </div>
   );
 }
-
-export default CariLowongan;
