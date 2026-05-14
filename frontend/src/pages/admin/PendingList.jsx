@@ -1,11 +1,34 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Building2, CheckCircle, ClipboardList } from 'lucide-react';
 import api from '@/api/axios';
+import Navbar from '@/components/organisms/Navbar';
+import PageFooter from '@/components/organisms/PageFooter';
+import DashboardStatsRow from '@/components/organisms/DashboardStatsRow';
+import DataTable from '@/components/organisms/DataTable';
+import SearchBar from '@/components/molecules/SearchBar';
+import Button from '@/components/atoms/Button';
+
+const COLUMNS = [
+  { key: 'name', label: 'Nama Perusahaan' },
+  { key: 'industry', label: 'Industri' },
+  { key: 'status', label: 'Status Verifikasi' },
+  { key: 'createdAt', label: 'Tanggal Registrasi' },
+  { key: 'action', label: 'Aksi' },
+];
+
+const STATS = [
+  { label: 'TOTAL PERUSAHAAN', value: 150, icon: <Building2 size={22} /> },
+  { label: 'TERVERIFIKASI', value: 120, icon: <CheckCircle size={22} /> },
+  { label: 'BELUM VERIFIKASI', value: 30, icon: <ClipboardList size={22} /> },
+];
 
 const PendingList = () => {
   const [hrs, setHrs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPending = async () => {
@@ -23,44 +46,139 @@ const PendingList = () => {
     fetchPending();
   }, []);
 
+  function onSearchChange(event) {
+    setSearch(event.target.value);
+  }
+
+  function onActionHandler(action, company) {
+    if (action === 'detail') {
+      navigate(`/admin/hr/profile/${company.id}`);
+    }
+  }
+
+  function onLogout() {
+    navigate('/login');
+  }
+
+  const tableData = hrs
+    .filter((hr) =>
+      hr.company_name.toLowerCase().includes(search.toLowerCase())
+    )
+    .map((hr) => ({
+      id: hr.hr_profile_id || hr.hr_id,
+      name: hr.company_name,
+      industry: hr.position || '-',
+      status: 'pending',
+      createdAt: new Date(hr.registered_at).toLocaleDateString('id-ID'),
+    }));
+
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <h2 className="text-2xl font-bold mb-6">Daftar Pendaftaran HR (Menunggu Verifikasi)</h2>
-      
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-      
-      {isLoading ? (
-        <p>Loading data...</p>
-      ) : hrs.length === 0 ? (
-        <p className="bg-white p-6 rounded shadow text-center text-gray-500">Tidak ada pendaftaran HR yang pending saat ini.</p>
-      ) : (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama HR</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Perusahaan</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Daftar</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {hrs.map((hr) => (
-                <tr key={hr.hr_profile_id || hr.hr_id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{hr.full_name} <br/><span className="text-xs text-gray-500 font-normal">{hr.position || '-'}</span></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{hr.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{hr.company_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(hr.registered_at).toLocaleDateString('id-ID')}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link to={`/admin/hr/profile/${hr.hr_profile_id || hr.hr_id}`} className="text-blue-600 hover:text-blue-900 font-bold">Lihat Detail</Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
+      <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
+      <div
+        style={{
+          flex: 1,
+          padding: '32px 40px',
+          maxWidth: '1200px',
+          width: '100%',
+          margin: '0 auto',
+          boxSizing: 'border-box',
+        }}
+      >
+        <h1
+          style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#1A1A2E',
+            fontFamily: 'Inter, sans-serif',
+            marginBottom: '24px',
+          }}
+        >
+          Dashboard
+        </h1>
+
+        <DashboardStatsRow stats={STATS} />
+
+        <div style={{ marginTop: '24px' }}>
+          <SearchBar
+            value={search}
+            onChange={onSearchChange}
+            placeholder="Cari nama perusahaan..."
+          />
         </div>
-      )}
+
+        {error && (
+          <div
+            style={{
+              marginTop: '16px',
+              padding: '12px 16px',
+              backgroundColor: '#FDECEA',
+              color: '#8B1A1A',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontFamily: 'Inter, sans-serif',
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        <div
+          style={{
+            marginTop: '24px',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '12px',
+            border: '1px solid #CBD0E0',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: '16px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid #CBD0E0',
+            }}
+          >
+            <span
+              style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1A1A2E',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              Daftar Perusahaan Terbaru
+            </span>
+            <Button variant="primary" size="sm" onClick={() => alert('Coming soon')}>
+              Filter
+            </Button>
+          </div>
+
+          {isLoading ? (
+            <div
+              style={{
+                padding: '40px',
+                textAlign: 'center',
+                fontSize: '14px',
+                color: '#6B7280',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              Memuat data...
+            </div>
+          ) : (
+            <DataTable
+              columns={COLUMNS}
+              data={tableData}
+              onAction={onActionHandler}
+              emptyMessage="Tidak ada perusahaan ditemukan"
+            />
+          )}
+        </div>
+      </div>
+      <PageFooter />
     </div>
   );
 };

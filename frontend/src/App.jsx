@@ -11,7 +11,6 @@ import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
-import HistoryList from '@/pages/admin/HistoryList';
 import CariLowongan from '@/pages/mahasiswa/CariLowongan';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -51,7 +50,9 @@ function App() {
           
           {/* App Routes — dengan Navbar & footer */}
           <Route path="/" element={<AppLayout><Home /></AppLayout>} />
-        
+          <Route path="/admin/dashboard" element={<PendingList />} />
+          <Route path="/admin/perusahaan/:id" element={<HRDetail />} />
+
           <Route
             path="/admin/pending"
             element={
@@ -68,14 +69,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/admin/history"
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AppLayout><HistoryList /></AppLayout>
-              </ProtectedRoute>
-            }
-          />
+
           <Route
             path="/lowongan"
             element={

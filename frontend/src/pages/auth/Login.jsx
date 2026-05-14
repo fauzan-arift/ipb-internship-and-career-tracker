@@ -48,7 +48,7 @@ function Login() {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       const role = payload?.role;
 
-      if (role === 'ADMIN') navigate('/admin/pending');
+      if (role === 'ADMIN') navigate('/admin/dashboard');
       else if (role === 'HR') navigate('/');
       else navigate('/');
     } catch (err) {

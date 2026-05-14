@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Building2, CheckCircle, XCircle } from 'lucide-react';
 import api from '@/api/axios';
+import Navbar from '@/components/organisms/Navbar';
+import PageFooter from '@/components/organisms/PageFooter';
+import DetailPageHeader from '@/components/organisms/DetailPageHeader';
+import TwoColumnDetailLayout from '@/components/organisms/TwoColumnDetailLayout';
+import InfoSectionCard from '@/components/organisms/InfoSectionCard';
+import InfoGrid from '@/components/organisms/InfoGrid';
+import HRDInfoCard from '@/components/organisms/HRDInfoCard';
+import DocumentsCard from '@/components/organisms/DocumentsCard';
+import DescriptionBox from '@/components/atoms/DescriptionBox';
+import Button from '@/components/atoms/Button';
 
 const HRDetail = () => {
   const { hr_profile_id } = useParams();
@@ -34,7 +45,7 @@ const HRDetail = () => {
     try {
       const res = await api.post(`/admin/hr/profile/${profileId}/approve`);
       setStatus({ type: 'success', msg: res.data.message });
-      setTimeout(() => navigate('/admin/pending'), 2000);
+      setTimeout(() => navigate('/admin/dashboard'), 2000);
     } catch (err) {
       setStatus({ type: 'error', msg: err.response?.data?.detail || 'Gagal menyetujui' });
       setIsProcessing(false);
@@ -42,119 +53,166 @@ const HRDetail = () => {
   };
 
   const handleReject = async () => {
-    const reason = window.prompt("Alasan penolakan (akan dikirim via email):");
-    if (!reason || reason.trim() === "") return;
-    
+    const reason = window.prompt('Alasan penolakan (akan dikirim via email):');
+    if (!reason || reason.trim() === '') return;
     setIsProcessing(true);
     setStatus({ type: '', msg: '' });
     try {
       const res = await api.post(`/admin/hr/profile/${profileId}/reject`, { reason });
       setStatus({ type: 'success', msg: res.data.message });
-      setTimeout(() => navigate('/admin/pending'), 2000);
+      setTimeout(() => navigate('/admin/dashboard'), 2000);
     } catch (err) {
       setStatus({ type: 'error', msg: err.response?.data?.detail || 'Gagal menolak' });
       setIsProcessing(false);
     }
   };
 
-  if (isLoading) return <div className="text-center py-10">Loading detail...</div>;
-  if (!detail) return <div className="text-center py-10 text-red-500">{status.msg}</div>;
+  function onLogout() {
+    navigate('/login');
+  }
+
+  if (isLoading) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
+        <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+            Memuat detail...
+          </span>
+        </div>
+        <PageFooter />
+      </div>
+    );
+  }
+
+  if (!detail) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
+        <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '14px', color: '#8B1A1A', fontFamily: 'Inter, sans-serif' }}>
+            {status.msg}
+          </span>
+        </div>
+        <PageFooter />
+      </div>
+    );
+  }
+
+  const isPending = detail.hr?.status?.toLowerCase() === 'pending';
+  const isVerified = detail.hr?.status?.toLowerCase() === 'approved';
+
+  const infoFields = [
+    { label: 'Nama Perusahaan', value: detail.company?.company_name },
+    { label: 'Industri', value: detail.company?.industry },
+    { label: 'Email Kontak', value: detail.company?.company_email },
+    { label: 'Website', value: detail.company?.website },
+    { label: 'Alamat Lengkap', value: detail.company?.address },
+  ];
+
+  const documents = detail.npwp_document
+    ? [
+        {
+          name: detail.npwp_document.file_name,
+          format: `FORMAT ${detail.npwp_document.file_format?.toUpperCase()}`,
+          date: `Diunggah: ${detail.npwp_document.uploaded_at || '-'}`,
+          href: detail.npwp_document.download_url,
+        },
+      ]
+    : [];
+
+  const headerActions = (
+    <div style={{ display: 'flex', gap: '10px' }}>
+      {isPending ? (
+        <>
+          <Button
+            variant="primary"
+            disabled={isProcessing || status.type === 'success'}
+            onClick={handleApprove}
+          >
+            <CheckCircle size={16} />
+            Verifikasi
+          </Button>
+          <Button
+            variant="danger"
+            disabled={isProcessing || status.type === 'success'}
+            onClick={handleReject}
+          >
+            <XCircle size={16} />
+            Tolak
+          </Button>
+        </>
+      ) : (
+        <Button variant="primary" disabled>
+          <CheckCircle size={16} />
+          {detail.hr?.status?.toUpperCase()}
+        </Button>
+      )}
+    </div>
+  );
 
   return (
-    <div className="max-w-4xl mx-auto py-8 space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Detail Pendaftaran HR</h2>
-        <button onClick={() => navigate(-1)} className="text-blue-600 hover:underline">← Kembali</button>
-      </div>
-
-      {status.msg && (
-        <div className={`p-4 rounded ${status.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-          {status.msg}
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-bold border-b pb-2 mb-4">Informasi HR (Pengguna)</h3>
-          <ul className="space-y-2 text-sm">
-            <li><strong>ID User:</strong> {detail.hr?.user_id || '-'}</li>
-            <li><strong>ID Profil HR:</strong> {detail.hr?.hr_profile_id || detail.hr?.hr_id || '-'}</li>
-            <li><strong>Nama:</strong> {detail.hr?.full_name}</li>
-            <li><strong>Email:</strong> {detail.hr?.email}</li>
-            <li><strong>Jabatan:</strong> {detail.hr?.position || '-'}</li>
-          </ul>
-        </div>
-
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-bold border-b pb-2 mb-4">Informasi Perusahaan</h3>
-          <ul className="space-y-2 text-sm">
-            <li><strong>Nama Perusahaan:</strong> {detail.company?.company_name}</li>
-            <li><strong>Email:</strong> {detail.company?.company_email || '-'}</li>
-            <li><strong>Industri:</strong> {detail.company?.industry || '-'}</li>
-            <li><strong>Website:</strong> {detail.company?.website ? <a href={detail.company.website} target="_blank" className="text-blue-500 hover:underline">{detail.company.website}</a> : '-'}</li>
-            <li><strong>Alamat:</strong> {detail.company?.address || '-'}</li>
-            <li><strong>Deskripsi:</strong> {detail.company?.description || '-'}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="bg-white p-6 rounded shadow flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-bold">Dokumen NPWP</h3>
-          <p className="text-sm text-gray-600 mb-2">Nama File: {detail.npwp_document?.file_name} ({detail.npwp_document?.file_format})</p>
-          <a
-            href={detail.npwp_document?.download_url} 
-            target="_blank" rel="noreferrer"
-            className="text-blue-600 hover:underline font-semibold text-sm inline-block mb-3"
+    <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
+      <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
+      <div
+        style={{
+          flex: 1,
+          padding: '32px 40px',
+          maxWidth: '1200px',
+          width: '100%',
+          margin: '0 auto',
+          boxSizing: 'border-box',
+        }}
+      >
+        {status.msg && (
+          <div
+            style={{
+              marginBottom: '16px',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              backgroundColor: status.type === 'error' ? '#FDECEA' : '#D6F5E3',
+              color: status.type === 'error' ? '#8B1A1A' : '#1A6B3A',
+              fontSize: '14px',
+              fontFamily: 'Inter, sans-serif',
+            }}
           >
-            Buka Dokumen di Tab Baru ↗
-          </a>
-          
-          <div className="mt-2 text-center rounded bg-gray-50 flex items-center justify-center p-2 border border-gray-200" style={{ minHeight: '300px' }}>
-            {(() => {
-              const format = detail.npwp_document?.file_format?.toLowerCase()?.replace('.', '') || '';
-              if (format === 'pdf') {
-                return (
-                  <iframe 
-                    src={detail.npwp_document?.download_url} 
-                    className="w-full h-96 border-0" 
-                    title="Preview PDF NPWP"
-                  />
-                );
-              } else if (['jpg', 'jpeg', 'png', 'webp'].includes(format)) {
-                return (
-                  <img 
-                    src={detail.npwp_document?.download_url} 
-                    alt="Preview NPWP" 
-                    className="max-w-full h-auto max-h-96 object-contain"
-                  />
-                );
-              } else {
-                return (
-                  <span className="text-gray-400 italic">Preview tidak tersedia untuk format {detail.npwp_document?.file_format || 'tidak diketahui'}</span>
-                );
-              }
-            })()}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex space-x-4 pt-4 border-t">
-        {detail.hr?.status?.toLowerCase() === 'pending' ? (
-          <>
-            <button onClick={handleApprove} disabled={isProcessing || status.type === 'success'} className="btn-primary !w-auto bg-green-600 hover:bg-green-700">
-              Setujui Pendaftaran (Approve)
-            </button>
-            <button onClick={handleReject} disabled={isProcessing || status.type === 'success'} className="btn-secondary !w-auto bg-red-100 text-red-700 hover:bg-red-200">
-              Tolak Pendaftaran (Reject)
-            </button>
-          </>
-        ) : (
-          <div className="text-gray-500 font-semibold italic">
-            HR ini sudah diproses dan berstatus: {detail.hr?.status?.toUpperCase()}
+            {status.msg}
           </div>
         )}
+
+        <DetailPageHeader
+          name={detail.company?.company_name}
+          badge={isVerified ? 'Terverifikasi' : 'Belum Diverifikasi'}
+          badgeVariant={isVerified ? 'green' : 'yellow'}
+          date={detail.hr?.registered_at
+            ? new Date(detail.hr.registered_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '-'
+          }
+          onBack={() => navigate('/admin/dashboard')}
+          actions={headerActions}
+        />
+
+        <TwoColumnDetailLayout
+          left={
+            <>
+              <InfoSectionCard title="Informasi Perusahaan" icon={<Building2 size={18} />}>
+                <InfoGrid fields={infoFields} />
+                <DescriptionBox label="Deskripsi Perusahaan" value={detail.company?.description} />
+              </InfoSectionCard>
+              <DocumentsCard documents={documents} />
+            </>
+          }
+          right={
+            <HRDInfoCard
+              name={detail.hr?.full_name}
+              position={detail.hr?.position}
+              email={detail.hr?.email}
+              phone={detail.hr?.phone}
+            />
+          }
+        />
       </div>
+      <PageFooter />
     </div>
   );
 };
