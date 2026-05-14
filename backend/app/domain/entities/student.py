@@ -17,5 +17,7 @@ class Student(User):
     gpa: Optional[float] = None
     phone_number: Optional[str] = None
     skills: List[str] = []
+    cv_id: Optional[UUID] = None
+    photo_profile_id: Optional[UUID] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
