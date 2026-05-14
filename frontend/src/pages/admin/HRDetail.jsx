@@ -100,7 +100,7 @@ const HRDetail = () => {
   }
 
   const isPending = detail.hr?.status?.toLowerCase() === 'pending';
-  const isVerified = detail.hr?.status?.toLowerCase() === 'approved';
+  const isVerified = detail.hr?.status?.toLowerCase() === 'verified';
 
   const infoFields = [
     { label: 'Nama Perusahaan', value: detail.company?.company_name },
@@ -115,7 +115,7 @@ const HRDetail = () => {
         {
           name: detail.npwp_document.file_name,
           format: `FORMAT ${detail.npwp_document.file_format?.toUpperCase()}`,
-          date: `Diunggah: ${detail.npwp_document.uploaded_at || '-'}`,
+          date: `Diunggah: ${detail.npwp_document.upload_date ? new Date(detail.npwp_document.upload_date).toLocaleDateString('id-ID') : '-'}`,
           href: detail.npwp_document.download_url,
         },
       ]

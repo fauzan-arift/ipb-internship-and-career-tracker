@@ -56,6 +56,8 @@ class SQLAlchemyUserRepository(IUserRepository):
             gpa=student_orm.gpa,
             phone_number=student_orm.phone_number,
             skills=student_orm.skills or [],
+            cv_id=student_orm.cv_id,
+            photo_profile_id=student_orm.photo_profile_id,
             created_at=user_orm.created_at,
             updated_at=user_orm.updated_at,
         )
@@ -265,6 +267,8 @@ class SQLAlchemyUserRepository(IUserRepository):
         s_orm.gpa = student.gpa
         s_orm.phone_number = student.phone_number
         s_orm.skills = student.skills
+        s_orm.cv_id = student.cv_id
+        s_orm.photo_profile_id = student.photo_profile_id
 
         await self._session.flush()
         return student.model_copy(update={"id": user_orm.id, "profile_id": s_orm.id})
@@ -300,6 +304,7 @@ class SQLAlchemyUserRepository(IUserRepository):
             self._session.add(h_orm)
 
         h_orm.position = hr.position
+        h_orm.phone_number = getattr(hr, "phone_number", None)
         await self._session.flush()
         return hr.model_copy(update={"id": user_orm.id, "profile_id": h_orm.id})
 
@@ -399,3 +404,64 @@ class SQLAlchemyUserRepository(IUserRepository):
         self._session.add(orm)
         await self._session.flush()
         return notif.model_copy(update={"id": orm.id})
+
+    # ==================== Profile Updates ====================
+
+    async def update_student_profile(
+        self,
+        user_id: UUID,
+        data: dict,
+    ) -> Optional[Student]:
+        """Partial update of UserORM + StudentORM from a dict of changed fields."""
+        user_r = await self._session.execute(select(UserORM).where(UserORM.id == user_id))
+        user_orm = user_r.scalars().first()
+        if not user_orm:
+            return None
+
+        student_r = await self._session.execute(
+            select(StudentORM).where(StudentORM.user_id == user_id)
+        )
+        student_orm = student_r.scalars().first()
+        if not student_orm:
+            return None
+
+        # Fields that live on UserORM
+        user_fields = {"full_name", "email"}
+        for field, value in data.items():
+            if field in user_fields:
+                setattr(user_orm, field, value)
+            else:
+                if hasattr(student_orm, field):
+                    setattr(student_orm, field, value)
+
+        await self._session.flush()
+        return self._student_to_domain(user_orm, student_orm)
+
+    async def update_hr_profile(
+        self,
+        user_id: UUID,
+        data: dict,
+    ) -> Optional[HR]:
+        """Partial update of HrORM fields from a dict of changed fields."""
+        user_r = await self._session.execute(select(UserORM).where(UserORM.id == user_id))
+        user_orm = user_r.scalars().first()
+        if not user_orm:
+            return None
+
+        hr_r = await self._session.execute(
+            select(HrORM).where(HrORM.user_id == user_id)
+        )
+        hr_orm = hr_r.scalars().first()
+        if not hr_orm:
+            return None
+
+        user_fields = {"full_name", "email"}
+        for field, value in data.items():
+            if field in user_fields:
+                setattr(user_orm, field, value)
+            else:
+                if hasattr(hr_orm, field):
+                    setattr(hr_orm, field, value)
+
+        await self._session.flush()
+        return self._hr_to_domain(user_orm, hr_orm)

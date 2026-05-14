@@ -21,8 +21,15 @@ class StudentORM(Base):
     phone_number = Column(String(20), nullable=True)
     skills = Column(JSON, nullable=True, default=list)
 
+    # Document FKs
+    cv_id = Column(PGUUID(as_uuid=True), ForeignKey("documents.id"), nullable=True)
+    photo_profile_id = Column(PGUUID(as_uuid=True), ForeignKey("documents.id"), nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
+    # Relationships
     user = relationship("UserORM", back_populates="student")
     applications = relationship("ApplicationORM", back_populates="student", cascade="all, delete-orphan")
+    cv_document = relationship("DocumentORM", foreign_keys=[cv_id])
+    photo_profile = relationship("DocumentORM", foreign_keys=[photo_profile_id])

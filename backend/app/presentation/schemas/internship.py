@@ -17,6 +17,10 @@ class CompanySummary(BaseModel):
     industry: Optional[str] = None
     address: Optional[str] = None
     website: Optional[str] = None
+    description: Optional[str] = None
+    email: Optional[str] = None
+    photo_profile_id: Optional[UUID] = None
+    photo_profile_url: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

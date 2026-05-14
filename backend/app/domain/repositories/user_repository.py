@@ -75,3 +75,11 @@ class IUserRepository(ABC):
     @abstractmethod
     async def save_email_notification(self, notif: EmailNotification) -> EmailNotification:
         ...
+
+    @abstractmethod
+    async def update_student_profile(self, user_id: UUID, data: dict) -> Optional[Student]:
+        ...
+
+    @abstractmethod
+    async def update_hr_profile(self, user_id: UUID, data: dict) -> Optional[HR]:
+        ...
