@@ -3,7 +3,7 @@ import Footer from '@/components/Footer';
 import Sidebar from '@/components/Sidebar';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function DashboardLayout({ children, role }) {
+export default function DashboardLayout({ children, role, showSidebar = true }) {
   const { user, logout } = useAuth();
 
   return (
@@ -14,7 +14,7 @@ export default function DashboardLayout({ children, role }) {
 
       {/* Sidebar + content sit side by side, grow to fill remaining height */}
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        <Sidebar role={role} />
+        {showSidebar && <Sidebar role={role} />}
         <main style={{ flex: 1, minWidth: 0, padding: '24px', backgroundColor: '#F3F4F6', overflowY: 'auto' }}>
           {children}
         </main>

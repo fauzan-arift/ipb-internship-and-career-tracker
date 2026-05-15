@@ -47,7 +47,9 @@ function AppRoutes() {
         path="/admin/dashboard"
         element={(
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <PendingList />
+            <DashboardLayout role="admin" showSidebar={false}>
+              <PendingList />
+            </DashboardLayout>
           </ProtectedRoute>
         )}
       />
@@ -55,7 +57,9 @@ function AppRoutes() {
         path="/admin/hr/profile/:hr_profile_id"
         element={(
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <HRDetail />
+            <DashboardLayout role="admin" showSidebar={false}>
+              <HRDetail />
+            </DashboardLayout>
           </ProtectedRoute>
         )}
       />
