@@ -54,3 +54,15 @@ class ApplicationStatus(str, Enum):
     INTERVIEW = "Interview"
     ACCEPTED = "Accepted"
     REJECTED = "Rejected"
+    # HR workflow statuses
+    DIPROSES = "Diproses"
+    REVIEW_HR = "Review HR"
+    DITOLAK = "Ditolak"
+    DITERIMA = "Diterima"
+    DITAWARKAN = "Ditawarkan"
+
+
+class OfferStatus(str, Enum):
+    PENDING = "Pending"
+    ACCEPTED = "Accepted"
+    REJECTED = "Rejected"
