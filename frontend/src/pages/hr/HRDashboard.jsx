@@ -14,7 +14,7 @@ import useHRs from '@/hooks/useHRs';
 
 const MENU_HR = [
   { label: 'Kelola Lowongan', icon: Briefcase, href: '/hr/dashboard' },
-  { label: 'Daftar Pelamar', icon: List, href: '/hr/pelamar' },
+  { label: 'Daftar Pelamar', icon: List, href: '/hr/applicants' },
 ];
 
 // data now loaded from API via useHRs
@@ -71,7 +71,7 @@ function HRDashboard() {
             <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif', margin: 0 }}>
               Kelola Lowongan
             </h1>
-            <Button variant="primary" onClick={() => navigate('/hr/dashboard/baru')}>
+            <Button variant="primary" onClick={() => navigate('/hr/dashboard/new')}>
               <Plus size={16} />
               Buat Lowongan Baru
             </Button>
@@ -100,8 +100,8 @@ function HRDashboard() {
                 location={item.location}
                 industry={item.industry}
                 quota={item.quota}
-                statusPelaksanaan={item.statusPelaksanaan}
-                closingDate={item.closing_date || item.closingDate}
+                statusPelaksanaan={item.work_status || item.statusPelaksanaan}
+                closingDate={item.close_date || item.closingDate}
                 onEdit={() => navigate(`/hr/dashboard/${item.id}/edit`)}
                 onClose={() => console.log('tutup', item.id)}
                 onDelete={() => console.log('hapus', item.id)}

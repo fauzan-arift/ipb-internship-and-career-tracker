@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Briefcase, List, Save, FileText } from 'lucide-react';
+import hrService from '@/services/hrService';
 import api from '@/api/axios';
 import Navbar from '@/components/organisms/Navbar';
 import PageFooter from '@/components/organisms/PageFooter';
@@ -14,10 +15,12 @@ import TextArea from '@/components/atoms/TextArea';
 import SelectInput from '@/components/atoms/SelectInput';
 import DateRangePicker from '@/components/atoms/DateRangePicker';
 import DatePicker from '@/components/atoms/DatePicker';
+import useToast from '@/hooks/useToast';
+import Toast from '@/components/atoms/Toast';
 
 const MENU_HR = [
   { label: 'Kelola Lowongan', icon: Briefcase, href: '/hr/dashboard' },
-  { label: 'Daftar Pelamar', icon: List, href: '/hr/pelamar' },
+  { label: 'Daftar Pelamar', icon: List, href: '/hr/applicants' },
 ];
 
 const STATUS_GAJI_OPTIONS = [
@@ -55,16 +58,16 @@ function EditInternship() {
   const [apiError, setApiError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const { toast, showToast, hideToast } = useToast();
 
   useEffect(() => {
     async function fetchInternship() {
       try {
-        const res = await api.get(`/api/v1/hr/internships/${internship_id}`);
-        const data = res.data.data || res.data;
+        const data = await hrService.getInternshipDetail(internship_id);
         setPosisi(data.title || '');
         setDeskripsi(data.description || '');
-        setPersyaratan(data.requirements || '');
-        setBenefit(data.benefits || '');
+        setPersyaratan(data.requirements || data.requirement || '');
+        setBenefit(data.benefits || data.benefit || '');
         setLokasi(data.location || '');
         setIndustri(data.industry || '');
         setWaktuMagang({
@@ -103,6 +106,14 @@ function EditInternship() {
     return newErrors;
   }
 
+  const toDateString = (d) => {
+    if (!d) return undefined;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   async function onSubmitHandler() {
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
@@ -117,23 +128,29 @@ function EditInternship() {
     const payload = {
       title: posisi,
       description: deskripsi,
-      requirements: persyaratan,
-      benefits: benefit,
+      requirement: persyaratan,
+      benefit: benefit,
       location: lokasi,
       industry: industri,
-      start_date: waktuMagang.from?.toISOString().split('T')[0],
-      end_date: waktuMagang.to?.toISOString().split('T')[0],
+      start_date: toDateString(waktuMagang.from),
+      end_date: toDateString(waktuMagang.to),
       quota: Number(kuota),
       payment_status: statusGaji,
       work_status: statusPelaksanaan,
-      close_date: tanggalDitutup?.toISOString().split('T')[0],
+      close_date: toDateString(tanggalDitutup),
     };
 
     try {
-      await api.put(`/hr/internships/${internship_id}`, payload);
-      navigate('/hr/dashboard');
+      await hrService.updateInternship(internship_id, payload);
+      showToast('Lowongan berhasil diupdate!', 'success');
+      setTimeout(() => navigate('/hr/dashboard'), 1500);
     } catch (err) {
-      setApiError(err.response?.data?.detail || 'Gagal mengupdate lowongan. Coba lagi.');
+      const detail = err.response?.data?.detail;
+      const errorMessage = Array.isArray(detail)
+        ? detail.map(d => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(', ')
+        : (detail || 'Gagal mengupdate lowongan. Coba lagi.');
+      setApiError(errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -280,6 +297,14 @@ function EditInternship() {
       </div>
 
       <PageFooter />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={hideToast}
+        />
+      )}
     </div>
   );
 }

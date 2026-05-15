@@ -68,7 +68,7 @@ function DatePicker({ label, placeholder = 'dd/mm/yyyy', value, onChange, error,
           >
             <DayPicker
               mode="single"
-              selected={value}
+              selected={value || undefined}
               onSelect={onSelectHandler}
               showOutsideDays
             />

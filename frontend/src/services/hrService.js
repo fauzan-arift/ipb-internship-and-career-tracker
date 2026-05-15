@@ -10,7 +10,30 @@ const hrService = {
     return response.data;
   },
 
-  // additional HR-related actions can be added here (create/update/close)
+  createInternship: async (payload) => {
+    const response = await api.post(BASE_PATH, payload);
+    return response.data;
+  },
+
+  getInternshipDetail: async (id) => {
+    const response = await api.get(`/internships/${id}`);
+    return response.data;
+  },
+
+  updateInternship: async (id, payload) => {
+    const response = await api.put(`${BASE_PATH}/${id}`, payload);
+    return response.data;
+  },
+
+  closeInternship: async (id) => {
+    const response = await api.patch(`${BASE_PATH}/${id}/close`);
+    return response.data;
+  },
+
+  deleteInternship: async (id) => {
+    const response = await api.delete(`${BASE_PATH}/${id}`);
+    return response.data;
+  },
 };
 
 export default hrService;

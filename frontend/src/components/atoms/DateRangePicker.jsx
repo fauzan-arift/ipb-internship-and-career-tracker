@@ -77,7 +77,7 @@ function DateRangePicker({ label, placeholder = 'dd/mm/yyyy – dd/mm/yyyy', val
           >
             <DayPicker
               mode="range"
-              selected={value}
+              selected={value?.from ? value : undefined}
               onSelect={onSelectHandler}
               showOutsideDays
             />

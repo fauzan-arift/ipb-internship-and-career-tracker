@@ -32,7 +32,7 @@ function InternshipTableRow({ title, location, industry, quota, statusPelaksanaa
         {industry}
       </td>
       <td style={{ padding: '14px 16px', fontSize: '14px', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}>
-        {quota.filled}/{quota.total}
+        {typeof quota === 'object' ? `${quota.filled}/${quota.total}` : `0/${quota}`}
       </td>
       <td style={{ padding: '14px 16px' }}>
         <Badge variant={statusVariant}>{statusPelaksanaan}</Badge>

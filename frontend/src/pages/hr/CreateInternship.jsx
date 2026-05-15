@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase, List, Save, FileText } from 'lucide-react';
+import hrService from '@/services/hrService';
 import api from '@/api/axios';
 import useToast from '@/hooks/useToast';
 import Toast from '@/components/atoms/Toast';
@@ -20,12 +21,12 @@ import Button from '@/components/atoms/Button';
 
 const MENU_HR = [
   { label: 'Kelola Lowongan', icon: Briefcase, href: '/hr/dashboard' },
-  { label: 'Daftar Pelamar', icon: List, href: '/hr/pelamar' },
+  { label: 'Daftar Pelamar', icon: List, href: '/hr/applicants' },
 ];
 
 const STATUS_GAJI_OPTIONS = [
-  { value: 'PAID', label: 'Paid Internship' },
-  { value: 'UNPAID', label: 'Unpaid Internship' },
+  { value: 'Paid', label: 'Paid Internship' },
+  { value: 'Unpaid', label: 'Unpaid Internship' },
 ];
 
 const STATUS_PELAKSANAAN_OPTIONS = [
@@ -70,6 +71,14 @@ function CreateInternship() {
     return newErrors;
   }
 
+  const toDateString = (d) => {
+    if (!d) return undefined;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   async function onSubmitHandler() {
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
@@ -83,24 +92,28 @@ function CreateInternship() {
     const payload = {
       title: posisi,
       description: deskripsi,
-      requirements: persyaratan,
-      benefits: benefit,
+      requirement: persyaratan,
+      benefit: benefit,
       location: lokasi,
       industry: industri,
-      start_date: waktuMagang.from?.toISOString().split('T')[0],
-      end_date: waktuMagang.to?.toISOString().split('T')[0],
+      start_date: toDateString(waktuMagang.from),
+      end_date: toDateString(waktuMagang.to),
       quota: Number(kuota),
       payment_status: statusGaji,
       work_status: statusPelaksanaan,
-      close_date: tanggalDitutup?.toISOString().split('T')[0],
+      close_date: toDateString(tanggalDitutup),
     };
 
     try {
-      await api.post('/hr/internships', payload);
+      await hrService.createInternship(payload);
       showToast('Lowongan berhasil dibuat!', 'success');
       setTimeout(() => navigate('/hr/dashboard'), 1500);
     } catch (err) {
-      showToast(err.response?.data?.detail || 'Gagal membuat lowongan. Coba lagi.', 'error');
+      const detail = err.response?.data?.detail;
+      const errorMessage = Array.isArray(detail)
+        ? detail.map(d => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(', ')
+        : (detail || 'Gagal membuat lowongan. Coba lagi.');
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }

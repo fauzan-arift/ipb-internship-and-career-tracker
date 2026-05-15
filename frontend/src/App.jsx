@@ -98,7 +98,7 @@ function AppRoutes() {
         )}
       />
       <Route
-        path="/hr/dashboard/baru"
+        path="/hr/dashboard/new"
         element={(
           <ProtectedRoute allowedRoles={['HR']}>
             <CreateInternship />
