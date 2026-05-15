@@ -14,6 +14,7 @@ from app.infrastructure.file_service import FileService
 from app.application.services.email_service import EmailService
 from app.application.services.auth_service import AuthService
 from app.application.services.admin_service import AdminService
+from app.application.services.skill_service import SkillService
 
 security = HTTPBearer()
 
@@ -49,6 +50,12 @@ def get_admin_service(
     email_service: EmailService = Depends(get_email_service),
 ) -> AdminService:
     return AdminService(uow=uow, email_service=email_service)
+
+
+def get_skill_service(
+    uow: SQLAlchemyUnitOfWork = Depends(get_uow),
+) -> SkillService:
+    return SkillService(uow=uow)
 
 
 async def get_current_user(
