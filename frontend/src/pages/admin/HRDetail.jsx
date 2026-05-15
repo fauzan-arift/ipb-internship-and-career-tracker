@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Building2, CheckCircle, XCircle } from 'lucide-react';
 import api from '@/api/axios';
-import Navbar from '@/components/organisms/Navbar';
-import PageFooter from '@/components/organisms/PageFooter';
 import DetailPageHeader from '@/components/organisms/DetailPageHeader';
 import TwoColumnDetailLayout from '@/components/organisms/TwoColumnDetailLayout';
 import InfoSectionCard from '@/components/organisms/InfoSectionCard';
@@ -67,34 +65,22 @@ const HRDetail = () => {
     }
   };
 
-  function onLogout() {
-    navigate('/login');
-  }
-
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
-        <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-            Memuat detail...
-          </span>
-        </div>
-        <PageFooter />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100dvh - 160px)' }}>
+        <span style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+          Memuat detail...
+        </span>
       </div>
     );
   }
 
   if (!detail) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
-        <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: '14px', color: '#8B1A1A', fontFamily: 'Inter, sans-serif' }}>
-            {status.msg}
-          </span>
-        </div>
-        <PageFooter />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100dvh - 160px)' }}>
+        <span style={{ fontSize: '14px', color: '#8B1A1A', fontFamily: 'Inter, sans-serif' }}>
+          {status.msg}
+        </span>
       </div>
     );
   }
@@ -152,67 +138,53 @@ const HRDetail = () => {
   );
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
-      <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
-      <div
-        style={{
-          flex: 1,
-          padding: '32px 40px',
-          maxWidth: '1200px',
-          width: '100%',
-          margin: '0 auto',
-          boxSizing: 'border-box',
-        }}
-      >
-        {status.msg && (
-          <div
-            style={{
-              marginBottom: '16px',
-              padding: '12px 16px',
-              borderRadius: '8px',
-              backgroundColor: status.type === 'error' ? '#FDECEA' : '#D6F5E3',
-              color: status.type === 'error' ? '#8B1A1A' : '#1A6B3A',
-              fontSize: '14px',
-              fontFamily: 'Inter, sans-serif',
-            }}
-          >
-            {status.msg}
-          </div>
-        )}
+    <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {status.msg && (
+        <div
+          style={{
+            padding: '12px 16px',
+            borderRadius: '8px',
+            backgroundColor: status.type === 'error' ? '#FDECEA' : '#D6F5E3',
+            color: status.type === 'error' ? '#8B1A1A' : '#1A6B3A',
+            fontSize: '14px',
+            fontFamily: 'Inter, sans-serif',
+          }}
+        >
+          {status.msg}
+        </div>
+      )}
 
-        <DetailPageHeader
-          name={detail.company?.company_name}
-          badge={isVerified ? 'Terverifikasi' : 'Belum Diverifikasi'}
-          badgeVariant={isVerified ? 'green' : 'yellow'}
-          date={detail.hr?.registered_at
-            ? new Date(detail.hr.registered_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-            : '-'
-          }
-          onBack={() => navigate('/admin/dashboard')}
-          actions={headerActions}
-        />
+      <DetailPageHeader
+        name={detail.company?.company_name}
+        badge={isVerified ? 'Terverifikasi' : 'Belum Diverifikasi'}
+        badgeVariant={isVerified ? 'green' : 'yellow'}
+        date={detail.hr?.registered_at
+          ? new Date(detail.hr.registered_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+          : '-'
+        }
+        onBack={() => navigate('/admin/dashboard')}
+        actions={headerActions}
+      />
 
-        <TwoColumnDetailLayout
-          left={
-            <>
-              <InfoSectionCard title="Informasi Perusahaan" icon={<Building2 size={18} />}>
-                <InfoGrid fields={infoFields} />
-                <DescriptionBox label="Deskripsi Perusahaan" value={detail.company?.description} />
-              </InfoSectionCard>
-              <DocumentsCard documents={documents} />
-            </>
-          }
-          right={
-            <HRDInfoCard
-              name={detail.hr?.full_name}
-              position={detail.hr?.position}
-              email={detail.hr?.email}
-              phone={detail.hr?.phone}
-            />
-          }
-        />
-      </div>
-      <PageFooter />
+      <TwoColumnDetailLayout
+        left={
+          <>
+            <InfoSectionCard title="Informasi Perusahaan" icon={<Building2 size={18} />}>
+              <InfoGrid fields={infoFields} />
+              <DescriptionBox label="Deskripsi Perusahaan" value={detail.company?.description} />
+            </InfoSectionCard>
+            <DocumentsCard documents={documents} />
+          </>
+        }
+        right={
+          <HRDInfoCard
+            name={detail.hr?.full_name}
+            position={detail.hr?.position}
+            email={detail.hr?.email}
+            phone={detail.hr?.phone}
+          />
+        }
+      />
     </div>
   );
 };

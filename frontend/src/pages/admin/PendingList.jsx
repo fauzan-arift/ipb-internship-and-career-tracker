@@ -2,12 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, CheckCircle, ClipboardList, ChevronDown } from 'lucide-react';
 import api from '@/api/axios';
-import Navbar from '@/components/organisms/Navbar';
-import PageFooter from '@/components/organisms/PageFooter';
 import DashboardStatsRow from '@/components/organisms/DashboardStatsRow';
 import DataTable from '@/components/organisms/DataTable';
 import SearchBar from '@/components/molecules/SearchBar';
-import Button from '@/components/atoms/Button';
 
 const COLUMNS = [
   { key: 'name', label: 'Nama Perusahaan' },
@@ -70,10 +67,6 @@ const PendingList = () => {
     }
   }
 
-  function onLogout() {
-    navigate('/login');
-  }
-
   const tableData = hrs
     .map((hr) => ({
       id: hr.hr_profile_id || hr.hr_id,
@@ -92,155 +85,130 @@ const PendingList = () => {
   ];
 
   return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        height: '100dvh',
-        backgroundColor: '#EEF0F8',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
-      <div
+    <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <h1
         style={{
-          flex: 1,
-          minHeight: 0,
-          overflow: 'auto',
-          padding: '32px 40px',
-          maxWidth: '1200px',
-          width: '100%',
-          margin: '0 auto',
-          boxSizing: 'border-box',
+          fontSize: '28px',
+          fontWeight: '700',
+          color: '#1A1A2E',
+          fontFamily: 'Inter, sans-serif',
+          margin: 0,
         }}
       >
-        <h1
+        Dashboard
+      </h1>
+
+      <DashboardStatsRow stats={displayStats} />
+
+      <div>
+        <SearchBar
+          value={search}
+          onChange={onSearchChange}
+          placeholder="Cari nama perusahaan..."
+        />
+      </div>
+
+      {error && (
+        <div
           style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: '#1A1A2E',
+            padding: '12px 16px',
+            backgroundColor: '#FDECEA',
+            color: '#8B1A1A',
+            borderRadius: '8px',
+            fontSize: '14px',
             fontFamily: 'Inter, sans-serif',
-            marginBottom: '24px',
           }}
         >
-          Dashboard
-        </h1>
-
-        <DashboardStatsRow stats={displayStats} />
-
-        <div style={{ marginTop: '24px' }}>
-          <SearchBar
-            value={search}
-            onChange={onSearchChange}
-            placeholder="Cari nama perusahaan..."
-          />
+          {error}
         </div>
+      )}
 
-        {error && (
-          <div
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          border: '1px solid #CBD0E0',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            padding: '16px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid #CBD0E0',
+          }}
+        >
+          <span
             style={{
-              marginTop: '16px',
-              padding: '12px 16px',
-              backgroundColor: '#FDECEA',
-              color: '#8B1A1A',
-              borderRadius: '8px',
-              fontSize: '14px',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#1A1A2E',
               fontFamily: 'Inter, sans-serif',
             }}
           >
-            {error}
-          </div>
-        )}
-
-        <div
-          style={{
-            marginTop: '24px',
-            backgroundColor: '#FFFFFF',
-            borderRadius: '12px',
-            border: '1px solid #CBD0E0',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              padding: '16px 24px',
+            Daftar Perusahaan Terbaru
+          </span>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              style={{
+                backgroundColor: '#3D3FA8',
+                color: '#FFFFFF',
+                padding: '6px 32px 6px 14px',
+                fontSize: '13px',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: '600',
+                border: 'none',
+                borderRadius: '8px',
+                appearance: 'none',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              <option value="all">Filter: Semua</option>
+              <option value="pending">Status: Belum Verifikasi</option>
+              <option value="verified">Status: Terverifikasi</option>
+              <option value="rejected">Status: Ditolak</option>
+            </select>
+            <div style={{
+              position: 'absolute',
+              right: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              pointerEvents: 'none',
+              color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              borderBottom: '1px solid #CBD0E0',
-            }}
-          >
-            <span
-              style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#1A1A2E',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
-              Daftar Perusahaan Terbaru
-            </span>
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                style={{
-                  backgroundColor: '#3D3FA8',
-                  color: '#FFFFFF',
-                  padding: '6px 32px 6px 14px',
-                  fontSize: '13px',
-                  fontFamily: 'Inter, sans-serif',
-                  fontWeight: '600',
-                  border: 'none',
-                  borderRadius: '8px',
-                  appearance: 'none',
-                  cursor: 'pointer',
-                  outline: 'none',
-                }}
-              >
-                <option value="all">Filter: Semua</option>
-                <option value="pending">Status: Belum Verifikasi</option>
-                <option value="verified">Status: Terverifikasi</option>
-                <option value="rejected">Status: Ditolak</option>
-              </select>
-              <div style={{
-                position: 'absolute',
-                right: '10px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                pointerEvents: 'none',
-                color: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-              }}>
-                <ChevronDown size={14} />
-              </div>
+            }}>
+              <ChevronDown size={14} />
             </div>
           </div>
-
-          {isLoading ? (
-            <div
-              style={{
-                padding: '40px',
-                textAlign: 'center',
-                fontSize: '14px',
-                color: '#6B7280',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
-              Memuat data...
-            </div>
-          ) : (
-            <DataTable
-              columns={COLUMNS}
-              data={tableData}
-              onAction={onActionHandler}
-              emptyMessage="Tidak ada perusahaan ditemukan"
-            />
-          )}
         </div>
+
+        {isLoading ? (
+          <div
+            style={{
+              padding: '40px',
+              textAlign: 'center',
+              fontSize: '14px',
+              color: '#6B7280',
+              fontFamily: 'Inter, sans-serif',
+            }}
+          >
+            Memuat data...
+          </div>
+        ) : (
+          <DataTable
+            columns={COLUMNS}
+            data={tableData}
+            onAction={onActionHandler}
+            emptyMessage="Tidak ada perusahaan ditemukan"
+          />
+        )}
       </div>
-      <PageFooter />
     </div>
   );
 };
