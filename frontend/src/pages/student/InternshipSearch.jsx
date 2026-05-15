@@ -19,7 +19,7 @@ function getCompanyInitial(name) {
 function getTagLabel(status) {
   if (!status) return null;
   const n = String(status).toUpperCase();
-  if (n === 'PAID')   return 'Paid Internship';
+  if (n === 'PAID') return 'Paid Internship';
   if (n === 'UNPAID') return 'Unpaid Internship';
   return n;
 }
@@ -29,16 +29,16 @@ function InternshipSearch() {
   const { internships, searchQuery, setSearchQuery, isLoading, error } = useInternships();
 
   const mappedInternships = internships.map((item) => ({
-    id:             item.id,
-    tags:           [item.work_status, getTagLabel(item.payment_status)].filter(Boolean),
-    companyName:    item.company?.company_name || 'Perusahaan Tidak Diketahui',
+    id: item.id,
+    tags: [item.work_status, getTagLabel(item.payment_status)].filter(Boolean),
+    companyName: item.company?.company_name || 'Perusahaan Tidak Diketahui',
     companyInitial: getCompanyInitial(item.company?.company_name || item.title),
-    position:       item.title,
-    location:       item.location || 'Lokasi tidak tersedia',
-    duration:       item.start_date && item.end_date
-                      ? `${formatDateLabel(item.start_date)} - ${formatDateLabel(item.end_date)}`
-                      : 'Durasi tidak tersedia',
-    deadline:       formatDateLabel(item.close_date),
+    position: item.title,
+    location: item.location || 'Lokasi tidak tersedia',
+    duration: item.start_date && item.end_date
+      ? `${formatDateLabel(item.start_date)} - ${formatDateLabel(item.end_date)}`
+      : 'Durasi tidak tersedia',
+    deadline: formatDateLabel(item.close_date),
   }));
 
   return (
@@ -84,7 +84,7 @@ function InternshipSearch() {
             location={item.location}
             duration={item.duration}
             deadline={item.deadline}
-            onDetailClick={() => navigate(`/internship/${item.id}`)}  // ← tetap /lowongan
+            onDetailClick={() => navigate(`/internship/${item.id}`)}
           />
         ))}
       </div>

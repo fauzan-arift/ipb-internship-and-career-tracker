@@ -1,17 +1,9 @@
-import React, { useState } from 'react';
-import { MoreVertical } from 'lucide-react';
+import React from 'react';
 import AvatarSquare from '../atoms/AvatarSquare';
 import Badge from '../atoms/Badge';
 
 function CompanyTableRow({ company, onAction }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  function onMenuToggle() {
-    setMenuOpen(!menuOpen);
-  }
-
   function onMenuAction(action) {
-    setMenuOpen(false);
     if (onAction) onAction(action, company);
   }
 
@@ -44,61 +36,27 @@ function CompanyTableRow({ company, onAction }) {
       <td style={{ padding: '14px 16px', fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
         {company.createdAt}
       </td>
-      <td style={{ padding: '14px 16px', position: 'relative' }}>
+      <td style={{ padding: '14px 16px' }}>
         <button
           type="button"
-          onClick={onMenuToggle}
+          onClick={() => onMenuAction('detail')}
           style={{
-            background: 'none',
+            backgroundColor: '#3D3FA8',
             border: 'none',
             cursor: 'pointer',
-            color: '#6B7280',
-            display: 'flex',
+            color: '#FFFFFF',
+            display: 'inline-flex',
             alignItems: 'center',
-            padding: '4px',
-            borderRadius: '4px',
+            justifyContent: 'center',
+            padding: '8px 14px',
+            borderRadius: '8px',
+            fontSize: '13px',
+            fontFamily: 'Inter, sans-serif',
+            fontWeight: '600',
           }}
         >
-          <MoreVertical size={16} />
+          Lihat Detail
         </button>
-        {menuOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              right: '16px',
-              top: '100%',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD0E0',
-              borderRadius: '8px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              zIndex: 10,
-              minWidth: '140px',
-              overflow: 'hidden',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => onMenuAction('detail')}
-              style={{ display: 'block', width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', fontSize: '13px', fontFamily: 'Inter, sans-serif', color: '#1A1A2E', cursor: 'pointer' }}
-            >
-              Lihat Detail
-            </button>
-            <button
-              type="button"
-              onClick={() => onMenuAction('verify')}
-              style={{ display: 'block', width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', fontSize: '13px', fontFamily: 'Inter, sans-serif', color: '#1A6B3A', cursor: 'pointer' }}
-            >
-              Verifikasi
-            </button>
-            <button
-              type="button"
-              onClick={() => onMenuAction('reject')}
-              style={{ display: 'block', width: '100%', padding: '10px 16px', textAlign: 'left', background: 'none', border: 'none', fontSize: '13px', fontFamily: 'Inter, sans-serif', color: '#8B1A1A', cursor: 'pointer' }}
-            >
-              Tolak
-            </button>
-          </div>
-        )}
       </td>
     </tr>
   );

@@ -42,6 +42,11 @@ function Button({ children, variant = 'primary', size = 'default', fullWidth = f
       color: '#3D3FA8',
       border: 'none',
     },
+    success: {
+      backgroundColor: '#1A6B3A',
+      color: '#FFFFFF',
+      border: 'none',
+    },
   };
 
   const style = {
