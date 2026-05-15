@@ -79,12 +79,12 @@ const BuildingIcon = () => (
 
 const sidebarMenus = {
   student: [
-    { label: "Lowongan Magang",  href: "/lowongan", icon: <BriefcaseIcon /> },
+    { label: "Lowongan Magang",  href: "/internship", icon: <BriefcaseIcon /> },
     { label: "Lamaran Saya",     href: "/lamaran",  icon: <ClipboardIcon /> },
     { label: "Tawaran Lowongan", href: "/tawaran",  icon: <HandshakeIcon /> },
     { label: "Career Mapping",   href: "/career",   icon: <MapPinIcon />    },
     { label: "Logbook",          href: "/logbook",  icon: <BookIcon />      },
-    { label: "Profil",           href: "/profil",   icon: <UserIcon />      },
+    { label: "Profil",           href: "/profile",   icon: <UserIcon />      },
   ],
   company: [
     { label: "Dashboard",         href: "/company/dashboard", icon: <GridIcon />     },
