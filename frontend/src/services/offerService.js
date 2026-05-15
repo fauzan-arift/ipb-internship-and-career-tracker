@@ -1,13 +1,11 @@
 import axios from '@/api/axios';
 
 export const offerService = {
-  listApplications: async () => {
-    const response = await axios.get('/students/applications');
-    return response.data;
-  },
-
-  getApplicationDetail: async (applicationId) => {
-    const response = await axios.get(`/students/applications/${applicationId}`);
+  // Fetch offers directly from the new endpoint
+  getOffers: async (status = 'Pending') => {
+    const response = await axios.get('/students/offers', {
+      params: { status },
+    });
     return response.data;
   },
 };

@@ -24,6 +24,7 @@ function OffersPage() {
     setPendingAction({ offerId: null, action: null });
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center text-gray-500">
@@ -32,6 +33,7 @@ function OffersPage() {
     );
   }
 
+  // Error state (tapi tetap tampilkan dummy jika ada)
   if (error && !isUsingDummy) {
     return (
       <div className="h-full">
@@ -42,6 +44,7 @@ function OffersPage() {
     );
   }
 
+  // Tampilkan informasi jika menggunakan dummy data
   if (isUsingDummy && offers.length > 0) {
     console.info('📦 Menggunakan data dummy untuk tawaran lowongan (API belum tersedia atau tidak ada data).');
   }

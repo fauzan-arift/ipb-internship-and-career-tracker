@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { offerService } from '@/services/offerService';
 
+// DUMMY DATA BACKUP (Tetap dipertahankan)
 const dummyOffers = [
   {
-    id: 1,
+    id: 'dummy-1',
     companyInitial: 'G',
     companyName: 'Google Indonesia',
     position: 'Software Engineering Intern',
@@ -18,6 +19,7 @@ const dummyOffers = [
   },
 ];
 
+// Helper: format date ke string
 const formatDate = (dateString) => {
   if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('id-ID', {
@@ -25,7 +27,7 @@ const formatDate = (dateString) => {
   });
 };
 
-export function useOffers() {
+export function useOffers(statusFilter = 'Pending') {
   const [offers, setOffers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,78 +39,64 @@ export function useOffers() {
     setUseDummy(false);
 
     try {
-      const listData = await offerService.listApplications();
-      const applications = listData.applications || [];
+      // 1. Panggil API baru
+      const data = await offerService.getOffers(statusFilter);
+      const apiOffers = data.offers || [];
 
-      if (applications.length === 0) {
+      if (apiOffers.length === 0) {
+        // Jika data API kosong, fallback ke dummy
         setOffers(dummyOffers);
         setUseDummy(true);
-        setIsLoading(false);
-        return;
-      }
-
-      const offerPromises = applications.map(async (app) => {
-        try {
-          const detail = await offerService.getApplicationDetail(app.id);
-          if (detail.offer && detail.offer.id) {
-            const companyName = detail.internship?.company?.company_name || 'Perusahaan Tidak Diketahui';
-            const companyInitial = companyName
-              .split(' ')
-              .slice(0, 2)
-              .map(w => w[0].toUpperCase())
-              .join('') || '?';
-            
-            return {
-              id: detail.offer.id,
-              applicationId: detail.id,
-              companyInitial: companyInitial,
-              companyName: companyName,
-              position: detail.internship?.title || 'Posisi Tidak Diketahui',
-              location: '-',
-              deadline: formatDate(detail.offer.expiry_date),
-              offerDate: formatDate(detail.offer.offer_date),
-              duration: detail.offer.duration || '-',
-              salary: detail.offer.compensation || '-',
-              documentName: detail.offer.offering_file_url 
-                ? detail.offer.offering_file_url.split('/').pop() || 'Dokumen Offering.pdf'
-                : 'Dokumen Offering.pdf',
-              documentUrl: detail.offer.offering_file_url || '#',
-              companyMessage: detail.offer.offer_detail || 'Tidak ada pesan dari perusahaan.',
-            };
-          }
-          return null;
-        } catch (err) {
-          console.warn(`Gagal mengambil detail aplikasi ${app.id}:`, err);
-          return null;
-        }
-      });
-
-      const offerResults = await Promise.all(offerPromises);
-      const validOffers = offerResults.filter(offer => offer !== null);
-
-      if (validOffers.length > 0) {
-        setOffers(validOffers);
       } else {
-        setOffers(dummyOffers);
-        setUseDummy(true);
-      }
+        // 2. Mapping data API ke format yang dibutuhkan OfferCard
+        const mappedOffers = apiOffers.map((item) => {
+          const companyName = item.internship?.company_name || 'Perusahaan Tidak Diketahui';
+          const companyInitial = companyName
+            .split(' ')
+            .slice(0, 2)
+            .map((w) => w[0].toUpperCase())
+            .join('') || '?';
 
+          return {
+            id: item.id,
+            companyInitial: companyInitial,
+            companyName: companyName,
+            position: item.internship?.title || 'Posisi Tidak Diketahui',
+            location: item.internship?.location || 'Lokasi tidak tersedia',
+            deadline: formatDate(item.expiry_date),
+            offerDate: formatDate(item.offer_date),
+            duration: item.duration || '-',
+            salary: item.compensation || '-',
+            documentName: item.offering_file_url
+              ? item.offering_file_url.split('/').pop() || 'Dokumen Offering.pdf'
+              : 'Dokumen Offering.pdf',
+            documentUrl: item.offering_file_url || '#',
+            companyMessage: item.offer_detail || 'Tidak ada pesan dari perusahaan.',
+          };
+        });
+        setOffers(mappedOffers);
+      }
     } catch (err) {
       console.error('Failed to fetch offers:', err);
       setError(err.message || 'Gagal memuat tawaran lowongan.');
+      // Fallback ke dummy jika API gagal
       setOffers(dummyOffers);
       setUseDummy(true);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [statusFilter]);
 
   const acceptOffer = useCallback((offerId) => {
-    setOffers(prev => prev.filter(o => o.id !== offerId));
+    // Logic API accept (bisa ditambahkan nanti)
+    console.log(`Accept offer ${offerId}`);
+    setOffers((prev) => prev.filter((o) => o.id !== offerId));
   }, []);
 
   const rejectOffer = useCallback((offerId) => {
-    setOffers(prev => prev.filter(o => o.id !== offerId));
+    // Logic API reject (bisa ditambahkan nanti)
+    console.log(`Reject offer ${offerId}`);
+    setOffers((prev) => prev.filter((o) => o.id !== offerId));
   }, []);
 
   useEffect(() => {
