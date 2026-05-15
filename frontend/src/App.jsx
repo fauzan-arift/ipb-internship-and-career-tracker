@@ -24,6 +24,7 @@ import InternshipDetail from '@/pages/student/InternshipDetail';
 import InternshipSearch from '@/pages/student/InternshipSearch';
 import StudentProfile from '@/pages/student/StudentProfile';
 import MyApplications from '@/pages/student/MyApplications'; 
+import OffersPage from '@/pages/student/OffersPage';
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   if (isLoading) return <div className="text-center mt-10">Loading...</div>;
@@ -94,12 +95,21 @@ function AppRoutes() {
         path="/my-application"
         element={
           <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
-            <DashboardLayout>
+            <DashboardLayout role="student">
               <MyApplications />
             </DashboardLayout>
           </ProtectedRoute>
         }
           />
+
+        <Route
+          path="/offers"
+          element={
+            <ProtectedRoute allowedRoles={['STUDENT']}>
+              <DashboardLayout role="student"><OffersPage /></DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
       {/* ── Fallback ── */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,11 +1,11 @@
 export const sidebarMenus = {
   student: [
-    { label: "Lowongan Magang", href: "/lowongan", icon: "briefcase" },
-    { label: "Lamaran Saya",    href: "/lamaran",  icon: "clipboard" },
-    { label: "Tawaran Lowongan",href: "/tawaran",  icon: "handshake" },
+    { label: "Lowongan Magang", href: "/internship", icon: "briefcase" },
+    { label: "Lamaran Saya",    href: "/my-application",  icon: "clipboard" },
+    { label: "Tawaran Lowongan",href: "/offers",  icon: "handshake" },
     { label: "Career Mapping",  href: "/career",   icon: "map-pin"   },
     { label: "Logbook",         href: "/logbook",  icon: "book"      },
-    { label: "Profil",          href: "/profil",   icon: "user"      },
+    { label: "Profil",          href: "/profile",   icon: "user"      },
   ],
   company: [
     { label: "Dashboard",       href: "/company/dashboard", icon: "grid"      },
