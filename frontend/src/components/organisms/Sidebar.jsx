@@ -11,7 +11,8 @@ function Sidebar({ menuItems = [], activeHref }) {
         minWidth: '210px',
         backgroundColor: '#FFFFFF',
         borderRight: '1px solid #CBD0E0',
-        minHeight: 'calc(100vh - 57px)',
+        height: '100%',
+        minHeight: '100%',
         paddingTop: '8px',
         flexShrink: 0,
       }}

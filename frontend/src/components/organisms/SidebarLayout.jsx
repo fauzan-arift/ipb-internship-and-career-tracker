@@ -5,17 +5,23 @@ function SidebarLayout({ sidebar, children }) {
     <div
       style={{
         display: 'flex',
-        alignItems: 'flex-start',
-        minHeight: 'calc(100vh - 57px)',
+        alignItems: 'stretch',
+        height: '100%',
+        minHeight: 0,
+        overflow: 'hidden',
       }}
     >
-      {sidebar}
+      <div style={{ flexShrink: 0 }}>
+        {sidebar}
+      </div>
       <div
         style={{
           flex: 1,
           minWidth: 0,
+          minHeight: 0,
           padding: '32px 40px',
           boxSizing: 'border-box',
+          overflow: 'auto',
         }}
       >
         {children}

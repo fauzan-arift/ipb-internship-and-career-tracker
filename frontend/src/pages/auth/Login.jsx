@@ -49,7 +49,7 @@ function Login() {
       const role = payload?.role;
 
       if (role === 'ADMIN') navigate('/admin/dashboard');
-      else if (role === 'HR') navigate('/');
+      else if (role === 'HR') navigate('/hr/dashboard');
       else navigate('/');
     } catch (err) {
       const msg = err.response?.data?.detail || 'Terjadi kesalahan. Coba lagi.';

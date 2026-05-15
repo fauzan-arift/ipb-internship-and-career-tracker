@@ -1,11 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase, FileText, Bell, Map, BookOpen, User } from 'lucide-react';
+import Navbar from '@/components/organisms/Navbar';
+import PageFooter from '@/components/organisms/PageFooter';
 import Sidebar from '@/components/organisms/Sidebar';
 import SidebarLayout from '@/components/organisms/SidebarLayout';
 import SearchBar from '@/components/molecules/SearchBar';
 import InternshipCard from '@/components/molecules/InternshipCard';
 import { useInternships } from '@/hooks/useInternships';
+import { useAuth } from '@/hooks/useAuth';
 
 const MENU_MAHASISWA = [
   { label: 'Lowongan Magang', icon: Briefcase, href: '/lowongan' },
@@ -42,7 +45,13 @@ function getTagLabel(status) {
 
 function InternshipSearch() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const { internships, searchQuery, setSearchQuery, isLoading, error } = useInternships();
+
+  function onLogout() {
+    logout();
+    navigate('/login');
+  }
 
   const mappedInternships = internships.map((item) => ({
     id: item.id,
@@ -59,10 +68,23 @@ function InternshipSearch() {
   }));
 
   return (
-    <div style={{ backgroundColor: '#EEF0F8', minHeight: '100vh' }}>
-      <SidebarLayout
-        sidebar={<Sidebar menuItems={MENU_MAHASISWA} activeHref="/lowongan" />}
-      >
+    <div
+      style={{
+        backgroundColor: '#EEF0F8',
+        minHeight: '100dvh',
+        height: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Navbar
+        variant="app"
+        user={user ? { name: user.email || user.userId || 'Mahasiswa' } : { name: 'Mahasiswa' }}
+        onLogout={onLogout}
+      />
+
+      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <SidebarLayout sidebar={<Sidebar menuItems={MENU_MAHASISWA} activeHref="/lowongan" />}>
         <h1
           style={{
             fontSize: '24px',
@@ -155,7 +177,10 @@ function InternshipSearch() {
             />
           ))}
         </div>
-      </SidebarLayout>
+        </SidebarLayout>
+      </div>
+
+      <PageFooter />
     </div>
   );
 }
