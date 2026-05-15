@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.domain.repositories.document_repository import IDocumentRepository
     from app.domain.repositories.internship_repository import IInternshipRepository
     from app.domain.repositories.application_repository import IApplicationRepository
+    from app.domain.repositories.skill_repository import ISkillRepository
 
 
 class IUnitOfWork(ABC):
@@ -19,6 +20,7 @@ class IUnitOfWork(ABC):
     documents: "IDocumentRepository"
     internships: "IInternshipRepository"
     applications: "IApplicationRepository"
+    skills: "ISkillRepository"
 
     @abstractmethod
     async def commit(self) -> None:

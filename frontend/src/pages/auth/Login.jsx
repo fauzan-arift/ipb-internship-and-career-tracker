@@ -31,7 +31,10 @@ function Login() {
   async function onSubmitHandler(event) {
     event.preventDefault();
     const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     setErrors({});
     setApiError('');
@@ -41,15 +44,14 @@ function Login() {
       const response = await api.post('/auth/login', { email, password });
       const token = response.data.data.access_token;
 
-      // Update auth context (ini juga save ke localStorage)
       login(token);
 
-      // Decode role dari JWT payload
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       const role = payload?.role;
 
       if (role === 'ADMIN') navigate('/admin/dashboard');
       else if (role === 'HR') navigate('/hr/dashboard');
+      else if (role === 'STUDENT') navigate('/internship');
       else navigate('/');
     } catch (err) {
       const msg = err.response?.data?.detail || 'Terjadi kesalahan. Coba lagi.';
@@ -93,7 +95,6 @@ function Login() {
               Belum punya akun? Daftar sebagai
             </span>
             <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
-              {/* FIXED: /register/student bukan /register/mahasiswa */}
               <Button variant="primary" fullWidth onClick={() => navigate('/register/student')}>
                 Mahasiswa
               </Button>

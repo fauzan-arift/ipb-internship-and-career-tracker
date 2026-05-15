@@ -2,49 +2,120 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
 
-// Components
-import Navbar from '@/components/Navbar';
-import Home from '@/pages/Home';
+import DashboardLayout from '@/layouts/DashboardLayout';
+import PublicLayout from '@/layouts/PublicLayout';
 
-// Auth pages
 import Login from '@/pages/auth/Login';
 import RegisterStudent from '@/pages/auth/RegisterStudent';
 import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
 
-// Admin pages
+import Home from '@/pages/Home';
+
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
 
-// HR pages
+import InternshipDetail from '@/pages/student/InternshipDetail';
+import InternshipSearch from '@/pages/student/InternshipSearch';
+import StudentProfile from '@/pages/student/StudentProfile';
+
 import HRDashboard from '@/pages/hr/HRDashboard';
 import CreateInternship from '@/pages/hr/CreateInternship';
 import EditInternship from '@/pages/hr/EditInternship';
 
-// Student pages
-import InternshipSearch from '@/pages/student/InternshipSearch';
-
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) return <div className="text-center mt-10">Loading auth state...</div>;
+  if (isLoading) return <div className="text-center mt-10">Loading...</div>;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
-
+  if (allowedRoles && !allowedRoles.includes(user?.role)) return <Navigate to="/" replace />;
   return children;
 };
 
-function AppLayout({ children }) {
+function AppRoutes() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
-      <Navbar />
-      <main className="grow container mx-auto px-4 sm:px-6 lg:px-8">
-        {children}
-      </main>
-      <footer className="bg-white text-center py-4 text-sm text-gray-500 mt-auto border-t">
-        &copy; 2026 IPB Internship Portal
-      </footer>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register/student" element={<RegisterStudent />} />
+      <Route path="/register/hr" element={<RegisterHR />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+
+      <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+
+      <Route
+        path="/admin/dashboard"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <PendingList />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/admin/hr/profile/:hr_profile_id"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <HRDetail />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/internship"
+        element={(
+          <ProtectedRoute allowedRoles={['STUDENT']}>
+            <DashboardLayout role="student">
+              <InternshipSearch />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/internship/:internship_id"
+        element={(
+          <ProtectedRoute allowedRoles={['STUDENT']}>
+            <DashboardLayout role="student">
+              <InternshipDetail />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/profile"
+        element={(
+          <ProtectedRoute allowedRoles={['STUDENT']}>
+            <DashboardLayout role="student">
+              <StudentProfile />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/hr/dashboard"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <HRDashboard />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/hr/dashboard/baru"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <CreateInternship />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/hr/dashboard/:internship_id/edit"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <EditInternship />
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
@@ -52,45 +123,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Auth Routes — layout sendiri, tanpa AppLayout */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register/student" element={<RegisterStudent />} />
-          <Route path="/register/hr" element={<RegisterHR />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-
-          {/* Public */}
-          <Route path="/" element={<AppLayout><Home /></AppLayout>} />
-
-          {/* Admin Routes — layout sendiri */}
-          <Route path="/admin/dashboard" element={<PendingList />} />
-          <Route path="/admin/perusahaan/:id" element={<HRDetail />} />
-          <Route
-            path="/admin/hr/profile/:hr_profile_id"
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <HRDetail />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* HR Routes — layout sendiri */}
-          <Route path="/hr/dashboard" element={<HRDashboard />} />
-          <Route path="/hr/dashboard/baru" element={<CreateInternship />} />
-          <Route path="/hr/dashboard/:internship_id/edit" element={<EditInternship />} />
-
-          {/* Student Routes — layout sendiri */}
-          <Route
-            path="/internship"
-            element={
-              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
-                <InternshipSearch />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
   );
