@@ -1,26 +1,10 @@
 import React, { useState } from 'react';
 import OfferCard from '@/components/organisms/OfferCard';
 import ConfirmationDialog from '@/components/organisms/ConfirmationDialog';
-
-const dummyOffers = [
-  {
-    id: 1,
-    companyInitial: 'G',
-    companyName: 'Google Indonesia',
-    position: 'Software Engineering Intern',
-    location: 'Jakarta Selatan, DKI Jakarta',
-    deadline: '20 October 2023',
-    offerDate: '10 October 2023',
-    duration: '6 Bulan (Januari - Juni 2024)',
-    salary: 'Rp 4.500.000 / Bulan',
-    documentName: 'Surat_Penawaran_Google.pdf',
-    documentUrl: '#',
-    companyMessage: 'Selamat! Berdasarkan hasil wawancara dan tes teknikal, kami sangat senang untuk menawarkan Anda posisi sebagai Software Engineering Intern di Google Indonesia.'
-  },
-];
+import { useOffers } from '@/hooks/useOffers';
 
 function OffersPage() {
-  const [offers, setOffers] = useState(dummyOffers);
+  const { offers, isLoading, error, isUsingDummy, acceptOffer, rejectOffer } = useOffers();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState({ offerId: null, action: null });
 
@@ -31,11 +15,36 @@ function OffersPage() {
 
   const confirmAction = () => {
     const { offerId, action } = pendingAction;
-    console.log(`User ${action} offer ID ${offerId}`);
-    setOffers(prev => prev.filter(o => o.id !== offerId));
+    if (action === 'accept') {
+      acceptOffer(offerId);
+    } else {
+      rejectOffer(offerId);
+    }
     setDialogOpen(false);
     setPendingAction({ offerId: null, action: null });
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center text-gray-500">
+        Memuat tawaran lowongan...
+      </div>
+    );
+  }
+
+  if (error && !isUsingDummy) {
+    return (
+      <div className="h-full">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 mb-6">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (isUsingDummy && offers.length > 0) {
+    console.info('📦 Menggunakan data dummy untuk tawaran lowongan (API belum tersedia atau tidak ada data).');
+  }
 
   return (
     <div className="h-full">
