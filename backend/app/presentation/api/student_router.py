@@ -7,16 +7,23 @@ GET  /api/v1/students/applications/{id}     — detail of a single application (
 """
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from typing import Optional
 
 from app.application.services.student_service import StudentService
 from app.application.services.application_service import ApplicationService
+from app.application.services.offer_service import OfferService
 from app.infrastructure.unit_of_work import SQLAlchemyUnitOfWork
 from app.presentation.dependencies import get_uow, require_role
 from app.presentation.schemas.student import StudentProfileUpdateRequest, StudentProfileResponse
 from app.presentation.schemas.application import (
     StudentApplicationListResponse,
     StudentApplicationDetailResponse,
+)
+from app.presentation.schemas.offer import (
+    StudentOfferListResponse,
+    OfferRespondRequest,
+    OfferResponse,
 )
 
 router = APIRouter()
@@ -32,6 +39,12 @@ def get_application_service(
     uow: SQLAlchemyUnitOfWork = Depends(get_uow),
 ) -> ApplicationService:
     return ApplicationService(uow=uow)
+
+
+def get_offer_service(
+    uow: SQLAlchemyUnitOfWork = Depends(get_uow),
+) -> OfferService:
+    return OfferService(uow=uow)
 
 
 @router.get(
@@ -113,4 +126,69 @@ async def get_my_application_detail(
     return await svc.get_student_application_detail(
         student_user_id=current_user.id,
         application_id=application_id,
+    )
+
+
+# ─────────────────────────────────────────────────────────────
+# Offer endpoints
+# ─────────────────────────────────────────────────────────────
+
+@router.get(
+    "/offers",
+    summary="Daftar penawaran yang saya terima",
+    response_model=StudentOfferListResponse,
+    tags=["Students"],
+)
+async def get_my_offers(
+    status: Optional[str] = Query(
+        default=None,
+        description="Filter status: Pending | Accepted | Rejected",
+    ),
+    current_user=Depends(require_role("STUDENT")),
+    svc: OfferService = Depends(get_offer_service),
+):
+    """
+    Mengembalikan semua penawaran yang diterima mahasiswa yang login.
+    Gunakan query param `?status=Pending` (atau Accepted / Rejected) untuk memfilter.
+    """
+    return await svc.get_student_offers(
+        student_user_id=current_user.id,
+        status_filter=status,
+    )
+
+
+@router.patch(
+    "/offers/{offer_id}/respond",
+    summary="Terima atau tolak penawaran",
+    response_model=OfferResponse,
+    tags=["Students"],
+)
+async def respond_to_offer(
+    offer_id: UUID,
+    body: OfferRespondRequest,
+    current_user=Depends(require_role("STUDENT")),
+    svc: OfferService = Depends(get_offer_service),
+):
+    """
+    Mahasiswa menerima atau menolak penawaran magang.
+
+    **Request body:**
+    ```json
+    { "response_status": "Accepted" }  // atau "Rejected"
+    ```
+
+    **Validasi server:**
+    - Penawaran harus milik lamaran mahasiswa yang login.
+    - Tanggal hari ini tidak boleh melebihi `expiry_date`.
+    - Status penawaran harus masih 'Pending'.
+
+    **Side-effects (atomik):**
+    - Status penawaran diperbarui.
+    - Status lamaran diperbarui ke 'Diterima' / 'Ditolak'.
+    - Riwayat perubahan status lamaran dicatat.
+    """
+    return await svc.respond_to_offer(
+        student_user_id=current_user.id,
+        offer_id=offer_id,
+        payload=body,
     )

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import select
@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.entities.offer import Offer
 from app.domain.repositories.offer_repository import IOfferRepository
 from app.infrastructure.models.offer import OfferORM
+from app.infrastructure.models.application import ApplicationORM
 
 
 class SQLAlchemyOfferRepository(IOfferRepository):
@@ -29,12 +30,36 @@ class SQLAlchemyOfferRepository(IOfferRepository):
             updated_at=orm.updated_at,
         )
 
+    async def get_by_id(self, offer_id: UUID) -> Optional[Offer]:
+        r = await self._session.execute(
+            select(OfferORM).where(OfferORM.id == offer_id)
+        )
+        orm = r.scalars().first()
+        return self._to_domain(orm) if orm else None
+
     async def get_by_application_id(self, application_id: UUID) -> Optional[Offer]:
         r = await self._session.execute(
             select(OfferORM).where(OfferORM.application_id == application_id)
         )
         orm = r.scalars().first()
         return self._to_domain(orm) if orm else None
+
+    async def list_by_student_id(
+        self,
+        student_id: UUID,
+        status_filter: Optional[str] = None,
+    ) -> List[Offer]:
+        """Return all offers whose parent application belongs to `student_id`."""
+        query = (
+            select(OfferORM)
+            .join(ApplicationORM, OfferORM.application_id == ApplicationORM.id)
+            .where(ApplicationORM.student_id == student_id)
+        )
+        if status_filter:
+            query = query.where(OfferORM.status == status_filter)
+        query = query.order_by(OfferORM.created_at.desc())
+        r = await self._session.execute(query)
+        return [self._to_domain(o) for o in r.scalars().all()]
 
     async def save(self, offer: Offer) -> Offer:
         existing = None
