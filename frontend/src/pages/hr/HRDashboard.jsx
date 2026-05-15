@@ -71,7 +71,7 @@ function HRDashboard() {
             <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif', margin: 0 }}>
               Kelola Lowongan
             </h1>
-            <Button variant="primary" onClick={() => navigate('/hr/lowongan/baru')}>
+            <Button variant="primary" onClick={() => navigate('/hr/dashboard/baru')}>
               <Plus size={16} />
               Buat Lowongan Baru
             </Button>

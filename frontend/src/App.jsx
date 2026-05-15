@@ -18,6 +18,7 @@ import HRDetail from '@/pages/admin/HRDetail';
 
 // HR pages
 import HRDashboard from '@/pages/hr/HRDashboard';
+import CreateInternship from '@/pages/hr/CreateInternship';
 
 // Student pages
 import InternshipSearch from '@/pages/student/InternshipSearch';
@@ -74,6 +75,7 @@ function App() {
 
           {/* HR Routes — layout sendiri */}
           <Route path="/hr/dashboard" element={<HRDashboard />} />
+          <Route path="/hr/dashboard/baru" element={<CreateInternship />} />
 
           {/* Student Routes — layout sendiri */}
           <Route
