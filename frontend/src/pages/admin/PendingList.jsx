@@ -92,11 +92,21 @@ const PendingList = () => {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        minHeight: '100dvh',
+        height: '100dvh',
+        backgroundColor: '#EEF0F8',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <Navbar variant="app" user={{ name: 'Admin IPB' }} onLogout={onLogout} />
       <div
         style={{
           flex: 1,
+          minHeight: 0,
+          overflow: 'auto',
           padding: '32px 40px',
           maxWidth: '1200px',
           width: '100%',

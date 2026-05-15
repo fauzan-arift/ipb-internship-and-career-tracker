@@ -1,7 +1,7 @@
 import React from 'react';
 import CompanyTableRow from '../molecules/CompanyTableRow';
 
-function DataTable({ columns, data, onAction, emptyMessage = 'Tidak ada data' }) {
+function DataTable({ columns, data, onAction, emptyMessage = 'Tidak ada data', renderRow }) {
   return (
     <div
       style={{
@@ -19,7 +19,7 @@ function DataTable({ columns, data, onAction, emptyMessage = 'Tidak ada data' })
                 key={col.key}
                 style={{
                   padding: '12px 16px',
-                  textAlign: 'left',
+                  textAlign: col.align || 'left',
                   fontSize: '12px',
                   fontWeight: '600',
                   color: '#6B7280',
@@ -27,6 +27,7 @@ function DataTable({ columns, data, onAction, emptyMessage = 'Tidak ada data' })
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                   whiteSpace: 'nowrap',
+                  width: col.width || 'auto',
                 }}
               >
                 {col.label}
@@ -51,13 +52,17 @@ function DataTable({ columns, data, onAction, emptyMessage = 'Tidak ada data' })
               </td>
             </tr>
           ) : (
-            data.map((item) => (
-              <CompanyTableRow
-                key={item.id}
-                company={item}
-                onAction={onAction}
-              />
-            ))
+            data.map((item) =>
+              renderRow ? (
+                renderRow(item)
+              ) : (
+                <CompanyTableRow
+                  key={item.id}
+                  company={item}
+                  onAction={onAction}
+                />
+              )
+            )
           )}
         </tbody>
       </table>
