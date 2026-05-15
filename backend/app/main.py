@@ -13,6 +13,7 @@ from app.presentation.api.hr_internship import router as hr_internship_router
 from app.presentation.api.document_router import router as document_router
 from app.presentation.api.student_router import router as student_router
 from app.presentation.api.hr_router import router as hr_profile_router
+from app.presentation.api.skill_router import router as skill_router
 
 
 @asynccontextmanager
@@ -44,6 +45,7 @@ app.include_router(hr_internship_router, prefix=f"{settings.API_V1_STR}/hr/inter
 app.include_router(document_router, prefix=f"{settings.API_V1_STR}/documents", tags=["Documents"])
 app.include_router(student_router, prefix=f"{settings.API_V1_STR}/students", tags=["Students"])
 app.include_router(hr_profile_router, prefix=f"{settings.API_V1_STR}/hr", tags=["HR - Profile"])
+app.include_router(skill_router, prefix=f"{settings.API_V1_STR}/skills", tags=["Skills"])
 
 
 @app.get("/", tags=["default"])

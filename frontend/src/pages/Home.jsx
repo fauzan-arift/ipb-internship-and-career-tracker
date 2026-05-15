@@ -1,10 +1,8 @@
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom'; 
+import { Link, Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth'; 
 
 const Home = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const navigate = useNavigate();
 
   if (isLoading) {
     return <div className="text-center py-12">Loading...</div>;
@@ -25,46 +23,19 @@ const Home = () => {
     );
   }
 
-  return (
-    <div className="max-w-3xl mx-auto py-12">
-      <div className="bg-white p-8 rounded-lg shadow-md border-t-4 border-blue-600">
-        <h2 className="text-3xl font-bold mb-2">Dashboard {user.role}</h2>
-        <p className="text-gray-600 mb-6">Halo, <span className="font-semibold">{user.email}</span>. Anda login sebagai {user.role}.</p>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {user.role === 'ADMIN' && (
-            <>
-              <Link to="/admin/pending" className="flex flex-col items-center p-6 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
-                <span className="text-2xl mb-2">📋</span>
-                <span className="font-semibold text-blue-800">Review Pendaftar HR</span>
-              </Link>
-              <Link to="/admin/history" className="flex flex-col items-center p-6 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors">
-                <span className="text-2xl mb-2">🗄️</span>
-                <span className="font-semibold text-gray-800">History Pendaftaran HR</span>
-              </Link>
-            </>
-          )}
+  // If user is authenticated, redirect them to their respective dashboards
+  if (user.role === 'ADMIN') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  if (user.role === 'STUDENT') {
+    return <Navigate to="/internship" replace />;
+  }
+  if (user.role === 'HR') {
+    // Placeholder for HR dashboard
+    return <Navigate to="/hr/dashboard" replace />;
+  }
 
-            {user.role === 'STUDENT' && (
-              <div 
-                className="flex flex-col items-center p-6 bg-green-50 rounded-lg border border-green-200 cursor-pointer hover:bg-green-100 transition-colors"
-                onClick={() => navigate('/internship')}
-              >
-                <span className="text-2xl mb-2">🎓</span>
-                <span className="font-semibold text-green-800">Cari Lowongan Magang</span>
-              </div>
-            )}
-
-            {user.role === 'HR' && (
-              <div className="flex flex-col items-center p-6 bg-purple-50 rounded-lg border border-purple-200 cursor-pointer hover:bg-purple-100 transition-colors">
-                <span className="text-2xl mb-2">🏢</span>
-                <span className="font-semibold text-purple-800">Pasang Lowongan (Coming Soon)</span>
-              </div>
-            )}
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 };
 
 export default Home;
