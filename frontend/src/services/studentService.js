@@ -26,6 +26,24 @@ export const studentService = {
   },
 
   /**
+   * GET /api/v1/skills
+   * Returns list of all globally available skills
+   */
+  async getGlobalSkills() {
+    const res = await fetch(`${API_BASE}/skills`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader(),
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw { response: { data: error, status: res.status } };
+    }
+    return res.json();
+  },
+
+  /**
    * PUT /api/v1/students/profile
    * Partial update — only sends fields that changed.
    *
@@ -61,9 +79,15 @@ export const studentService = {
   async uploadDocument(file, type = 'cv') {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('type', type);
+    
+    // Map frontend 'type' to backend 'document_type' enum values
+    let docType = 'OTHER';
+    if (type.toLowerCase() === 'cv') docType = 'CV';
+    else if (type.toLowerCase() === 'photo') docType = 'PROFILE_PHOTO';
+    
+    formData.append('document_type', docType);
 
-    const res = await fetch(`${API_BASE}/api/v1/documents/upload`, {
+    const res = await fetch(`${API_BASE}/documents/upload`, {
       method: 'POST',
       headers: {
         // No Content-Type here — browser sets it with boundary for multipart

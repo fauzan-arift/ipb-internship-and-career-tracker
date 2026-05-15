@@ -11,13 +11,14 @@ const FormField = ({ label, children }) => (
   </div>
 )
 
-const TextInput = ({ value, onChange, type = 'text', placeholder = '' }) => (
+const TextInput = ({ value, onChange, type = 'text', placeholder = '', disabled = false }) => (
   <input
     type={type}
     value={value ?? ''}
     onChange={onChange}
     placeholder={placeholder}
-    className="w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] bg-white text-black text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors"
+    disabled={disabled}
+    className={`w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-black'}`}
   />
 )
 
@@ -26,7 +27,7 @@ const SelectInput = ({ value, onChange, options }) => (
     <select
       value={value ?? ''}
       onChange={onChange}
-      className="w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] bg-white text-black text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors appearance-none pr-10"
+      className="w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] bg-white text-black text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors appearance-none pr-14 truncate"
     >
       <option value="" disabled>Pilih...</option>
       {options.map((opt) => (
@@ -135,6 +136,7 @@ export default function StudentProfile() {
   const [phoneNumber, setPhoneNumber]       = useState('')
   const [skills, setSkills]                 = useState([])
   const [skillInput, setSkillInput]         = useState('')
+  const [globalSkills, setGlobalSkills]     = useState([])
 
   // ── File state ──
   const [cvUrl, setCvUrl]               = useState(null)
@@ -175,7 +177,16 @@ export default function StudentProfile() {
         setIsLoading(false)
       }
     }
+    const fetchSkills = async () => {
+      try {
+        const skillsData = await studentService.getGlobalSkills()
+        setGlobalSkills(skillsData.map((s) => s.name))
+      } catch (err) {
+        console.error('Gagal memuat daftar keahlian:', err)
+      }
+    }
     fetch()
+    fetchSkills()
   }, [])
 
   // ── Faculty change resets major ──
@@ -324,7 +335,7 @@ export default function StudentProfile() {
             ref={photoInputRef}
             type="file"
             accept="image/*"
-            className="hidden"
+            style={{ display: 'none' }}
             onChange={(e) => handlePhotoFile(e.target.files?.[0])}
           />
           {newPhotoFile && (
@@ -366,7 +377,7 @@ export default function StudentProfile() {
             <TextInput value={graduationYear} onChange={(e) => setGraduationYear(e.target.value)} placeholder="contoh: 2027" />
           </FormField>
           <FormField label="Email IPB">
-            <TextInput value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
+            <TextInput value={email} onChange={(e) => setEmail(e.target.value)} type="email" disabled={true} />
           </FormField>
           <FormField label="Nomor Telepon (WhatsApp)">
             <TextInput value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} type="tel" placeholder="contoh: 08123456789" />
@@ -396,7 +407,13 @@ export default function StudentProfile() {
             onKeyDown={handleSkillKeyDown}
             placeholder="Tambahkan keahlian, tekan Enter"
             className="flex-1 text-gray-500 text-base outline-none bg-transparent placeholder-gray-400"
+            list="global-skills-list"
           />
+          <datalist id="global-skills-list">
+            {globalSkills.map((skill) => (
+              <option key={skill} value={skill} />
+            ))}
+          </datalist>
           <button onClick={addSkill} className="ml-2 hover:opacity-60 transition-opacity">
             <PlusIcon />
           </button>
@@ -408,65 +425,17 @@ export default function StudentProfile() {
         <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Dokumen</h2>
         <p className="text-[#6B7280] text-sm">Unggah Kurikulum Vitae (CV) terbaru Anda.</p>
 
-        {/* Drop zone */}
-        {!newCvFile && (
-          <div
-            className={`flex flex-col items-center justify-center gap-4 h-[147px] rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging ? 'border-[#4D44B5] bg-[#E8F0FE]/30' : 'border-gray-300 hover:border-[#4D44B5]'}`}
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className="w-[52px] h-[52px] rounded-full bg-[#E8F0FE] flex items-center justify-center">
-              <UploadIcon />
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-[#4D44B5] font-semibold text-sm">Klik untuk memilih file</span>
-              <span className="text-[#6B7280] text-sm">atau drag and drop file di sini</span>
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              accept=".pdf,.doc,.docx"
-              onChange={(e) => { if (e.target.files?.[0]) setNewCvFile(e.target.files[0]) }}
-            />
-          </div>
-        )}
+        {/* Global hidden file input for CV */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          style={{ display: 'none' }}
+          accept=".pdf,.doc,.docx"
+          onChange={(e) => { if (e.target.files?.[0]) setNewCvFile(e.target.files[0]) }}
+        />
 
-        {/* Existing CV from server */}
-        {!newCvFile && cvUrl && (
-          <div className="flex items-center gap-3 px-3 py-4 rounded-lg border border-[#DBD9E1] bg-[#F8F9FE]">
-            <FileIcon />
-            <div className="flex flex-col gap-0.5 flex-1 overflow-hidden">
-              <span className="text-[#1B1B21] font-semibold text-sm truncate">CV tersimpan</span>
-              <a
-                href={cvUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#35299D] text-xs hover:underline truncate"
-              >
-                Lihat CV
-              </a>
-            </div>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="text-[#4D44B5] text-xs font-medium hover:underline flex-shrink-0"
-            >
-              Ganti
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              accept=".pdf,.doc,.docx"
-              onChange={(e) => { if (e.target.files?.[0]) setNewCvFile(e.target.files[0]) }}
-            />
-          </div>
-        )}
-
-        {/* New file picked */}
-        {newCvFile && (
+        {newCvFile ? (
+          /* State 1: New file selected (ready to save) */
           <div className="flex items-center gap-3 px-3 py-4 rounded-lg border border-[#DBD9E1] bg-[#F8F9FE]">
             <FileIcon />
             <div className="flex flex-col gap-0.5 flex-1 overflow-hidden">
@@ -481,6 +450,45 @@ export default function StudentProfile() {
             >
               <TrashIcon />
             </button>
+          </div>
+        ) : cvUrl ? (
+          /* State 2: Existing CV on server */
+          <div className="flex items-center gap-3 px-3 py-4 rounded-lg border border-[#DBD9E1] bg-[#F8F9FE]">
+            <FileIcon />
+            <div className="flex flex-col gap-0.5 flex-1 overflow-hidden">
+              <span className="text-[#1B1B21] font-semibold text-sm truncate">CV Tersimpan</span>
+              <a
+                href={cvUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#35299D] text-xs hover:underline truncate"
+              >
+                Lihat Dokumen Saat Ini
+              </a>
+            </div>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="text-[#4D44B5] text-xs font-medium hover:underline flex-shrink-0"
+            >
+              Ganti File
+            </button>
+          </div>
+        ) : (
+          /* State 3: Drop zone (No file) */
+          <div
+            className={`flex flex-col items-center justify-center gap-4 h-[147px] rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging ? 'border-[#4D44B5] bg-[#E8F0FE]/30' : 'border-gray-300 hover:border-[#4D44B5]'}`}
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <div className="w-[52px] h-[52px] rounded-full bg-[#E8F0FE] flex items-center justify-center">
+              <UploadIcon />
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-[#4D44B5] font-semibold text-sm">Klik untuk memilih file</span>
+              <span className="text-[#6B7280] text-sm">atau drag and drop file di sini</span>
+            </div>
           </div>
         )}
       </div>
