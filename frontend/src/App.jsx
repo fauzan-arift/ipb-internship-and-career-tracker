@@ -75,20 +75,20 @@ function App() {
           {/* ── Student pages ── */}
           <Route path="/lowongan"
             element={
-              // <ProtectedRoute allowedRoles={['MAHASISWA']}>
+              <ProtectedRoute allowedRoles={['MAHASISWA']}>
                 <DashboardLayout role="student">
                   <CariLowongan />
                 </DashboardLayout>
-              // </ProtectedRoute>
+              </ProtectedRoute>
             }
           />
           <Route path="/lowongan/:internship_id"
             element={
-              // <ProtectedRoute allowedRoles={['MAHASISWA']}>
+              <ProtectedRoute allowedRoles={['MAHASISWA']}>
                 <DashboardLayout role="student">
                   <InternshipDetail />
                 </DashboardLayout>
-              // </ProtectedRoute>
+              </ProtectedRoute>
             }
           />
 
