@@ -86,6 +86,10 @@ const sidebarMenus = {
     { label: "Logbook",          href: "/logbook",  icon: <BookIcon />      },
     { label: "Profil",           href: "/profile",   icon: <UserIcon />      },
   ],
+  hr: [
+    { label: "Kelola Lowongan", href: "/hr/dashboard", icon: <BriefcaseIcon /> },
+    { label: "Daftar Pelamar", href: "/hr/applicants", icon: <UsersIcon /> },
+  ],
   company: [
     { label: "Dashboard",         href: "/company/dashboard", icon: <GridIcon />     },
     { label: "Lowongan Saya",     href: "/company/lowongan",  icon: <BriefcaseIcon /> },
@@ -106,7 +110,7 @@ const sidebarMenus = {
  * Sidebar — role-aware, collapsible, normal document flow (NOT fixed/sticky)
  *
  * Props:
- *   role: "student" | "company" | "admin"  (default: "student")
+ *   role: "student" | "hr" | "company" | "admin"  (default: "student")
  */
 export default function Sidebar({ role = "student" }) {
   const location = useLocation();

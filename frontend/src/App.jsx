@@ -93,7 +93,9 @@ function AppRoutes() {
         path="/hr/dashboard"
         element={(
           <ProtectedRoute allowedRoles={['HR']}>
-            <HRDashboard />
+            <DashboardLayout role="hr">
+              <HRDashboard />
+            </DashboardLayout>
           </ProtectedRoute>
         )}
       />
@@ -101,7 +103,9 @@ function AppRoutes() {
         path="/hr/dashboard/new"
         element={(
           <ProtectedRoute allowedRoles={['HR']}>
-            <CreateInternship />
+            <DashboardLayout role="hr">
+              <CreateInternship />
+            </DashboardLayout>
           </ProtectedRoute>
         )}
       />
@@ -109,7 +113,9 @@ function AppRoutes() {
         path="/hr/dashboard/:internship_id/edit"
         element={(
           <ProtectedRoute allowedRoles={['HR']}>
-            <EditInternship />
+            <DashboardLayout role="hr">
+              <EditInternship />
+            </DashboardLayout>
           </ProtectedRoute>
         )}
       />
