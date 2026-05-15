@@ -18,6 +18,8 @@ import HRDetail from '@/pages/admin/HRDetail';
 import InternshipDetail from '@/pages/student/InternshipDetail';
 import InternshipSearch from '@/pages/student/InternshipSearch';
 import StudentProfile from '@/pages/student/StudentProfile';
+import MyApplications from '@/pages/student/MyApplications'; 
+import OffersPage from '@/pages/student/OffersPage';
 
 import HRDashboard from '@/pages/hr/HRDashboard';
 import CreateInternship from '@/pages/hr/CreateInternship';
@@ -120,6 +122,27 @@ function AppRoutes() {
         )}
       />
 
+      <Route
+        path="/my-application"
+        element={
+          <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
+            <DashboardLayout role="student">
+              <MyApplications />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+          />
+
+        <Route
+          path="/offers"
+          element={
+            <ProtectedRoute allowedRoles={['STUDENT']}>
+              <DashboardLayout role="student"><OffersPage /></DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+      {/* ── Fallback ── */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

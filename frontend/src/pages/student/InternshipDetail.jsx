@@ -97,7 +97,7 @@ const HeroSkeleton = () => (
         <div className="h-6 w-28 bg-gray-200 rounded-full" />
       </div>
     </div>
-    <div className="h-10 w-36 bg-gray-200 rounded-lg flex-shrink-0" />
+    <div className="h-10 w-36 bg-gray-200 rounded-lg shrink-0" />
   </div>
 )
 
@@ -200,7 +200,7 @@ export default function InternshipDetail() {
   // No flex wrapper, no sidebar, no min-h-screen here.
   // DashboardLayout in App.jsx handles all of that.
   return (
-    <div className="px-8 py-8 max-w-[1100px] mx-auto flex flex-col gap-6">
+    <div className="px-8 py-8 max-w-275 mx-auto flex flex-col gap-6">
 
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-3">
@@ -342,7 +342,7 @@ export default function InternshipDetail() {
                 </h2>
               </div>
               <div className="flex items-center gap-2 pt-2">
-                <div className="w-20 h-20 flex items-center justify-center rounded-2xl border border-[#E5E1EB] bg-white shadow-sm flex-shrink-0">
+                <div className="w-20 h-20 flex items-center justify-center rounded-2xl border border-[#E5E1EB] bg-white shadow-sm shrink-0">
                   <span className="text-2xl font-bold text-[#4D44B5]">
                     {internship.company.company_name.charAt(0)}
                   </span>

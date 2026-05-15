@@ -279,14 +279,14 @@ export default function StudentProfile() {
 
   // ── Loading ──
   if (isLoading) return (
-    <div className="px-8 py-8 max-w-[860px] mx-auto">
+    <div className="px-8 py-8 max-w-215 mx-auto">
       <ProfileSkeleton />
     </div>
   )
 
   // ── Error ──
   if (isError) return (
-    <div className="px-8 py-8 max-w-[860px] mx-auto flex flex-col items-center gap-4 mt-16">
+    <div className="px-8 py-8 max-w-215 mx-auto flex flex-col items-center gap-4 mt-16">
       <p className="text-[#1B1B21] text-lg font-semibold">Gagal memuat profil</p>
       <p className="text-[#454651] text-sm">{errorMsg}</p>
       <button
@@ -300,7 +300,7 @@ export default function StudentProfile() {
 
   // ── Render ──
   return (
-    <div className="px-8 py-8 max-w-[860px] mx-auto flex flex-col gap-6">
+    <div className="px-8 py-8 max-w-215 mx-auto flex flex-col gap-6">
 
       {successMsg && (
         <div className="px-4 py-3 rounded-lg bg-[#D1FAE5] border border-[#6EE7B7] text-[#065F46] text-sm font-medium">
@@ -318,7 +318,7 @@ export default function StudentProfile() {
 
         {/* Avatar */}
         <div className="flex items-center gap-3">
-          <div className="w-20 h-20 rounded-2xl border border-gray-200 bg-white shadow-sm flex items-center justify-center overflow-hidden flex-shrink-0">
+          <div className="w-20 h-20 rounded-2xl border border-gray-200 bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0">
             {photoUrl
               ? <img src={photoUrl} alt="Foto profil" className="w-full h-full object-cover" />
               : <span className="text-2xl font-bold text-[#4D44B5]">{fullName?.charAt(0) ?? '?'}</span>
@@ -468,7 +468,7 @@ export default function StudentProfile() {
             </div>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="text-[#4D44B5] text-xs font-medium hover:underline flex-shrink-0"
+              className="text-[#4D44B5] text-xs font-medium hover:underline shrink-0"
             >
               Ganti File
             </button>
@@ -476,13 +476,13 @@ export default function StudentProfile() {
         ) : (
           /* State 3: Drop zone (No file) */
           <div
-            className={`flex flex-col items-center justify-center gap-4 h-[147px] rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging ? 'border-[#4D44B5] bg-[#E8F0FE]/30' : 'border-gray-300 hover:border-[#4D44B5]'}`}
+            className={`flex flex-col items-center justify-center gap-4 h-36.75 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging ? 'border-[#4D44B5] bg-[#E8F0FE]/30' : 'border-gray-300 hover:border-[#4D44B5]'}`}
             onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <div className="w-[52px] h-[52px] rounded-full bg-[#E8F0FE] flex items-center justify-center">
+            <div className="w-13 h-13 rounded-full bg-[#E8F0FE] flex items-center justify-center">
               <UploadIcon />
             </div>
             <div className="flex flex-col items-center gap-1">
