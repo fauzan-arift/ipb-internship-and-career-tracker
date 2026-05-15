@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { applicationService } from '@/services/applicationService';
+import { dummyApplications } from '@/data/dummyApplications';
 
 export function useApplications() {
   const [applications, setApplications] = useState([]);
@@ -14,29 +15,87 @@ export function useApplications() {
   const [isLoadingList, setIsLoadingList] = useState(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [error, setError] = useState(null);
+  const [useDummy, setUseDummy] = useState(false);
 
-  // --- FETCH LIST + STATS ---
   const fetchApplications = useCallback(async () => {
     setIsLoadingList(true);
     setError(null);
     try {
       const data = await applicationService.listApplications();
-      setApplications(data.applications || []);
-      setStats(data.stats || {});
+      const apiApps = data.applications || [];
+      const apiStats = data.stats || {};
+
+      if (apiApps.length === 0) {
+        console.info('Data API kosong. Menggunakan dummy applications sebagai fallback.');
+        setApplications(dummyApplications);
+        setStats({
+          total_applications: dummyApplications.length,
+          processing_count: dummyApplications.filter(a => a.status === 'Diproses').length,
+          accepted_count: dummyApplications.filter(a => a.status === 'Diterima').length,
+          rejected_count: dummyApplications.filter(a => a.status === 'Ditolak').length,
+        });
+        setUseDummy(true);
+        if (!selectedId && dummyApplications.length > 0) {
+          setSelectedId(dummyApplications[0].id);
+        }
+      } else {
+        setApplications(apiApps);
+        setStats(apiStats);
+        setUseDummy(false);
+        if (!selectedId && apiApps.length > 0) {
+          setSelectedId(apiApps[0].id);
+        }
+      }
     } catch (err) {
       console.error('Failed to fetch applications:', err);
       setError(err.message || 'Gagal memuat daftar lamaran.');
+      console.info('API error. Menggunakan dummy applications sebagai fallback.');
+      setApplications(dummyApplications);
+      setStats({
+        total_applications: dummyApplications.length,
+        processing_count: dummyApplications.filter(a => a.status === 'Diproses').length,
+        accepted_count: dummyApplications.filter(a => a.status === 'Diterima').length,
+        rejected_count: dummyApplications.filter(a => a.status === 'Ditolak').length,
+      });
+      setUseDummy(true);
+      if (!selectedId && dummyApplications.length > 0) {
+        setSelectedId(dummyApplications[0].id);
+      }
     } finally {
       setIsLoadingList(false);
     }
-  }, []);
+  }, [selectedId]);
 
-  // --- FETCH DETAIL (selected) ---
   const fetchDetail = useCallback(async (id) => {
     if (!id) {
       setSelectedDetail(null);
       return;
     }
+
+    if (useDummy) {
+      const dummyDetail = dummyApplications.find(app => app.id === id);
+      if (dummyDetail) {
+        setSelectedDetail({
+          id: dummyDetail.id,
+          internship: {
+            title: dummyDetail.position,
+            company: {
+              company_name: dummyDetail.company,
+              photo_profile_url: null,
+            },
+          },
+          status: dummyDetail.status,
+          application_time: dummyDetail.date,
+          status_history: dummyDetail.timeline || [],
+          offer: null,
+          position: dummyDetail.position,
+          company: dummyDetail.company,
+          logo: dummyDetail.logo || '?',
+        });
+        return;
+      }
+    }
+
     setIsLoadingDetail(true);
     setError(null);
     try {
@@ -45,33 +104,34 @@ export function useApplications() {
     } catch (err) {
       console.error(`Failed to fetch detail for ${id}:`, err);
       setError(err.message || 'Gagal memuat detail lamaran.');
+      setSelectedDetail(null);
     } finally {
       setIsLoadingDetail(false);
     }
-  }, []);
+  }, [useDummy]);
 
-  // --- AUTO FETCH LIST ON MOUNT ---
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
 
-  // --- AUTO FETCH DETAIL WHEN selectedId CHANGES ---
   useEffect(() => {
     fetchDetail(selectedId);
   }, [selectedId, fetchDetail]);
 
   return {
-    // List & stats
     applications,
     stats,
     isLoadingList,
     isLoadingDetail,
     error,
+    isUsingDummy: useDummy,
     refresh: fetchApplications,
 
-    // Selection
     selectedId,
     setSelectedId,
     selectedDetail,
   };
+
+  console.log('dummyDetail.timeline:', dummyDetail.timeline);
+  console.log('status_history yang disimpan:', dummyDetail.timeline || []);
 }
