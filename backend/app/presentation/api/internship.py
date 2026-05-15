@@ -26,7 +26,7 @@ def get_internship_service(uow: SQLAlchemyUnitOfWork = Depends(get_uow)) -> Inte
 
 
 @router.get(
-    "/",
+    "",
     summary="Daftar lowongan magang aktif",
     response_model=PaginatedInternshipResponse,
 )

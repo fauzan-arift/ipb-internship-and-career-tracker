@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase } from 'lucide-react';
 import Navbar from '@/components/organisms/Navbar';
+import logoIPB from '@/assets/logo-ipb.png';
 import PageFooter from '@/components/organisms/PageFooter';
 import TextInput from '@/components/atoms/TextInput';
 import PasswordInput from '@/components/atoms/PasswordInput';
@@ -65,9 +65,7 @@ function Login() {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '40px', width: '100%', maxWidth: '440px', boxSizing: 'border-box' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px', gap: '12px' }}>
-            <div style={{ backgroundColor: '#EEF0FF', borderRadius: '10px', padding: '12px', color: '#3D3FA8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Briefcase size={24} />
-            </div>
+            <img src={logoIPB} alt="IPB Logo" style={{ height: '64px', width: 'auto' }} />
             <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif', margin: 0 }}>
               IPB Internship Portal
             </h1>

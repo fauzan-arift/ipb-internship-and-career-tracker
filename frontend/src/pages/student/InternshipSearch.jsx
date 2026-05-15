@@ -24,7 +24,7 @@ function getTagLabel(status) {
   return n;
 }
 
-export default function CariLowongan() {
+function InternshipSearch() {
   const navigate = useNavigate();
   const { internships, searchQuery, setSearchQuery, isLoading, error } = useInternships();
 
@@ -42,13 +42,12 @@ export default function CariLowongan() {
   }));
 
   return (
-    // ✅ Just content — no sidebar, no h-screen, no overflow-y-auto
     <div>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px', color: '#111827' }}>
+      <h1 className="text-2xl font-bold mb-4 text-gray-900">
         Cari Lowongan Magang
       </h1>
 
-      <div style={{ marginBottom: '24px' }}>
+      <div className="mb-6">
         <SearchBar
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -57,32 +56,40 @@ export default function CariLowongan() {
       </div>
 
       {isLoading && (
-        <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px', textAlign: 'center', color: '#6B7280' }}>
+        <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-600 shadow-sm">
           Memuat lowongan magang...
         </div>
       )}
 
       {error && (
-        <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#B91C1C', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 mb-6">
           {error}
         </div>
       )}
 
       {!isLoading && !error && mappedInternships.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #E5E7EB', padding: '24px', textAlign: 'center', color: '#6B7280' }}>
+        <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
           Tidak ada lowongan magang yang sesuai.
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {mappedInternships.map((item) => (
           <InternshipCard
             key={item.id}
-            {...item}
-            onDetailClick={() => navigate(`/lowongan/${item.id}`)}
+            tags={item.tags}
+            companyName={item.companyName}
+            companyInitial={item.companyInitial}
+            position={item.position}
+            location={item.location}
+            duration={item.duration}
+            deadline={item.deadline}
+            onDetailClick={() => navigate(`/internship/${item.id}`)}  // ← tetap /lowongan
           />
         ))}
       </div>
     </div>
   );
 }
+
+export default InternshipSearch;
