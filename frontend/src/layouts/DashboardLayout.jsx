@@ -7,15 +7,15 @@ export default function DashboardLayout({ children, role }) {
   const { user, logout } = useAuth();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}>
 
       {/* Header spans full width */}
       <Header variant="app" user={user} onLogout={logout} />
 
       {/* Sidebar + content sit side by side, grow to fill remaining height */}
-      <div style={{ display: 'flex', flex: 1 }}>
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <Sidebar role={role} />
-        <main style={{ flex: 1, minWidth: 0, padding: '24px', backgroundColor: '#F3F4F6' }}>
+        <main style={{ flex: 1, minWidth: 0, padding: '24px', backgroundColor: '#F3F4F6', overflowY: 'auto' }}>
           {children}
         </main>
       </div>

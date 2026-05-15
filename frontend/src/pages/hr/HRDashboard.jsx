@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase, List, Plus } from 'lucide-react';
-import Navbar from '@/components/organisms/Navbar';
-import PageFooter from '@/components/organisms/PageFooter';
-import Sidebar from '@/components/organisms/Sidebar';
-import SidebarLayout from '@/components/organisms/SidebarLayout';
 import DataTable from '@/components/organisms/DataTable';
 import SearchBar from '@/components/molecules/SearchBar';
 import InternshipTableRow from '@/components/molecules/InternshipTableRow';
@@ -37,10 +33,6 @@ function HRDashboard() {
 
   const { items, isLoading, error, total, page, setPage, setSearchQuery } = useHRs({ initialSearch: '', initialPage: 1, initialLimit: ITEMS_PER_PAGE });
 
-  function onLogout() {
-    navigate('/login');
-  }
-
   function onSearchChange(event) {
     const q = event.target.value;
     setSearch(q);
@@ -52,76 +44,58 @@ function HRDashboard() {
   const totalPages = Math.ceil((total || 0) / ITEMS_PER_PAGE);
 
   return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        height: '100dvh',
-        backgroundColor: '#EEF0F8',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <Navbar variant="app" user={{ name: 'HR Manager' }} onLogout={onLogout} />
-
-      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-        <SidebarLayout
-          sidebar={<Sidebar menuItems={MENU_HR} activeHref="/hr/dashboard" />}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif', margin: 0 }}>
-              Kelola Lowongan
-            </h1>
-            <Button variant="primary" onClick={() => navigate('/hr/dashboard/new')}>
-              <Plus size={16} />
-              Buat Lowongan Baru
-            </Button>
-          </div>
-
-          <div style={{ marginBottom: '20px' }}>
-            <SearchBar
-              value={search}
-              onChange={(e) => {
-                onSearchChange(e);
-                // set hook searchQuery by calling setSearchQuery from hook
-              }}
-              placeholder="Cari judul, lokasi, industri, atau status"
-            />
-          </div>
-
-          <DataTable
-            columns={COLUMNS}
-            data={paginated}
-            emptyMessage={isLoading ? 'Memuat...' : 'Tidak ada lowongan ditemukan'}
-            renderRow={(item) => (
-              <InternshipTableRow
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                location={item.location}
-                industry={item.industry}
-                quota={item.quota}
-                statusPelaksanaan={item.work_status || item.statusPelaksanaan}
-                closingDate={item.close_date || item.closingDate}
-                onEdit={() => navigate(`/hr/dashboard/${item.id}/edit`)}
-                onClose={() => console.log('tutup', item.id)}
-                onDelete={() => console.log('hapus', item.id)}
-              />
-            )}
-          />
-
-          {totalPages > 1 && (
-            <div style={{ marginTop: '16px', padding: '0 8px' }}>
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={(p) => setPage(p)}
-              />
-            </div>
-          )}
-        </SidebarLayout>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif', margin: 0 }}>
+          Kelola Lowongan
+        </h1>
+        <Button variant="primary" onClick={() => navigate('/hr/dashboard/new')}>
+          <Plus size={16} />
+          Buat Lowongan Baru
+        </Button>
       </div>
 
-      <PageFooter />
+      <div style={{ marginBottom: '20px' }}>
+        <SearchBar
+          value={search}
+          onChange={(e) => {
+            onSearchChange(e);
+            // set hook searchQuery by calling setSearchQuery from hook
+          }}
+          placeholder="Cari judul, lokasi, industri, atau status"
+        />
+      </div>
+
+      <DataTable
+        columns={COLUMNS}
+        data={paginated}
+        emptyMessage={isLoading ? 'Memuat...' : 'Tidak ada lowongan ditemukan'}
+        renderRow={(item) => (
+          <InternshipTableRow
+            key={item.id}
+            id={item.id}
+            title={item.title}
+            location={item.location}
+            industry={item.industry}
+            quota={item.quota}
+            statusPelaksanaan={item.work_status || item.statusPelaksanaan}
+            closingDate={item.close_date || item.closingDate}
+            onEdit={() => navigate(`/hr/dashboard/${item.id}/edit`)}
+            onClose={() => console.log('tutup', item.id)}
+            onDelete={() => console.log('hapus', item.id)}
+          />
+        )}
+      />
+
+      {totalPages > 1 && (
+        <div style={{ marginTop: '16px', padding: '0 8px' }}>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={(p) => setPage(p)}
+          />
+        </div>
+      )}
     </div>
   );
 }
