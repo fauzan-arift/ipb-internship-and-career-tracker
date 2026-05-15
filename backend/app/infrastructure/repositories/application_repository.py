@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from sqlalchemy import select, func
@@ -52,6 +52,53 @@ class SQLAlchemyApplicationRepository(IApplicationRepository):
         )
         orm = r.scalars().first()
         return self._to_domain(orm) if orm else None
+
+    async def list_by_student(self, student_id: UUID) -> List[Application]:
+        r = await self._session.execute(
+            select(ApplicationORM)
+            .where(ApplicationORM.student_id == student_id)
+            .order_by(ApplicationORM.application_time.desc())
+        )
+        return [self._to_domain(o) for o in r.scalars().all()]
+
+    async def list_by_internship(
+        self,
+        internship_id: UUID,
+        status_filter: Optional[str],
+        page: int,
+        limit: int,
+    ) -> Tuple[List[Application], int]:
+        from app.domain.entities.enums import ApplicationStatus  # local import to avoid circular
+
+        query = select(ApplicationORM).where(
+            ApplicationORM.internship_id == internship_id
+        )
+        if status_filter:
+            try:
+                enum_val = ApplicationStatus(status_filter)
+                query = query.where(ApplicationORM.status == enum_val)
+            except ValueError:
+                # Unknown status value — return empty result set
+                return [], 0
+
+        count_q = select(func.count()).select_from(query.subquery())
+        total = (await self._session.execute(count_q)).scalar_one()
+
+        query = query.order_by(ApplicationORM.application_time.desc())
+        query = query.offset((page - 1) * limit).limit(limit)
+        items = (await self._session.execute(query)).scalars().all()
+
+        return [self._to_domain(o) for o in items], total
+
+    async def get_status_history(
+        self, application_id: UUID
+    ) -> List[ApplicationStatusHistory]:
+        r = await self._session.execute(
+            select(ApplicationStatusHistoryORM)
+            .where(ApplicationStatusHistoryORM.application_id == application_id)
+            .order_by(ApplicationStatusHistoryORM.changed_at.desc())
+        )
+        return [self._history_to_domain(o) for o in r.scalars().all()]
 
     async def count_by_internship(self, internship_id: UUID) -> int:
         r = await self._session.execute(
