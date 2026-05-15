@@ -19,11 +19,11 @@ function StatusTimelineItem({ title, description, date, state, isLast }) {
   return (
     <div className="relative flex gap-4 pb-6">
       {!isLast && (
-        <div className="absolute left-[11px] top-7 bottom-0 w-0.5 bg-gray-200" />
+        <div className="absolute left-2.75 top-7 bottom-0 w-0.5 bg-gray-200" />
       )}
       
       <div 
-        className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${iconBgColor} transition-colors`}
+        className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center ${iconBgColor} transition-colors`}
       >
         {iconContent}
       </div>

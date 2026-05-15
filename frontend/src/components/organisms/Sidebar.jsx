@@ -115,7 +115,7 @@ export default function Sidebar({ activeMenu }) {
                 `}
               >
                 {/* Icon — warna ikut state aktif */}
-                <span className={`flex-shrink-0 ${isActive ? 'text-[#4D44B5]' : 'text-gray-400'}`}>
+                <span className={`shrink-0 ${isActive ? 'text-[#4D44B5]' : 'text-gray-400'}`}>
                   {item.icon}
                 </span>
 
@@ -132,7 +132,7 @@ export default function Sidebar({ activeMenu }) {
       </aside>
 
       {/* Spacer — dorong konten ke kanan sesuai lebar sidebar */}
-      <div className={`flex-shrink-0 transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`} />
+      <div className={`shrink-0 transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`} />
     </>
   );
 }

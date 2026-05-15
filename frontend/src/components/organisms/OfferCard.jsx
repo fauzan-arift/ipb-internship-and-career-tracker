@@ -25,7 +25,7 @@ function OfferCard({ offer, onAccept, onReject }) {
             </div>
           </div>
         </div>
-        <div className="text-right flex-shrink-0">
+        <div className="text-right shrink-0">
           <span className="text-xs text-gray-400">Batas Waktu:</span>
           <p className="text-red-600 font-semibold text-sm">{offer.deadline}</p>
         </div>
