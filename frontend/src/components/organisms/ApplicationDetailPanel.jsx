@@ -18,7 +18,7 @@ function ApplicationDetailPanel({ application }) {
   if (application.status === 'Diterima') badgeVariant = 'green';
   if (application.status === 'Ditolak') badgeVariant = 'red';
 
-  const timelineItems = application.timeline || [];
+  const timelineItems = application.status_history ? [...application.status_history].reverse() : [];
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 h-full flex flex-col">
