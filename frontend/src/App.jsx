@@ -12,7 +12,7 @@ import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
 import InternshipSearch from '@/pages/student/InternshipSearch';
-
+import MyApplications from './pages/student/MyApplications';
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
 
@@ -78,6 +78,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          
+          <Route
+            path="/my-application"
+            element={
+              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
+                <AppLayout><MyApplications /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
