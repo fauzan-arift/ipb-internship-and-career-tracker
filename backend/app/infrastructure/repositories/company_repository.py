@@ -25,6 +25,7 @@ class SQLAlchemyCompanyRepository(ICompanyRepository):
             description=orm.description,
             email=orm.email,
             npwp_document_id=orm.npwp_document_id,
+            photo_profile_id=orm.photo_profile_id,
             verification_status=orm.verification_status,
             verified_at=orm.verified_at,
             registration_date=orm.registration_date,
@@ -56,6 +57,7 @@ class SQLAlchemyCompanyRepository(ICompanyRepository):
             existing.description = company.description
             existing.email = company.email
             existing.npwp_document_id = company.npwp_document_id
+            existing.photo_profile_id = company.photo_profile_id
             existing.verification_status = company.verification_status
             existing.verified_at = company.verified_at
             orm = existing
@@ -69,6 +71,7 @@ class SQLAlchemyCompanyRepository(ICompanyRepository):
                 description=company.description,
                 email=company.email,
                 npwp_document_id=company.npwp_document_id,
+                photo_profile_id=company.photo_profile_id,
                 verification_status=company.verification_status,
                 verified_at=company.verified_at,
             )

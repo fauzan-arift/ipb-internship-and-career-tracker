@@ -23,6 +23,7 @@ class CompanyVerificationStatus(str, Enum):
 class DocumentType(str, Enum):
     CV = "CV"
     NPWP = "NPWP"
+    PROFILE_PHOTO = "PROFILE_PHOTO"
     OTHER = "OTHER"
 
 

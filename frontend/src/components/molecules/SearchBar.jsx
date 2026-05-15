@@ -24,7 +24,7 @@ function SearchBar({ value, onChange, placeholder = 'Cari...' }) {
         style={{
           width: '100%',
           padding: '10px 12px 10px 38px',
-          borderRadius: '8px',
+          borderRadius: '100px',
           border: '1.5px solid #CBD0E0',
           fontSize: '14px',
           fontFamily: 'Inter, sans-serif',

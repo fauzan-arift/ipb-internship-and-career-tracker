@@ -11,6 +11,9 @@ const variants = {
   wfa: { backgroundColor: '#E8F5EE', color: '#1A6B3A' },
   diproses: { backgroundColor: '#F3EEFF', color: '#6B21A8' },
   pipeline: { backgroundColor: '#FFF3CD', color: '#856404' },
+  orange: { backgroundColor: '#FFEDD5', color: '#9A3412' },
+  teal: { backgroundColor: '#E0F2F1', color: '#004D40' },
+  indigo: { backgroundColor: '#E0E7FF', color: '#3730A3' },
 };
 
 function Badge({ children, variant = 'gray' }) {
@@ -23,7 +26,7 @@ function Badge({ children, variant = 'gray' }) {
         padding: '4px 10px',
         borderRadius: '999px',
         fontSize: '12px',
-        fontWeight: '600',
+        fontWeight: '500',
         fontFamily: 'Inter, sans-serif',
         display: 'inline-block',
         whiteSpace: 'nowrap',

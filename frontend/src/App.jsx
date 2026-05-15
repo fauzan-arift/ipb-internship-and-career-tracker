@@ -11,6 +11,7 @@ import RegisterHR from '@/pages/auth/RegisterHR';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
 import PendingList from '@/pages/admin/PendingList';
 import HRDetail from '@/pages/admin/HRDetail';
+import InternshipSearch from '@/pages/student/InternshipSearch';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -26,7 +27,7 @@ function AppLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="grow container mx-auto px-4 sm:px-6 lg:px-8">
         {children}
       </main>
       <footer className="bg-white text-center py-4 text-sm text-gray-500 mt-auto border-t">
@@ -46,17 +47,17 @@ function App() {
           <Route path="/register/student" element={<RegisterStudent />} />
           <Route path="/register/hr" element={<RegisterHR />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-
+          
           {/* App Routes — dengan Navbar & footer */}
           <Route path="/" element={<AppLayout><Home /></AppLayout>} />
           <Route path="/admin/dashboard" element={<PendingList />} />
           <Route path="/admin/perusahaan/:id" element={<HRDetail />} />
 
           <Route
-            path="/admin/pending"
+            path="/admin/dashboard"
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AppLayout><PendingList /></AppLayout>
+                <PendingList />
               </ProtectedRoute>
             }
           />
@@ -64,19 +65,19 @@ function App() {
             path="/admin/hr/profile/:hr_profile_id"
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AppLayout><HRDetail /></AppLayout>
+                <HRDetail />
               </ProtectedRoute>
             }
           />
-          {/* <Route
-            path="/admin/history"
+
+          <Route
+            path="/internship"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AppLayout><HistoryList /></AppLayout>
+              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
+                <AppLayout><InternshipSearch /></AppLayout>
               </ProtectedRoute>
             }
-          /> */}
-
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

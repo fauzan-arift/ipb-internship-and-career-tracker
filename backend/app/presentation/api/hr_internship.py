@@ -50,7 +50,7 @@ async def _resolve_company_id(
 
 
 @router.get(
-    "/",
+    "",
     summary="Daftar lowongan milik perusahaan HR",
     response_model=PaginatedInternshipResponse,
 )
@@ -67,7 +67,7 @@ async def list_hr_internships(
 
 
 @router.post(
-    "/",
+    "",
     summary="Buat lowongan magang baru",
     response_model=InternshipDetailResponse,
     status_code=status.HTTP_201_CREATED,
