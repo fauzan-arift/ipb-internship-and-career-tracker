@@ -12,9 +12,11 @@ from app.infrastructure.models.verification_token import VerificationTokenORM
 from app.infrastructure.models.internship import InternshipORM
 from app.infrastructure.models.application import ApplicationORM, ApplicationStatusHistoryORM
 from app.infrastructure.models.skill import SkillORM
+from app.infrastructure.models.offer import OfferORM
 
 __all__ = [
     "UserORM", "StudentORM", "HrORM", "AdminORM",
     "CompanyORM", "DocumentORM", "EmailNotificationORM", "VerificationTokenORM",
     "InternshipORM", "ApplicationORM", "ApplicationStatusHistoryORM", "SkillORM",
+    "OfferORM",
 ]
