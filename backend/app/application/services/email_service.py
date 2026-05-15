@@ -130,6 +130,78 @@ class EmailService:
             ref_id=str(user.id), ref_type="HR_APPROVAL"
         )
 
+    async def send_application_status_update(
+        self,
+        student_user: User,
+        internship_title: str,
+        company_name: str,
+        new_status: str,
+        application_id: str,
+        uow: IUnitOfWork,
+    ) -> None:
+        """
+        Notifies a student that their application status has changed.
+        The accent color reflects the nature of the update:
+          - Green  → Diterima / Accepted / Ditawarkan
+          - Red    → Ditolak / Rejected
+          - Blue   → everything else (in-progress)
+        """
+        # Determine badge colour
+        _green = {"Diterima", "Accepted", "Ditawarkan"}
+        _red   = {"Ditolak", "Rejected"}
+        if new_status in _green:
+            accent = "#1f7a4d"
+            badge_bg = "#dcfce7"
+            badge_color = "#166534"
+        elif new_status in _red:
+            accent = "#c2410c"
+            badge_bg = "#fee2e2"
+            badge_color = "#991b1b"
+        else:
+            accent = "#1f6feb"
+            badge_bg = "#dbeafe"
+            badge_color = "#1e40af"
+
+        app_url = f"{settings.FRONTEND_URL}/student/applications/{application_id}"
+
+        subject = f"Update Status Lamaran – {internship_title}"
+        body_html = f"""
+            <p style="margin:0 0 14px 0;">
+                Status lamaran kamu untuk posisi <strong>{escape(internship_title)}</strong>
+                di <strong>{escape(company_name)}</strong> telah diperbarui.
+            </p>
+            <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;
+                        padding:16px 18px;margin:0 0 16px 0;">
+                <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">Status terbaru</div>
+                <span style="display:inline-block;background:{badge_bg};color:{badge_color};
+                             font-weight:700;font-size:14px;padding:5px 14px;border-radius:20px;
+                             letter-spacing:0.3px;">
+                    {escape(new_status)}
+                </span>
+            </div>
+            <p style="margin:0;color:#6b7280;font-size:13px;">
+                Kamu bisa melihat riwayat lengkap perubahan status lamaran di halaman detail lamaran.
+            </p>
+        """
+        html = self._build_email_layout(
+            title="Status Lamaran Diperbarui",
+            recipient_name=student_user.full_name,
+            body_html=body_html,
+            accent_color=accent,
+            cta_label="Lihat Detail Lamaran",
+            cta_url=app_url,
+        )
+        send_status = await self._send(student_user.email, student_user.full_name, subject, html)
+        await self._save_notification(
+            uow,
+            student_user.id,
+            subject,
+            html,
+            send_status,
+            ref_id=application_id,
+            ref_type="APPLICATION_STATUS_UPDATE",
+        )
+
     async def send_hr_rejection_email(self, user: User, reason: str, uow: IUnitOfWork) -> None:
         subject = "Registrasi Kamu Ditolak"
         body_html = f"""

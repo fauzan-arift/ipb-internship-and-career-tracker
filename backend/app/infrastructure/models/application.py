@@ -31,6 +31,12 @@ class ApplicationORM(Base):
         cascade="all, delete-orphan",
         order_by="ApplicationStatusHistoryORM.changed_at",
     )
+    offer = relationship(
+        "OfferORM",
+        back_populates="application",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
 
 
 class ApplicationStatusHistoryORM(Base):
