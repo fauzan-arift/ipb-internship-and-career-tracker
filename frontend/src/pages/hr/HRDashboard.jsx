@@ -10,19 +10,14 @@ import SearchBar from '@/components/molecules/SearchBar';
 import InternshipTableRow from '@/components/molecules/InternshipTableRow';
 import Pagination from '@/components/molecules/Pagination';
 import Button from '@/components/atoms/Button';
+import useHRs from '@/hooks/useHRs';
 
 const MENU_HR = [
   { label: 'Kelola Lowongan', icon: Briefcase, href: '/hr/dashboard' },
   { label: 'Daftar Pelamar', icon: List, href: '/hr/pelamar' },
 ];
 
-const DUMMY_INTERNSHIPS = [
-  { id: 1, title: 'Data Analyst', location: 'Jakarta Utara', industry: 'Teknologi', quota: { filled: 3, total: 5 }, statusPelaksanaan: 'Hybrid', closingDate: '30 Apr 2026' },
-  { id: 2, title: 'Frontend Developer', location: 'Bogor', industry: 'Software House', quota: { filled: 2, total: 2 }, statusPelaksanaan: 'WFO', closingDate: '28 Feb 2026' },
-  { id: 3, title: 'Marketing Specialist', location: 'Bandung', industry: 'Manufaktur', quota: { filled: 0, total: 4 }, statusPelaksanaan: 'WFA', closingDate: '11 Apr 2026' },
-  { id: 4, title: 'UI/UX Designer', location: 'Jakarta Selatan', industry: 'Teknologi', quota: { filled: 1, total: 3 }, statusPelaksanaan: 'Hybrid', closingDate: '15 Mei 2026' },
-  { id: 5, title: 'Backend Engineer', location: 'Remote', industry: 'Software House', quota: { filled: 0, total: 2 }, statusPelaksanaan: 'WFA', closingDate: '20 Mei 2026' },
-];
+// data now loaded from API via useHRs
 
 const COLUMNS = [
   { key: 'title', label: 'Judul Lowongan' },
@@ -39,33 +34,22 @@ const ITEMS_PER_PAGE = 4;
 function HRDashboard() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const { items, isLoading, error, total, page, setPage, setSearchQuery } = useHRs({ initialSearch: '', initialPage: 1, initialLimit: ITEMS_PER_PAGE });
 
   function onLogout() {
     navigate('/login');
   }
 
   function onSearchChange(event) {
-    setSearch(event.target.value);
-    setCurrentPage(1);
+    const q = event.target.value;
+    setSearch(q);
+    setPage(1);
+    setSearchQuery(q);
   }
-
-  const filtered = DUMMY_INTERNSHIPS.filter((item) => {
-    const q = search.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      (item.title && item.title.toLowerCase().includes(q)) ||
-      (item.location && item.location.toLowerCase().includes(q)) ||
-      (item.industry && item.industry.toLowerCase().includes(q)) ||
-      (item.statusPelaksanaan && item.statusPelaksanaan.toLowerCase().includes(q))
-    );
-  });
-
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginated = filtered.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  // map hook results to table data
+  const paginated = items || [];
+  const totalPages = Math.ceil((total || 0) / ITEMS_PER_PAGE);
 
   return (
     <div
@@ -96,24 +80,28 @@ function HRDashboard() {
           <div style={{ marginBottom: '20px' }}>
             <SearchBar
               value={search}
-              onChange={onSearchChange}
-              placeholder="Deskripsi search"
+              onChange={(e) => {
+                onSearchChange(e);
+                // set hook searchQuery by calling setSearchQuery from hook
+              }}
+              placeholder="Cari judul, lokasi, industri, atau status"
             />
           </div>
 
           <DataTable
             columns={COLUMNS}
             data={paginated}
-            emptyMessage="Tidak ada lowongan ditemukan"
+            emptyMessage={isLoading ? 'Memuat...' : 'Tidak ada lowongan ditemukan'}
             renderRow={(item) => (
               <InternshipTableRow
                 key={item.id}
+                id={item.id}
                 title={item.title}
                 location={item.location}
                 industry={item.industry}
                 quota={item.quota}
                 statusPelaksanaan={item.statusPelaksanaan}
-                closingDate={item.closingDate}
+                closingDate={item.closing_date || item.closingDate}
                 onEdit={() => navigate(`/hr/lowongan/${item.id}/edit`)}
                 onClose={() => console.log('tutup', item.id)}
                 onDelete={() => console.log('hapus', item.id)}
@@ -124,9 +112,9 @@ function HRDashboard() {
           {totalPages > 1 && (
             <div style={{ marginTop: '16px', padding: '0 8px' }}>
               <Pagination
-                currentPage={currentPage}
+                currentPage={page}
                 totalPages={totalPages}
-                onPageChange={setCurrentPage}
+                onPageChange={(p) => setPage(p)}
               />
             </div>
           )}
