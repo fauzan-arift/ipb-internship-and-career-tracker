@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Sidebar from '../../components/organisms/Sidebar';
-import StatCard from '../../components/molecules/StatCard';
-import ApplicationListItem from '../../components/molecules/ApplicationListItem';
-import ApplicationDetailPanel from '../../components/organisms/ApplicationDetailPanel';
+import StatCard from '@/components/molecules/StatCard';
+import ApplicationListItem from '@/components/molecules/ApplicationListItem';
+import ApplicationDetailPanel from '@/components/organisms/ApplicationDetailPanel';
 
+// 🧪 DUMMY DATA
 const dummyApplications = [
   {
     id: 1,
@@ -85,54 +85,51 @@ function MyApplications() {
   const [selectedId, setSelectedId] = useState(dummyApplications[0].id);
   const selectedApp = dummyApplications.find(app => app.id === selectedId);
   const applicationWithReversedTimeline = selectedApp 
-  ? { ...selectedApp, timeline: [...selectedApp.timeline].reverse() } 
-  : null;
+    ? { ...selectedApp, timeline: [...selectedApp.timeline].reverse() } 
+    : null;
 
+  // Hitung statistik
   const total = dummyApplications.length;
   const diproses = dummyApplications.filter(a => a.status === 'Diproses').length;
   const diterima = dummyApplications.filter(a => a.status === 'Diterima').length;
   const ditolak = dummyApplications.filter(a => a.status === 'Ditolak').length;
 
   return (
-    <div className="w-screen ml-[calc(50%-50vw)] overflow-x-hidden bg-[#F3F4FF] min-h-screen">
-      <div className="flex w-full h-screen">
-        <div className="hidden md:block w-64 flex-shrink-0 bg-[#F8F9FE] border-r border-gray-200 h-full">
-          <Sidebar activeMenu="Lamaran Saya" />
+    <div className="h-full">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900">Lamaran Saya</h1>
+
+      {/* Statistik */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <StatCard label="Total Lamaran" value={total} />
+        <StatCard label="Sedang Diproses" value={diproses} variant="blue" />
+        <StatCard label="Diterima" value={diterima} variant="green" />
+        <StatCard label="Ditolak" value={ditolak} variant="red" />
+      </div>
+
+      {/* Layout 2 Kolom */}
+      <div className="flex gap-6 h-[calc(100vh-250px)]">
+        {/* Kiri: Daftar Lamaran */}
+        <div className="w-7/12 bg-white rounded-xl border border-gray-200 p-4 overflow-y-auto">
+          <h3 className="font-semibold text-gray-800 mb-4">Daftar Lamaran Magang</h3>
+          <div className="space-y-3">
+            {dummyApplications.map((app) => (
+              <ApplicationListItem
+                key={app.id}
+                logo={app.logo}
+                position={app.position}
+                company={app.company}
+                date={app.date}
+                status={app.status}
+                isActive={selectedId === app.id}
+                onClick={() => setSelectedId(app.id)}
+              />
+            ))}
+          </div>
         </div>
 
-        <div className="flex-1 h-full overflow-y-auto p-6">
-          <h1 className="text-2xl font-bold mb-6 text-gray-900">Lamaran Saya</h1>
-
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            <StatCard label="Total Lamaran" value={total} />
-            <StatCard label="Sedang Diproses" value={diproses} variant="blue" />
-            <StatCard label="Diterima" value={diterima} variant="green" />
-            <StatCard label="Ditolak" value={ditolak} variant="red" />
-          </div>
-
-          <div className="flex gap-6 h-[calc(100%-150px)]">
-            <div className="w-7/12 bg-white rounded-xl border border-gray-200 p-4 overflow-y-auto">
-              <h3 className="font-semibold text-gray-800 mb-4">Daftar Lamaran Magang</h3>
-              <div className="space-y-3">
-                {dummyApplications.map((app) => (
-                  <ApplicationListItem
-                    key={app.id}
-                    logo={app.logo}
-                    position={app.position}
-                    company={app.company}
-                    date={app.date}
-                    status={app.status}
-                    isActive={selectedId === app.id}
-                    onClick={() => setSelectedId(app.id)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="w-5/12 overflow-y-auto">
-              <ApplicationDetailPanel application={applicationWithReversedTimeline} />
-            </div>
-          </div>
+        {/* Kanan: Detail Panel */}
+        <div className="w-5/12 overflow-y-auto">
+          <ApplicationDetailPanel application={applicationWithReversedTimeline} />
         </div>
       </div>
     </div>

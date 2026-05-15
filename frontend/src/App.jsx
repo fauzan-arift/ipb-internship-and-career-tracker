@@ -22,9 +22,8 @@ import HRDetail from '@/pages/admin/HRDetail';
 // Pages — Student
 import InternshipDetail from '@/pages/student/InternshipDetail';
 import InternshipSearch from '@/pages/student/InternshipSearch';
-import MyApplications from './pages/student/MyApplications';
 import StudentProfile from '@/pages/student/StudentProfile';
-
+import MyApplications from '@/pages/student/MyApplications'; 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   if (isLoading) return <div className="text-center mt-10">Loading...</div>;
@@ -91,6 +90,17 @@ function AppRoutes() {
         }
       />
 
+      <Route
+        path="/my-application"
+        element={
+          <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
+            <DashboardLayout>
+              <MyApplications />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+          />
+
       {/* ── Fallback ── */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -101,56 +111,6 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Auth Routes — tanpa Navbar & footer App */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register/student" element={<RegisterStudent />} />
-          <Route path="/register/hr" element={<RegisterHR />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          
-          {/* App Routes — dengan Navbar & footer */}
-          <Route path="/" element={<AppLayout><Home /></AppLayout>} />
-          <Route path="/admin/dashboard" element={<PendingList />} />
-          <Route path="/admin/perusahaan/:id" element={<HRDetail />} />
-
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <PendingList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/hr/profile/:hr_profile_id"
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <HRDetail />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/internship"
-            element={
-              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
-                <AppLayout><InternshipSearch /></AppLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          
-          <Route
-            path="/my-application"
-            element={
-              <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
-                <AppLayout><MyApplications /></AppLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
         <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
