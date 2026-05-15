@@ -178,6 +178,19 @@ class SQLAlchemyUserRepository(IUserRepository):
             return None
         return self._student_to_domain(student_orm.user, student_orm)
 
+    async def get_student_profile_by_id(self, student_profile_id: UUID) -> Optional[Student]:
+        """Fetch student profile by the students table PK (profile_id)."""
+        stmt = (
+            select(StudentORM)
+            .options(selectinload(StudentORM.user), selectinload(StudentORM.skills))
+            .where(StudentORM.id == student_profile_id)
+        )
+        result = await self._session.execute(stmt)
+        student_orm = result.scalars().first()
+        if not student_orm or not student_orm.user:
+            return None
+        return self._student_to_domain(student_orm.user, student_orm)
+
     async def get_admin_by_user_id(self, user_id: UUID) -> Optional[Admin]:
         stmt = (
             select(AdminORM)
