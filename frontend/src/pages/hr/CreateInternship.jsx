@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase, List, Save, FileText } from 'lucide-react';
+import api from '@/api/axios';
+import useToast from '@/hooks/useToast';
+import Toast from '@/components/atoms/Toast';
 import Navbar from '@/components/organisms/Navbar';
 import PageFooter from '@/components/organisms/PageFooter';
 import Sidebar from '@/components/organisms/Sidebar';
@@ -46,6 +49,8 @@ function CreateInternship() {
   const [statusPelaksanaan, setStatusPelaksanaan] = useState('');
   const [tanggalDitutup, setTanggalDitutup] = useState(null);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
   function onLogout() {
     navigate('/login');
@@ -65,12 +70,15 @@ function CreateInternship() {
     return newErrors;
   }
 
-  function onSubmitHandler() {
+  async function onSubmitHandler() {
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
+
+    setErrors({});
+    setIsLoading(true);
 
     const payload = {
       title: posisi,
@@ -79,17 +87,23 @@ function CreateInternship() {
       benefits: benefit,
       location: lokasi,
       industry: industri,
-      start_date: waktuMagang.from,
-      end_date: waktuMagang.to,
+      start_date: waktuMagang.from?.toISOString().split('T')[0],
+      end_date: waktuMagang.to?.toISOString().split('T')[0],
       quota: Number(kuota),
       payment_status: statusGaji,
       work_status: statusPelaksanaan,
-      close_date: tanggalDitutup,
+      close_date: tanggalDitutup?.toISOString().split('T')[0],
     };
 
-    console.log('Submit lowongan:', payload);
-    // TODO: hubungkan ke API
-    navigate('/hr/dashboard');
+    try {
+      await api.post('/hr/internships', payload);
+      showToast('Lowongan berhasil dibuat!', 'success');
+      setTimeout(() => navigate('/hr/dashboard'), 1500);
+    } catch (err) {
+      showToast(err.response?.data?.detail || 'Gagal membuat lowongan. Coba lagi.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -203,14 +217,23 @@ function CreateInternship() {
               onCancel={() => navigate('/hr/dashboard')}
               onSubmit={onSubmitHandler}
               cancelLabel="Batal"
-              submitLabel="Simpan Lowongan"
+              submitLabel={isLoading ? 'Menyimpan...' : 'Simpan Lowongan'}
               submitIcon={<Save size={15} />}
+              disabled={isLoading}
             />
           </div>
         </SidebarLayout>
       </div>
 
       <PageFooter />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={hideToast}
+        />
+      )}
     </div>
   );
 }

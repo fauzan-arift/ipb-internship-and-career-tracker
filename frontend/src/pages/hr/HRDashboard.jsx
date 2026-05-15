@@ -102,7 +102,7 @@ function HRDashboard() {
                 quota={item.quota}
                 statusPelaksanaan={item.statusPelaksanaan}
                 closingDate={item.closing_date || item.closingDate}
-                onEdit={() => navigate(`/hr/lowongan/${item.id}/edit`)}
+                onEdit={() => navigate(`/hr/dashboard/${item.id}/edit`)}
                 onClose={() => console.log('tutup', item.id)}
                 onDelete={() => console.log('hapus', item.id)}
               />
