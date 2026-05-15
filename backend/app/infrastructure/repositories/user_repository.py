@@ -19,6 +19,7 @@ from app.infrastructure.models.hr import HrORM
 from app.infrastructure.models.admin import AdminORM
 from app.infrastructure.models.email_notification import EmailNotificationORM
 from app.infrastructure.models.verification_token import VerificationTokenORM
+from app.infrastructure.models.skill import SkillORM
 
 
 class SQLAlchemyUserRepository(IUserRepository):
@@ -55,7 +56,7 @@ class SQLAlchemyUserRepository(IUserRepository):
             graduation_year=student_orm.graduation_year,
             gpa=student_orm.gpa,
             phone_number=student_orm.phone_number,
-            skills=student_orm.skills or [],
+            skills=[s.name for s in student_orm.skills] if student_orm.skills else [],
             cv_id=student_orm.cv_id,
             photo_profile_id=student_orm.photo_profile_id,
             created_at=user_orm.created_at,
@@ -168,7 +169,7 @@ class SQLAlchemyUserRepository(IUserRepository):
     async def get_student_profile_by_user_id(self, user_id: UUID) -> Optional[Student]:
         stmt = (
             select(StudentORM)
-            .options(selectinload(StudentORM.user))
+            .options(selectinload(StudentORM.user), selectinload(StudentORM.skills))
             .where(StudentORM.user_id == user_id)
         )
         result = await self._session.execute(stmt)
@@ -253,7 +254,9 @@ class SQLAlchemyUserRepository(IUserRepository):
 
         # Upsert student profile
         s_result = await self._session.execute(
-            select(StudentORM).where(StudentORM.user_id == user_orm.id)
+            select(StudentORM)
+            .options(selectinload(StudentORM.skills))
+            .where(StudentORM.user_id == user_orm.id)
         )
         s_orm = s_result.scalars().first()
         if not s_orm:
@@ -266,7 +269,22 @@ class SQLAlchemyUserRepository(IUserRepository):
         s_orm.graduation_year = student.graduation_year
         s_orm.gpa = student.gpa
         s_orm.phone_number = student.phone_number
-        s_orm.skills = student.skills
+        
+        if student.skills is not None:
+            skills_result = await self._session.execute(
+                select(SkillORM).where(SkillORM.name.in_(student.skills))
+            )
+            existing_skills = {s.name: s for s in skills_result.scalars().all()}
+            
+            new_skills = []
+            for skill_name in student.skills:
+                if skill_name not in existing_skills:
+                    new_skill = SkillORM(name=skill_name)
+                    self._session.add(new_skill)
+                    new_skills.append(new_skill)
+            
+            s_orm.skills = list(existing_skills.values()) + new_skills
+
         s_orm.cv_id = student.cv_id
         s_orm.photo_profile_id = student.photo_profile_id
 
@@ -419,7 +437,9 @@ class SQLAlchemyUserRepository(IUserRepository):
             return None
 
         student_r = await self._session.execute(
-            select(StudentORM).where(StudentORM.user_id == user_id)
+            select(StudentORM)
+            .options(selectinload(StudentORM.skills))
+            .where(StudentORM.user_id == user_id)
         )
         student_orm = student_r.scalars().first()
         if not student_orm:
@@ -427,6 +447,23 @@ class SQLAlchemyUserRepository(IUserRepository):
 
         # Fields that live on UserORM
         user_fields = {"full_name", "email"}
+        
+        skills_data = data.pop("skills", None)
+        if skills_data is not None:
+            skills_result = await self._session.execute(
+                select(SkillORM).where(SkillORM.name.in_(skills_data))
+            )
+            existing_skills = {s.name: s for s in skills_result.scalars().all()}
+            
+            new_skills = []
+            for skill_name in skills_data:
+                if skill_name not in existing_skills:
+                    new_skill = SkillORM(name=skill_name)
+                    self._session.add(new_skill)
+                    new_skills.append(new_skill)
+            
+            student_orm.skills = list(existing_skills.values()) + new_skills
+
         for field, value in data.items():
             if field in user_fields:
                 setattr(user_orm, field, value)

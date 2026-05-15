@@ -50,6 +50,7 @@ function Login() {
 
       if (role === 'ADMIN') navigate('/admin/dashboard');
       else if (role === 'HR') navigate('/');
+      else if (role === 'STUDENT') navigate('/internship');
       else navigate('/');
     } catch (err) {
       const msg = err.response?.data?.detail || 'Terjadi kesalahan. Coba lagi.';

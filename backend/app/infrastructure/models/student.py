@@ -19,7 +19,7 @@ class StudentORM(Base):
     graduation_year = Column(Integer, nullable=True)
     gpa = Column(Float, nullable=True)
     phone_number = Column(String(20), nullable=True)
-    skills = Column(JSON, nullable=True, default=list)
+    # skills column removed in favor of many-to-many relationship
 
     # Document FKs
     cv_id = Column(PGUUID(as_uuid=True), ForeignKey("documents.id"), nullable=True)
@@ -33,3 +33,4 @@ class StudentORM(Base):
     applications = relationship("ApplicationORM", back_populates="student", cascade="all, delete-orphan")
     cv_document = relationship("DocumentORM", foreign_keys=[cv_id])
     photo_profile = relationship("DocumentORM", foreign_keys=[photo_profile_id])
+    skills = relationship("SkillORM", secondary="student_skills", back_populates="students")
