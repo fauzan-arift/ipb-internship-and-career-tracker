@@ -1,7 +1,9 @@
 import React from 'react';
 
 function AvatarSquare({ name, bg = '#3D3FA8', color = '#FFFFFF', size = 40 }) {
-  const initials = name
+  // 🛡️ Guard: Jika name undefined/null/empty, pakai '?'
+  const safeName = name || '?';
+  const initials = safeName
     .split(' ')
     .slice(0, 2)
     .map((word) => word[0].toUpperCase())
