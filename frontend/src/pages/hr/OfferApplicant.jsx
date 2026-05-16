@@ -65,12 +65,16 @@ export default function OfferApplicant() {
     return true;
   };
 
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isFormSubmitting || submitting) return;
     if (!validateForm()) return;
     if (!application) return;
 
+    setIsFormSubmitting(true);
     try {
       let offeringFileId = null;
       if (formData.file) {
@@ -93,6 +97,8 @@ export default function OfferApplicant() {
     } catch (err) {
       console.error('Failed to send offer:', err);
       alert('Gagal mengirim penawaran: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setIsFormSubmitting(false);
     }
   };
 
@@ -185,8 +191,8 @@ export default function OfferApplicant() {
             <Button variant="secondary" type="button" onClick={() => navigate('/hr/applicants')}>
               Batal
             </Button>
-            <Button variant="primary" type="submit" disabled={submitting}>
-              {submitting ? 'Mengirim...' : 'Kirim Penawaran'}
+            <Button variant="primary" type="submit" disabled={isFormSubmitting || submitting}>
+              {isFormSubmitting || submitting ? 'Mengirim...' : 'Kirim Penawaran'}
             </Button>
           </div>
         </form>
