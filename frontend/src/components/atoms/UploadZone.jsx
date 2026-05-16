@@ -4,6 +4,7 @@ import { Upload, FileText } from 'lucide-react';
 function UploadZone({ label, onChange, hint, error, accept }) {
   const [fileName, setFileName] = useState('');
   const [dragging, setDragging] = useState(false);
+  const [hovering, setHovering] = useState(false);
   const inputRef = useRef(null);
 
   function handleFile(file) {
@@ -35,6 +36,8 @@ function UploadZone({ label, onChange, hint, error, accept }) {
     handleFile(event.dataTransfer.files[0]);
   }
 
+  const isActive = dragging || hovering;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
@@ -47,10 +50,12 @@ function UploadZone({ label, onChange, hint, error, accept }) {
         onDragOver={onDragOverHandler}
         onDragLeave={onDragLeaveHandler}
         onDrop={onDropHandler}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
         style={{
-          border: error ? '1.5px dashed #8B1A1A' : dragging ? '1.5px dashed #3D3FA8' : '1.5px dashed #CBD0E0',
+          border: error ? '1.5px dashed #8B1A1A' : isActive ? '1.5px dashed #3D3FA8' : '1.5px dashed #CBD0E0',
           borderRadius: '8px',
-          backgroundColor: dragging ? '#EEF0FF' : '#FAFAFA',
+          backgroundColor: isActive ? '#EEF0FF' : '#FAFAFA',
           padding: '24px',
           display: 'flex',
           flexDirection: 'column',
@@ -79,7 +84,7 @@ function UploadZone({ label, onChange, hint, error, accept }) {
           </>
         ) : (
           <>
-            <Upload size={24} color="#6B7280" />
+            <Upload size={24} color={isActive ? '#3D3FA8' : '#6B7280'} />
             <span style={{ fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
               Drag & drop atau <span style={{ color: '#3D3FA8', fontWeight: '600' }}>klik untuk upload</span>
             </span>

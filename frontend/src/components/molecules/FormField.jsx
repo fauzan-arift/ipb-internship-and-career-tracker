@@ -1,24 +1,11 @@
 import React from 'react';
 
-function FormField({ label, error, hint, children }) {
+function FormField({ label, error, children }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      {label && (
-        <label style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}>
-          {label}
-        </label>
-      )}
+    <div className="flex flex-col gap-2">
+      {label && <label className="text-black font-medium text-base">{label}</label>}
       {children}
-      {hint && !error && (
-        <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-          {hint}
-        </span>
-      )}
-      {error && (
-        <span style={{ fontSize: '12px', color: '#8B1A1A', fontFamily: 'Inter, sans-serif' }}>
-          {error}
-        </span>
-      )}
+      {error && <span className="text-red-500 text-xs">{error}</span>}
     </div>
   );
 }

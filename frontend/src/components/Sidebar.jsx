@@ -157,7 +157,7 @@ export default function Sidebar({ role = "student" }) {
         <svg
           width="12" height="12" viewBox="0 0 24 24" fill="none"
           style={{
-            transform: collapsed ? "rotate(0deg)" : "rotate(180deg)",
+            transform: collapsed ? "rotate(180deg)" : "rotate(0deg)",
             transition: "transform 0.3s ease",
           }}
         >

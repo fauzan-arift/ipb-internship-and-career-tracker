@@ -1,70 +1,29 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
-function SelectInput({ label, value, onChange, options = [], placeholder, hint, error, disabled = false, name }) {
+function SelectInput({ value, onChange, options = [], placeholder, disabled = false, ...rest }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      {label && (
-        <label style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}>
-          {label}
-        </label>
-      )}
-      <div style={{ position: 'relative' }}>
-        <select
-          name={name}
-          value={value}
-          onChange={onChange}
-          disabled={disabled}
-          style={{
-            padding: '10px 40px 10px 12px',
-            borderRadius: '8px',
-            border: error ? '1.5px solid #8B1A1A' : '1.5px solid #CBD0E0',
-            fontSize: '14px',
-            fontFamily: 'Inter, sans-serif',
-            color: value ? '#1A1A2E' : '#6B7280',
-            backgroundColor: disabled ? '#F5F5F5' : '#FFFFFF',
-            outline: 'none',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            opacity: disabled ? 0.6 : 1,
-            width: '100%',
-            boxSizing: 'border-box',
-            appearance: 'none',
-          }}
-        >
-          {placeholder && (
-            <option value="" disabled>
-              {placeholder}
-            </option>
-          )}
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <div style={{
-          position: 'absolute',
-          right: '12px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          pointerEvents: 'none',
-          color: '#6B7280',
-          display: 'flex',
-          alignItems: 'center',
-        }}>
-          <ChevronDown size={16} />
-        </div>
+    <div className="relative">
+      <select
+        value={value ?? ''}
+        onChange={onChange}
+        disabled={disabled}
+        className={`w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors appearance-none pr-14 ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-black'}`}
+        {...rest}
+      >
+        {placeholder && <option value="" disabled>{placeholder}</option>}
+        {options.map((option) => (
+          <option
+            key={typeof option === 'string' ? option : option.value}
+            value={typeof option === 'string' ? option : option.value}
+          >
+            {typeof option === 'string' ? option : option.label}
+          </option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+        <ChevronDown size={20} color="black" />
       </div>
-      {hint && !error && (
-        <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-          {hint}
-        </span>
-      )}
-      {error && (
-        <span style={{ fontSize: '12px', color: '#8B1A1A', fontFamily: 'Inter, sans-serif' }}>
-          {error}
-        </span>
-      )}
     </div>
   );
 }
