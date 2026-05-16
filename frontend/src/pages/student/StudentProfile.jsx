@@ -65,7 +65,7 @@ const SkillDropdown = ({ value, onChange, onAdd, globalSkills, selectedSkills })
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
       {/* Input row */}
-      <div className="flex items-center w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] bg-white">
+      <div className="flex items-center w-full">
         <input
           type="text"
           value={value}
@@ -400,14 +400,14 @@ export default function StudentProfile() {
 
   // ── Loading ──
   if (isLoading) return (
-    <div className="px-8 py-8 max-w-215 mx-auto">
+    <div className="px-8 py-8 max-w-5x1 mx-auto">
       <ProfileSkeleton />
     </div>
   )
 
   // ── Error ──
   if (isError) return (
-    <div className="px-8 py-8 max-w-215 mx-auto flex flex-col items-center gap-4 mt-16">
+    <div className="px-8 py-8 max-w-5x1 mx-auto flex flex-col items-center gap-4 mt-16">
       <p className="text-[#1B1B21] text-lg font-semibold">Gagal memuat profil</p>
       <p className="text-[#454651] text-sm">{errorMsg}</p>
       <button
@@ -421,7 +421,7 @@ export default function StudentProfile() {
 
   // ── Render ──
   return (
-    <div className="px-8 py-8 max-w-215 mx-auto flex flex-col gap-6">
+    <div className="px-8 py-8 max-w-250 mx-auto flex flex-col gap-6">
 
       {successMsg && (
         <div className="px-4 py-3 rounded-lg bg-[#D1FAE5] border border-[#6EE7B7] text-[#065F46] text-sm font-medium">
@@ -509,12 +509,11 @@ export default function StudentProfile() {
       </div>
 
       {/* ── Keahlian ── */}
-      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
-        <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Keahlian</h2>
+        <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
+          <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Keahlian</h2>
 
-        {/* Skill chips */}
-        {skills.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          {/* Skill chips */}
+          <div className="flex flex-wrap gap-2 min-h-[32px]">
             {skills.map((skill) => (
               <SkillChip
                 key={skill}
@@ -522,18 +521,23 @@ export default function StudentProfile() {
                 onRemove={() => setSkills((prev) => prev.filter((s) => s !== skill))}
               />
             ))}
+            {skills.length === 0 && (
+              <span className="text-gray-400 text-sm">Belum ada keahlian ditambahkan</span>
+            )}
           </div>
-        )}
 
-        {/* Custom dropdown input */}
-        <SkillDropdown
-          value={skillInput}
-          onChange={setSkillInput}
-          onAdd={addSkill}
-          globalSkills={globalSkills}
-          selectedSkills={skills}
-        />
-      </div>
+          {/* Garis pemisah */}
+          <div className="border-t border-[#DBD9E1]" />
+
+          {/* Input dropdown */}
+          <SkillDropdown
+            value={skillInput}
+            onChange={setSkillInput}
+            onAdd={addSkill}
+            globalSkills={globalSkills}
+            selectedSkills={skills}
+          />
+        </div>
 
       {/* ── Dokumen ── */}
       <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-3">
