@@ -6,14 +6,8 @@ import SearchBar from '@/components/molecules/SearchBar';
 import InternshipTableRow from '@/components/molecules/InternshipTableRow';
 import Pagination from '@/components/molecules/Pagination';
 import Button from '@/components/atoms/Button';
+import ConfirmationDialog from '@/components/organisms/ConfirmationDialog';
 import useHRs from '@/hooks/useHRs';
-
-const MENU_HR = [
-  { label: 'Kelola Lowongan', icon: Briefcase, href: '/hr/dashboard' },
-  { label: 'Daftar Pelamar', icon: List, href: '/hr/applicants' },
-];
-
-// data now loaded from API via useHRs
 
 const COLUMNS = [
   { key: 'title', label: 'Judul Lowongan' },
@@ -30,8 +24,12 @@ const ITEMS_PER_PAGE = 4;
 function HRDashboard() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState({ id: null, action: null });
 
-  const { items, isLoading, error, total, page, setPage, setSearchQuery } = useHRs({ initialSearch: '', initialPage: 1, initialLimit: ITEMS_PER_PAGE });
+  const { items, isLoading, error, total, page, setPage, setSearchQuery } = useHRs({
+    initialSearch: '', initialPage: 1, initialLimit: ITEMS_PER_PAGE
+  });
 
   function onSearchChange(event) {
     const q = event.target.value;
@@ -39,7 +37,23 @@ function HRDashboard() {
     setPage(1);
     setSearchQuery(q);
   }
-  // map hook results to table data
+
+  function handleAction(id, action) {
+    setPendingAction({ id, action });
+    setDialogOpen(true);
+  }
+
+  function confirmAction() {
+    const { id, action } = pendingAction;
+    if (action === 'close') {
+      console.log('tutup', id); // ganti dengan API call nanti
+    } else if (action === 'delete') {
+      console.log('hapus', id); // ganti dengan API call nanti
+    }
+    setDialogOpen(false);
+    setPendingAction({ id: null, action: null });
+  }
+
   const paginated = items || [];
   const totalPages = Math.ceil((total || 0) / ITEMS_PER_PAGE);
 
@@ -58,10 +72,7 @@ function HRDashboard() {
       <div style={{ marginBottom: '20px' }}>
         <SearchBar
           value={search}
-          onChange={(e) => {
-            onSearchChange(e);
-            // set hook searchQuery by calling setSearchQuery from hook
-          }}
+          onChange={onSearchChange}
           placeholder="Cari judul, lokasi, industri, atau status"
         />
       </div>
@@ -81,8 +92,8 @@ function HRDashboard() {
             statusPelaksanaan={item.work_status || item.statusPelaksanaan}
             closingDate={item.close_date || item.closingDate}
             onEdit={() => navigate(`/hr/dashboard/${item.id}/edit`)}
-            onClose={() => console.log('tutup', item.id)}
-            onDelete={() => console.log('hapus', item.id)}
+            onClose={() => handleAction(item.id, 'close')}
+            onDelete={() => handleAction(item.id, 'delete')}
           />
         )}
       />
@@ -96,6 +107,21 @@ function HRDashboard() {
           />
         </div>
       )}
+
+      <ConfirmationDialog
+        isOpen={dialogOpen}
+        onClose={() => {
+          setDialogOpen(false);
+          setPendingAction({ id: null, action: null });
+        }}
+        onConfirm={confirmAction}
+        title={pendingAction.action === 'close' ? 'Tutup Lowongan' : 'Hapus Lowongan'}
+        message={
+          pendingAction.action === 'close'
+            ? 'Apakah Anda yakin ingin menutup lowongan ini? Lowongan tidak akan bisa dilamar lagi.'
+            : 'Apakah Anda yakin ingin menghapus lowongan ini? Tindakan ini tidak bisa dibatalkan.'
+        }
+      />
     </div>
   );
 }
