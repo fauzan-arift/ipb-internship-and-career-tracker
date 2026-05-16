@@ -98,7 +98,20 @@ const RegisterStudent = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <form
+            onSubmit={handleSubmit} 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '14px',
+              backgroundColor: 'transparent',
+              borderRadius: '0',
+              padding: '0',
+              boxShadow: 'none',
+              width: '100%',
+              maxWidth: '100%',
+            }}
+          >
           <p style={sectionTitle}>Data Pribadi</p>
 
           <FormField label="Nama Lengkap *">
