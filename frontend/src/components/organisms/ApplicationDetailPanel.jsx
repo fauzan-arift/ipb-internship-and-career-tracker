@@ -36,11 +36,6 @@ function ApplicationDetailPanel({ application }) {
         <StatusTimeline items={timelineItems} />
       </div>
 
-      <div className="border-t pt-6 shrink-0">
-        <Button variant="primary" fullWidth>
-          Unduh Resume
-        </Button>
-      </div>
     </div>
   );
 }
