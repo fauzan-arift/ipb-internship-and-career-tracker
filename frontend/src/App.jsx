@@ -189,6 +189,16 @@ function AppRoutes() {
           </ProtectedRoute>
         )}
       />
+      <Route
+        path="/hr/applicant/:application_id/offer"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <DashboardLayout role="hr">
+              <OfferApplicant />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
 
       <Route
         path="/hr/profile"

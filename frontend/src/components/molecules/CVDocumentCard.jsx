@@ -2,6 +2,14 @@ import React from 'react';
 import { Download, FileText } from 'lucide-react';
 
 export default function CVDocumentCard({ cvDocument }) {
+  const handleDownload = () => {
+    if (cvDocument?.url) {
+      window.open(cvDocument.url, '_blank');
+    } else {
+      alert("URL CV tidak tersedia");
+    }
+  };
+
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
       <div className="flex items-center gap-4">
@@ -24,6 +32,7 @@ export default function CVDocumentCard({ cvDocument }) {
       {/* Tombol Download */}
       <button
         type="button"
+        onClick={handleDownload}
         className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors"
         aria-label="Download CV"
       >

@@ -53,7 +53,7 @@ const STATUS_FLOW = [
   },
 ];
 
-export function useHrApplicationStatus(applicationId, currentStatus) {
+export function useHrApplicationStatus(applicationId, currentStatus, onSuccess) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -130,7 +130,9 @@ export function useHrApplicationStatus(applicationId, currentStatus) {
         try {
           await hrApplicationService.updateStatus(applicationId, selectedStatus);
           closeModal();
-          if (window.location.pathname.includes('/hr/applications/')) {
+          if (onSuccess) {
+            onSuccess();
+          } else if (window.location.pathname.includes('/hr/applicants/')) {
             window.location.reload();
           }
         } catch (err) {
@@ -141,7 +143,7 @@ export function useHrApplicationStatus(applicationId, currentStatus) {
         }
       },
     });
-  }, [applicationId, selectedStatus, currentStatus, closeModal, showConfirmation]);
+  }, [applicationId, selectedStatus, currentStatus, closeModal, showConfirmation, onSuccess]);
 
   const isStatusSelected = useCallback((statusValue) => {
     if (!selectedStatus) return false;

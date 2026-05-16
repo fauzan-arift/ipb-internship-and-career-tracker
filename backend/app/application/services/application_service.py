@@ -289,6 +289,7 @@ class ApplicationService:
             id=app.id,
             status=app.status.value,
             application_time=app.application_time,
+            position=internship.title,
             student=StudentDetail(
                 id=student_profile.profile_id,  # students table PK
                 full_name=user_orm.full_name if user_orm else "Unknown",

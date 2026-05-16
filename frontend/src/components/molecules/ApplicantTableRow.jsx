@@ -2,7 +2,7 @@ import React from 'react';
 import Badge from '../atoms/Badge';
 import ChevronRightButton from '../atoms/ChevronRightButton';
 
-function ApplicantTableRow({ name, major, appliedDate, status, onClick }) {
+function ApplicantTableRow({ name, major, internshipTitle, appliedDate, status, onClick }) {
   let badgeVariant = 'gray';
   if (status === 'Diterima') badgeVariant = 'green';
   if (status === 'Diproses') badgeVariant = 'diproses';
@@ -27,6 +27,9 @@ function ApplicantTableRow({ name, major, appliedDate, status, onClick }) {
       </td>
       <td style={{ padding: '14px 16px', fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
         {major}
+      </td>
+      <td style={{ padding: '14px 16px', fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+        {internshipTitle || '-'}
       </td>
       <td style={{ padding: '14px 16px', fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
         {appliedDate}
