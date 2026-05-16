@@ -81,3 +81,35 @@ class HrService:
             photo_url = await _resolve_url(uow, saved.photo_profile_id)
 
         return saved, photo_url
+
+    async def get_hr_profile(self, hr_user_id: UUID):
+        """Return the HR's own personal profile (name, position, phone_number)."""
+        async with self.uow as uow:
+            hr = await uow.users.get_hr_by_user_id(hr_user_id)
+            if not hr:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Profil HR tidak ditemukan.",
+                )
+        return hr
+
+    async def update_hr_profile(self, hr_user_id: UUID, payload: dict):
+        """
+        Partial update of the HR's personal profile fields:
+        full_name, position, phone_number.
+        """
+        async with self.uow as uow:
+            hr = await uow.users.get_hr_by_user_id(hr_user_id)
+            if not hr:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Profil HR tidak ditemukan.",
+                )
+            updated_hr = await uow.users.update_hr_profile(hr_user_id, payload)
+            if not updated_hr:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Gagal memperbarui profil HR.",
+                )
+            await uow.commit()
+        return updated_hr
