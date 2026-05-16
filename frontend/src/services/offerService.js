@@ -1,10 +1,14 @@
 import axios from '@/api/axios';
 
 export const offerService = {
-  // Fetch offers directly from the new endpoint
-  getOffers: async (status = 'Pending') => {
-    const response = await axios.get('/students/offers', {
-      params: { status },
+  getOffers: async () => {
+    const response = await axios.get('/students/offers');
+    return response.data;
+  },
+
+  respondOffer: async (offerId, responseStatus) => {
+    const response = await axios.patch(`/students/offers/${offerId}/respond`, {
+      response_status: responseStatus, // "Accepted" atau "Rejected"
     });
     return response.data;
   },
