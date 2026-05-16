@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 
 from app.domain.entities.enums import CompanyVerificationStatus
 
-
 class CompanyProfileUpdateRequest(BaseModel):
     """HR can update these company fields. All are optional (partial update)."""
     company_name: Optional[str] = Field(None, min_length=2, max_length=255)

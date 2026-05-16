@@ -77,6 +77,13 @@ export default function CompanyProfile() {
   const [industry, setIndustry]       = useState('')
   const [website, setWebsite]         = useState('')
   const [description, setDescription] = useState('')
+  const [companyEmail, setCompanyEmail] = useState('')
+
+  // ── Editable personal fields ──
+  const [fullName, setFullName]       = useState('')
+  const [position, setPosition]       = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [hrEmail, setHrEmail]         = useState('')
 
   // ── Photo state ──
   const [photoUrl, setPhotoUrl]         = useState(null)
@@ -96,7 +103,15 @@ export default function CompanyProfile() {
         setIndustry(data.industry ?? '')
         setWebsite(data.website ?? '')
         setDescription(data.description ?? '')
+        setCompanyEmail(data.email ?? '')
         setPhotoUrl(data.photo_profile_url ?? null)
+
+        // Fetch personal info
+        const personal = await hrService.getPersonalProfile()
+        setFullName(personal.full_name ?? '')
+        setPosition(personal.position ?? '')
+        setPhoneNumber(personal.phone_number ?? '')
+        setHrEmail(personal.email ?? '')
       } catch (err) {
         setIsError(true)
         setErrorMsg(err?.response?.data?.detail ?? 'Gagal memuat profil perusahaan.')
@@ -136,13 +151,23 @@ export default function CompanyProfile() {
         industry:     industry,
         website:      website,
         description:  description,
+        email:        companyEmail,
         ...(photoId && { photo_profile_id: photoId }),
       }
 
       const updated = await hrService.updateProfile(payload)
+      
+      // Save personal info
+      const personalPayload = {
+        full_name:    fullName,
+        position:     position,
+        phone_number: phoneNumber,
+      }
+      await hrService.updatePersonalProfile(personalPayload)
+
       setProfile(updated)
       setPhotoUrl(updated.photo_profile_url ?? photoUrl)
-      setSuccessMsg('Profil perusahaan berhasil disimpan!')
+      setSuccessMsg('Profil berhasil disimpan!')
       setTimeout(() => setSuccessMsg(''), 3000)
     } catch (err) {
       const detail = err?.response?.data?.detail
@@ -215,7 +240,7 @@ export default function CompanyProfile() {
             <span className="text-xs text-gray-500">{newPhotoFile.name} — simpan untuk menerapkan</span>
             )}
             {/* Email HR — read only */}
-            <span className="text-sm text-[#6B7280]">{profile?.email}</span>
+            <span className="text-sm text-[#6B7280]">{hrEmail}</span>
         </div>
         </div>
 
@@ -300,6 +325,40 @@ export default function CompanyProfile() {
               )}
             </div>
           </div>
+
+        </div>
+      </div>
+
+      {/* ── Card 2: Informasi Pribadi HR ── */}
+      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-5">
+        <div className="border-b border-[#DBD9E1] pb-1">
+          <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Informasi Pribadi HR</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField label="Nama Lengkap">
+            <TextInput
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Masukkan nama lengkap Anda"
+            />
+          </FormField>
+
+          <FormField label="Jabatan / Posisi">
+            <TextInput
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              placeholder="contoh: HR Manager, Recruiter"
+            />
+          </FormField>
+
+          <FormField label="Nomor Telepon">
+            <TextInput
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="contoh: 08123456789"
+            />
+          </FormField>
 
         </div>
       </div>

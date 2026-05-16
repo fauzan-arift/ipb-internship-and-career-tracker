@@ -196,7 +196,7 @@ const RegisterHR = () => {
             ) : (
               <UploadZone
                 accept=".pdf,.jpg,.jpeg,.png"
-                onFileSelect={handleFileSelect}
+                onChange={handleFileSelect}
                 fileInputRef={fileInputRef}
               />
             )}
