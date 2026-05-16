@@ -27,6 +27,8 @@ import EditInternship from '@/pages/hr/EditInternship';
 import ApplicantList from '@/pages/hr/ApplicantList';
 import ApplicantDetail from '@/pages/hr/ApplicantDetail';
 import OfferApplicant from '@/pages/hr/OfferApplicant';
+import CompanyProfile from '@/pages/hr/CompanyProfile'
+
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -168,6 +170,17 @@ function AppRoutes() {
             </DashboardLayout>
           </ProtectedRoute>
         }
+      />
+
+      <Route
+        path="/hr/profile"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <DashboardLayout role="hr">
+              <CompanyProfile />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
       />
 
       <Route
