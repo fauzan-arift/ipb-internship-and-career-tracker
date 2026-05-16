@@ -25,6 +25,10 @@ import HRDashboard from '@/pages/hr/HRDashboard';
 import CreateInternship from '@/pages/hr/CreateInternship';
 import EditInternship from '@/pages/hr/EditInternship';
 import ApplicantList from '@/pages/hr/ApplicantList';
+import ApplicantDetail from '@/pages/hr/ApplicantDetail';
+import OfferApplicant from '@/pages/hr/OfferApplicant';
+import CompanyProfile from '@/pages/hr/CompanyProfile'
+
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -177,7 +181,37 @@ function AppRoutes() {
         )}
       />
 
-      {/* ── Fallback ── */}
+      <Route
+        path="/my-application"
+        element={
+          <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
+            <DashboardLayout role="student">
+              <MyApplications />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/hr/profile"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <DashboardLayout role="hr">
+              <CompanyProfile />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
+
+      <Route
+        path="/offers"
+        element={
+          <ProtectedRoute allowedRoles={['STUDENT']}>
+            <DashboardLayout role="student"><OffersPage /></DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
