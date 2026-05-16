@@ -23,12 +23,21 @@ function ApplicationDetailPanel({ application }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 h-full flex flex-col">
       
-      <div className="flex flex-col items-center border-b pb-6 shrink-0">
-        <AvatarSquare name={application.logo} bg="#1A1A1A" color="#FFFFFF" size={64} />
-        <h4 className="text-lg font-bold mt-3">{application.position}</h4>
-        <p className="text-sm text-gray-500">{application.company}</p>
-        <div className="mt-2">
-          <Badge variant={badgeVariant}>{application.status}</Badge>
+      <div className="flex flex-row items-center gap-4 border-b pb-6 shrink-0">
+        <AvatarSquare
+          name={application.logo}
+          imageSrc={application.companyPhotoUrl}
+          alt={application.company}
+          bg="#1A1A1A"
+          color="#FFFFFF"
+          size={64}
+        />
+        <div className="flex flex-col gap-1">
+          <h4 className="text-lg font-bold">{application.position}</h4>
+          <p className="text-sm text-gray-500">{application.company}</p>
+          <div className="w-fit">
+            <Badge variant={badgeVariant}>{application.status}</Badge>
+          </div>
         </div>
       </div>
 

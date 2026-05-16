@@ -58,11 +58,13 @@ function MyApplications() {
                 const position = app.position || app.internship?.title || 'Posisi Tidak Diketahui';
                 const company = app.company || app.internship?.company?.company_name || 'Perusahaan Tidak Diketahui';
                 const date = app.date || app.application_time;
+                const companyPhotoUrl = app.companyPhotoUrl || app.internship?.company?.photo_profile_url || null;
 
                 return (
                   <ApplicationListItem
                     key={app.id}
                     logo={logo}
+                    companyPhotoUrl={companyPhotoUrl}
                     position={position}
                     company={company}
                     date={date}
