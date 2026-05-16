@@ -71,7 +71,7 @@ function TimelineProgress({ timeline }) {
 export default function ApplicantDetail() {
   const { applicant_id } = useParams();
   const navigate = useNavigate();
-  const { application, loading, usingDummy } = useHrApplication(applicant_id);
+  const { application, loading, usingDummy, refetch } = useHrApplication(applicant_id);
   const {
     isOpen,
     openModal,
@@ -85,7 +85,7 @@ export default function ApplicantDetail() {
     statuses,
     confirmation,
     closeConfirmation,
-  } = useHrApplicationStatus(applicant_id, application?.status);
+  } = useHrApplicationStatus(applicant_id, application?.status, refetch);
 
   if (loading) {
     return (
@@ -150,13 +150,23 @@ export default function ApplicantDetail() {
           >
             <Edit2 size={16} /> Ubah Status
           </Button>
-          <Button 
-            variant="primary" 
-            onClick={() => navigate(`/hr/applicant/${application.id}/offer`)}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
-          >
-            <PlusCircle size={16} /> Kasih Offering 
-          </Button>
+          {['Ditawarkan', 'Diterima', 'Ditolak'].includes(application.status) ? (
+            <Button 
+              variant="outline"
+              disabled
+              className="flex items-center gap-2 cursor-not-allowed text-gray-500 border-gray-200 bg-gray-50"
+            >
+              Offering Sudah Dibuat
+            </Button>
+          ) : (
+            <Button 
+              variant="primary" 
+              onClick={() => navigate(`/hr/applicant/${application.id}/offer`)}
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
+            >
+              <PlusCircle size={16} /> Kasih Offering 
+            </Button>
+          )}
         </div>
       </div>
 

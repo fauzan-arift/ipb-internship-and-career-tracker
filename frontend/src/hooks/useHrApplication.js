@@ -50,58 +50,37 @@ export function useHrApplication(applicationId) {
 
     try {
       const data = await hrApplicationService.getApplicationDetail(applicationId);
-      console.log('API Response:', data);
       
       if (data && data.id) {
         const transformedData = {
           ...data,
-          status_history: (data.status_history || []).map((item, idx) => ({
-            stage: item.new_status ? item.new_status.charAt(0).toUpperCase() + item.new_status.slice(1) : `Status ${idx + 1}`,
-            status: item.new_status === 'accepted' ? 'accepted' : item.new_status === 'rejected' ? 'rejected' : (idx < (data.status_history || []).length - 1 ? 'completed' : 'in-progress'),
-            date: item.changed_at,
-          })),
+          status_history: (data.status_history || []).map((item, idx) => {
+            let mappedStatus = 'completed';
+            if (['Diterima', 'Accepted'].includes(item.new_status)) {
+              mappedStatus = 'accepted';
+            } else if (['Ditolak', 'Rejected'].includes(item.new_status)) {
+              mappedStatus = 'rejected';
+            } else if (idx === (data.status_history || []).length - 1) {
+              mappedStatus = 'in-progress';
+            }
+            
+            return {
+              stage: item.new_status ? item.new_status.charAt(0).toUpperCase() + item.new_status.slice(1) : `Status ${idx + 1}`,
+              status: mappedStatus,
+              date: item.changed_at,
+            };
+          }),
         };
-        console.log('Transformed API data:', transformedData);
         setApplication(transformedData);
         setUsingDummy(false);
       } else {
-        console.warn('API mengembalikan data kosong, mencari di dummy data...');
-        let dummyData = getDummyHrApplication(applicationId);
-        
-        if (!dummyData) {
-          const applicant = dummyApplicants.find(a => String(a.id) === String(applicationId));
-          if (applicant) {
-            dummyData = transformApplicantToHrApplication(applicant);
-          }
-        }
-        
-        if (dummyData) {
-          console.log('Dummy data:', dummyData);
-          setApplication(dummyData);
-          setUsingDummy(true);
-        } else {
-          setApplication(null);
-        }
+        setApplication(null);
+        setError("Data pelamar tidak ditemukan");
       }
     } catch (err) {
-      console.error('API error, mencari di dummy data:', err.message);
-      let dummyData = getDummyHrApplication(applicationId);
-      
-      if (!dummyData) {
-        const applicant = dummyApplicants.find(a => String(a.id) === String(applicationId));
-        if (applicant) {
-          dummyData = transformApplicantToHrApplication(applicant);
-        }
-      }
-      
-      if (dummyData) {
-        console.log('Dummy data (from error):', dummyData);
-        setApplication(dummyData);
-        setUsingDummy(true);
-      } else {
-        setApplication(null);
-        setError(err.message);
-      }
+      console.error('API error fetching HR application detail:', err);
+      setApplication(null);
+      setError(err.message || "Gagal memuat detail pelamar");
     } finally {
       setLoading(false);
     }
