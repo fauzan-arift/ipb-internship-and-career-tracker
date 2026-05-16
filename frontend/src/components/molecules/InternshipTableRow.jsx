@@ -3,8 +3,9 @@ import Badge from '../atoms/Badge';
 import EditButton from '../atoms/EditButton';
 import CloseButton from '../atoms/CloseButton';
 import DeleteFileButton from '../atoms/DeleteFileButton';
+import ReopenButton from '../atoms/ReopenButton';
 
-function InternshipTableRow({ title, location, industry, quota, statusPelaksanaan, closingDate, onEdit, onClose, onDelete }) {
+function InternshipTableRow({ title, location, industry, quota, statusPelaksanaan, closingDate, status, onEdit, onClose, onDelete, onReopen }) {
   let statusVariant = 'gray';
   if (statusPelaksanaan === 'Hybrid') statusVariant = 'hybrid';
   if (statusPelaksanaan === 'WFO') statusVariant = 'wfo';
@@ -35,6 +36,9 @@ function InternshipTableRow({ title, location, industry, quota, statusPelaksanaa
         {typeof quota === 'object' ? `${quota.filled}/${quota.total}` : `0/${quota}`}
       </td>
       <td style={{ padding: '14px 16px' }}>
+        <Badge variant={status === 'closed' ? 'red' : 'green'}>{status === 'closed' ? 'Tertutup' : 'Terbuka'}</Badge>
+      </td>
+      <td style={{ padding: '14px 16px' }}>
         <Badge variant={statusVariant}>{statusPelaksanaan}</Badge>
       </td>
       <td style={{ padding: '14px 16px', fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
@@ -43,7 +47,14 @@ function InternshipTableRow({ title, location, industry, quota, statusPelaksanaa
       <td style={{ padding: '14px 16px' }}>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
           <EditButton onClick={onEdit} />
-          <CloseButton onClick={onClose} />
+          {status === 'closed' ? (
+            // show reopen button when closed
+            <>
+              <ReopenButton onClick={onReopen} />
+            </>
+          ) : (
+            <CloseButton onClick={onClose} />
+          )}
           <DeleteFileButton onClick={onDelete} />
         </div>
       </td>

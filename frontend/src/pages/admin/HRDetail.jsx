@@ -10,6 +10,8 @@ import HRDInfoCard from '@/components/organisms/HRDInfoCard';
 import DocumentsCard from '@/components/organisms/DocumentsCard';
 import DescriptionBox from '@/components/atoms/DescriptionBox';
 import Button from '@/components/atoms/Button';
+import ConfirmationDialog from '@/components/organisms/ConfirmationDialog';
+import PromptDialog from '@/components/organisms/PromptDialog';
 
 const HRDetail = () => {
   const { hr_profile_id } = useParams();
@@ -19,13 +21,18 @@ const HRDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [status, setStatus] = useState({ type: '', msg: '' });
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
+  const [showRejectPrompt, setShowRejectPrompt] = useState(false);
 
   useEffect(() => {
     const fetchDetail = async () => {
       try {
         const res = await api.get(`/admin/hr/profile/${profileId}`);
-        if (res.data.success) {
-          setDetail(res.data.data);
+        if (res.data && res.data.success === false) {
+          setStatus({ type: 'error', msg: res.data.message || res.data.detail || 'Gagal memuat detail HR' });
+        } else {
+          const payload = res.data?.data ?? res.data;
+          setDetail(payload);
         }
       } catch (err) {
         setStatus({ type: 'error', msg: err.response?.data?.detail || 'Gagal memuat detail HR' });
@@ -37,30 +44,30 @@ const HRDetail = () => {
   }, [profileId]);
 
   const handleApprove = async () => {
-    if (!window.confirm('Yakin ingin menyetujui HR ini? Email persetujuan akan dikirim.')) return;
+    setShowApproveConfirm(false);
     setIsProcessing(true);
     setStatus({ type: '', msg: '' });
     try {
       const res = await api.post(`/admin/hr/profile/${profileId}/approve`);
-      setStatus({ type: 'success', msg: res.data.message });
+      setStatus({ type: 'success', msg: res.data?.message ?? res.data?.detail ?? 'Berhasil diverifikasi' });
       setTimeout(() => navigate('/admin/dashboard'), 2000);
     } catch (err) {
-      setStatus({ type: 'error', msg: err.response?.data?.detail || 'Gagal menyetujui' });
+      setStatus({ type: 'error', msg: err.response?.data?.detail || err.response?.data?.message || 'Gagal menyetujui' });
       setIsProcessing(false);
     }
   };
 
-  const handleReject = async () => {
-    const reason = window.prompt('Alasan penolakan (akan dikirim via email):');
+  const handleReject = async (reason) => {
+    setShowRejectPrompt(false);
     if (!reason || reason.trim() === '') return;
     setIsProcessing(true);
     setStatus({ type: '', msg: '' });
     try {
       const res = await api.post(`/admin/hr/profile/${profileId}/reject`, { reason });
-      setStatus({ type: 'success', msg: res.data.message });
+      setStatus({ type: 'success', msg: res.data?.message ?? res.data?.detail ?? 'Berhasil ditolak' });
       setTimeout(() => navigate('/admin/dashboard'), 2000);
     } catch (err) {
-      setStatus({ type: 'error', msg: err.response?.data?.detail || 'Gagal menolak' });
+      setStatus({ type: 'error', msg: err.response?.data?.detail || err.response?.data?.message || 'Gagal menolak' });
       setIsProcessing(false);
     }
   };
@@ -85,36 +92,38 @@ const HRDetail = () => {
     );
   }
 
-  const isPending = detail.hr?.status?.toLowerCase() === 'pending';
-  const isVerified = detail.hr?.status?.toLowerCase() === 'verified';
+  const statusStr = (detail?.hr?.status ?? detail?.status ?? '').toString();
+  const isPending = statusStr.toLowerCase() === 'pending';
+  const isVerified = statusStr.toLowerCase() === 'verified';
 
   const infoFields = [
     { label: 'Nama Perusahaan', value: detail.company?.company_name },
     { label: 'Industri', value: detail.company?.industry },
     { label: 'Email Kontak', value: detail.company?.company_email },
+    { label: 'No. Telepon HR', value: detail.hr?.phone_number },
     { label: 'Website', value: detail.company?.website },
     { label: 'Alamat Lengkap', value: detail.company?.address },
   ];
 
   const documents = detail.npwp_document
     ? [
-        {
-          name: detail.npwp_document.file_name,
-          format: `FORMAT ${detail.npwp_document.file_format?.toUpperCase()}`,
-          date: `Diunggah: ${detail.npwp_document.upload_date ? new Date(detail.npwp_document.upload_date).toLocaleDateString('id-ID') : '-'}`,
-          href: detail.npwp_document.download_url,
-        },
-      ]
+      {
+        name: detail.npwp_document.file_name,
+        format: `FORMAT ${detail.npwp_document.file_format?.toUpperCase()}`,
+        date: `Diunggah: ${detail.npwp_document.upload_date ? new Date(detail.npwp_document.upload_date).toLocaleDateString('id-ID') : '-'}`,
+        href: detail.npwp_document.download_url,
+      },
+    ]
     : [];
 
   const headerActions = (
-    <div style={{ display: 'flex', gap: '10px' }}>
+    <div style={{ display: 'flex', gap: '10px', position: 'relative' }}>
       {isPending ? (
         <>
           <Button
             variant="primary"
             disabled={isProcessing || status.type === 'success'}
-            onClick={handleApprove}
+            onClick={() => setShowApproveConfirm(true)}
           >
             <CheckCircle size={16} />
             Verifikasi
@@ -122,11 +131,26 @@ const HRDetail = () => {
           <Button
             variant="danger"
             disabled={isProcessing || status.type === 'success'}
-            onClick={handleReject}
+            onClick={() => setShowRejectPrompt(true)}
           >
             <XCircle size={16} />
             Tolak
           </Button>
+          <ConfirmationDialog
+            isOpen={showApproveConfirm}
+            onClose={() => setShowApproveConfirm(false)}
+            onConfirm={handleApprove}
+            title="Verifikasi HR"
+            message="Yakin ingin menyetujui HR ini? Email persetujuan akan dikirim."
+          />
+          <PromptDialog
+            isOpen={showRejectPrompt}
+            onClose={() => setShowRejectPrompt(false)}
+            onSubmit={handleReject}
+            title="Alasan Penolakan"
+            placeholder="Masukkan alasan penolakan..."
+            centered={true}
+          />
         </>
       ) : (
         <Button variant="primary" disabled>
@@ -136,6 +160,14 @@ const HRDetail = () => {
       )}
     </div>
   );
+
+  const registeredAtRaw = detail.npwp_document?.upload_date ?? detail?.hr?.registered_at ?? detail?.registered_at ?? detail?.company?.registered_at ?? detail?.created_at ?? detail?.hr?.created_at ?? null;
+
+  const registeredAt = registeredAtRaw
+    ? new Date(registeredAtRaw).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+    : '-';
+
+  const badgeLabel = isVerified ? 'Terverifikasi' : 'Belum Diverifikasi';
 
   return (
     <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -156,12 +188,9 @@ const HRDetail = () => {
 
       <DetailPageHeader
         name={detail.company?.company_name}
-        badge={isVerified ? 'Terverifikasi' : 'Belum Diverifikasi'}
+        badge={badgeLabel}
         badgeVariant={isVerified ? 'green' : 'yellow'}
-        date={detail.hr?.registered_at
-          ? new Date(detail.hr.registered_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-          : '-'
-        }
+        date={registeredAt}
         onBack={() => navigate('/admin/dashboard')}
         actions={headerActions}
       />
@@ -181,7 +210,7 @@ const HRDetail = () => {
             name={detail.hr?.full_name}
             position={detail.hr?.position}
             email={detail.hr?.email}
-            phone={detail.hr?.phone}
+            phone={detail.hr?.phone_number}
           />
         }
       />

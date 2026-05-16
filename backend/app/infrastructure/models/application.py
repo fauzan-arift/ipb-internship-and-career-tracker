@@ -16,7 +16,7 @@ class ApplicationORM(Base):
     internship_id = Column(PGUUID(as_uuid=True), ForeignKey("internships.id"), nullable=False, index=True)
     submitted_cv_id = Column(PGUUID(as_uuid=True), ForeignKey("documents.id"), nullable=False)
 
-    status = Column(SAEnum(ApplicationStatus), nullable=False, default=ApplicationStatus.PENDING)
+    status = Column(SAEnum(ApplicationStatus, native_enum=False), nullable=False, default=ApplicationStatus.PENDING)
     application_time = Column(DateTime(timezone=True), server_default=func.now())
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())

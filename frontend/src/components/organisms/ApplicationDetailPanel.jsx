@@ -32,10 +32,9 @@ function ApplicationDetailPanel({ application }) {
         </div>
       </div>
 
-      <div className="flex-1 py-6 overflow-y-auto">
+      <div className="flex-1 py-6 overflow-y-auto" style={{ paddingBottom: '0px' }}>
         <StatusTimeline items={timelineItems} />
       </div>
-
     </div>
   );
 }

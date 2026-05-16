@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '@/api/axios';
-import Navbar from '@/components/organisms/Navbar';
-import PageFooter from '@/components/organisms/PageFooter';
 import Button from '@/components/atoms/Button';
 import TextInput from '@/components/atoms/TextInput';
 import PasswordInput from '@/components/atoms/PasswordInput';
@@ -78,108 +76,121 @@ const RegisterStudent = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
-      <Navbar variant="auth" />
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '40px', width: '100%', maxWidth: '520px', boxSizing: 'border-box' }}>
-          <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif', margin: '0 0 24px 0', textAlign: 'center' }}>
-            Registrasi Mahasiswa
-          </h1>
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{
+        backgroundColor: '#FFFFFF', borderRadius: '12px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '40px',
+        width: '100%', maxWidth: '520px', boxSizing: 'border-box'
+      }}>
+        <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif', margin: '0 0 24px 0', textAlign: 'center' }}>
+          Registrasi Mahasiswa
+        </h1>
 
-          {status.msg && (
-            <div style={{
-              backgroundColor: status.type === 'error' ? '#FEE2E2' : '#D1FAE5',
-              border: `1px solid ${status.type === 'error' ? '#FECACA' : '#6EE7B7'}`,
-              borderRadius: '8px', padding: '10px 14px',
-              color: status.type === 'error' ? '#DC2626' : '#065F46',
-              fontSize: '13px', fontFamily: 'Inter, sans-serif', marginBottom: '16px'
-            }}>
-              {status.msg}
+        {status.msg && (
+          <div style={{
+            backgroundColor: status.type === 'error' ? '#FEE2E2' : '#D1FAE5',
+            border: `1px solid ${status.type === 'error' ? '#FECACA' : '#6EE7B7'}`,
+            borderRadius: '8px', padding: '10px 14px',
+            color: status.type === 'error' ? '#DC2626' : '#065F46',
+            fontSize: '13px', fontFamily: 'Inter, sans-serif', marginBottom: '16px'
+          }}>
+            {status.msg}
+          </div>
+        )}
+
+        <form
+            onSubmit={handleSubmit} 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '14px',
+              backgroundColor: 'transparent',
+              borderRadius: '0',
+              padding: '0',
+              boxShadow: 'none',
+              width: '100%',
+              maxWidth: '100%',
+            }}
+          >
+          <p style={sectionTitle}>Data Pribadi</p>
+
+          <FormField label="Nama Lengkap *">
+            <TextInput placeholder="Nama lengkap sesuai KTP"
+              value={formData.full_name} onChange={handleChange} name="full_name" required />
+          </FormField>
+
+          <FormField label="NIM * (contoh: G6401231040)">
+            <TextInput placeholder="G6401231040"
+              value={formData.nim} onChange={handleChange} name="nim" required />
+          </FormField>
+
+          <FormField label="Fakultas *">
+            <SelectInput
+              placeholder="Pilih Fakultas"
+              value={formData.faculty}
+              onChange={handleFacultyChange}
+              options={facultyOptions}
+            />
+          </FormField>
+
+          <FormField label="Program Studi *">
+            <SelectInput
+              placeholder={formData.faculty ? 'Pilih Program Studi' : 'Pilih Fakultas terlebih dahulu'}
+              value={formData.major}
+              onChange={handleChange}
+              name="major"
+              options={majorOptions}
+              disabled={!formData.faculty}
+            />
+          </FormField>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <FormField label="Tahun Lulus">
+                <TextInput placeholder="2026" type="number"
+                  value={formData.graduation_year} onChange={handleChange}
+                  name="graduation_year" min="2000" max="2100" />
+              </FormField>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <p style={sectionTitle}>Data Pribadi</p>
-
-            <FormField label="Nama Lengkap *">
-              <TextInput placeholder="Nama lengkap sesuai KTP"
-                value={formData.full_name} onChange={handleChange} name="full_name" required />
-            </FormField>
-
-            <FormField label="NIM * (contoh: G6401231040)">
-              <TextInput placeholder="G6401231040"
-                value={formData.nim} onChange={handleChange} name="nim" required />
-            </FormField>
-
-            <FormField label="Fakultas *">
-              <SelectInput
-                placeholder="Pilih Fakultas"
-                value={formData.faculty}
-                onChange={handleFacultyChange}
-                options={facultyOptions}
-              />
-            </FormField>
-
-            <FormField label="Program Studi *">
-              <SelectInput
-                placeholder={formData.faculty ? 'Pilih Program Studi' : 'Pilih Fakultas terlebih dahulu'}
-                value={formData.major}
-                onChange={handleChange}
-                name="major"
-                options={majorOptions}
-                disabled={!formData.faculty}
-              />
-            </FormField>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ flex: 1 }}>
-                <FormField label="Tahun Lulus">
-                  <TextInput placeholder="2026" type="number"
-                    value={formData.graduation_year} onChange={handleChange}
-                    name="graduation_year" min="2000" max="2100" />
-                </FormField>
-              </div>
-              <div style={{ flex: 1 }}>
-                <FormField label="IPK">
-                  <TextInput placeholder="3.50" type="number"
-                    value={formData.gpa} onChange={handleChange}
-                    name="gpa" min="0" max="4" step="0.01" />
-                </FormField>
-              </div>
+            <div style={{ flex: 1 }}>
+              <FormField label="IPK">
+                <TextInput placeholder="3.50" type="number"
+                  value={formData.gpa} onChange={handleChange}
+                  name="gpa" min="0" max="4" step="0.01" />
+              </FormField>
             </div>
+          </div>
 
-            <FormField label="Nomor HP">
-              <TextInput placeholder="08123456789"
-                value={formData.phone_number} onChange={handleChange} name="phone_number" />
-            </FormField>
+          <FormField label="Nomor HP">
+            <TextInput placeholder="08123456789"
+              value={formData.phone_number} onChange={handleChange} name="phone_number" />
+          </FormField>
 
-            <p style={sectionTitle}>Akun</p>
+          <p style={sectionTitle}>Akun</p>
 
-            <FormField label="Email IPB * (@apps.ipb.ac.id)">
-              <TextInput type="email" placeholder="nama@apps.ipb.ac.id"
-                value={formData.email} onChange={handleChange} name="email" required />
-            </FormField>
+          <FormField label="Email IPB * (@apps.ipb.ac.id)">
+            <TextInput type="email" placeholder="nama@apps.ipb.ac.id"
+              value={formData.email} onChange={handleChange} name="email" required />
+          </FormField>
 
-            <FormField label="Password * (minimal 8 karakter)">
-              <PasswordInput placeholder="Minimal 8 karakter"
-                value={formData.password} onChange={handleChange} name="password"
-                minLength={8} required />
-            </FormField>
+          <FormField label="Password * (minimal 8 karakter)">
+            <PasswordInput placeholder="Minimal 8 karakter"
+              value={formData.password} onChange={handleChange} name="password"
+              minLength={8} required />
+          </FormField>
 
-            <Button type="submit" variant="primary" fullWidth disabled={isLoading} style={{ marginTop: '8px' }}>
-              {isLoading ? 'Mendaftarkan...' : 'Daftar Mahasiswa'}
-            </Button>
+          <Button type="submit" variant="primary" fullWidth disabled={isLoading} style={{ marginTop: '8px' }}>
+            {isLoading ? 'Mendaftarkan...' : 'Daftar Mahasiswa'}
+          </Button>
 
-            <p style={{ textAlign: 'center', fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif', margin: 0 }}>
-              Sudah punya akun?{' '}
-              <span onClick={() => navigate('/login')} style={{ color: '#3D3FA8', cursor: 'pointer', fontWeight: '500' }}>
-                Login di sini
-              </span>
-            </p>
-          </form>
-        </div>
+          <p style={{ textAlign: 'center', fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif', margin: 0 }}>
+            Sudah punya akun?{' '}
+            <span onClick={() => navigate('/login')} style={{ color: '#3D3FA8', cursor: 'pointer', fontWeight: '500' }}>
+              Login di sini
+            </span>
+          </p>
+        </form>
       </div>
-      <PageFooter />
     </div>
   );
 };

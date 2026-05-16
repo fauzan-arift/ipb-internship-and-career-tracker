@@ -4,6 +4,7 @@ Handles student and HR views of applications, status updates (with history), and
 """
 import logging
 import math
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
@@ -27,6 +28,8 @@ from app.presentation.schemas.application import (
     StudentBrief,
     StudentDetail,
     ApplicationStatusHistoryResponse,
+    HRApplicantListItemWithInternship,
+    PaginatedHRAllApplicantResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -328,9 +331,15 @@ class ApplicationService:
 
             old_status = app.status.value
 
-            # Validate new status value
+            # Validate new status value (Case-Insensitive)
             try:
-                updated_status = ApplicationStatus(new_status)
+                target = new_status.strip().lower()
+                updated_status = next(
+                    (s for s in ApplicationStatus if s.value.lower() == target),
+                    None
+                )
+                if not updated_status:
+                    raise ValueError()
             except ValueError:
                 raise HTTPException(
                     status_code=422,
@@ -373,3 +382,95 @@ class ApplicationService:
                     "Gagal mengirim email notifikasi status lamaran %s: %s",
                     application_id, exc
                 )
+
+    async def list_all_hr_applicants(
+        self,
+        hr_user_id: UUID,
+        status_filter: Optional[str],
+        page: int,
+        limit: int,
+    ) -> PaginatedHRAllApplicantResponse:
+        """
+        Return ALL applicants across every internship posted by the HR's company.
+
+        Strategy:
+          1. Fetch all company internships (single bulk query, no pagination).
+          2. For each internship, query its applications (with optional status filter).
+          3. Collect all results, sort by application_time desc, then paginate in Python.
+
+        This avoids N+1 at the HTTP level while keeping the existing repository
+        interfaces unchanged.
+        """
+        async with self.uow as uow:
+            company = await self._resolve_hr_company(uow, hr_user_id)
+
+            # Get ALL internships for this company (use a large limit; companies
+            # realistically have far fewer than 10 000 postings)
+            all_internships, _ = await uow.internships.get_by_company(
+                company_id=company.id,
+                page=1,
+                limit=10_000,
+                search=None,
+            )
+
+            # Collect raw applications enriched with internship title
+            raw: list[tuple] = []  # (application, internship_title)
+            for internship in all_internships:
+                apps, _ = await uow.applications.list_by_internship(
+                    internship_id=internship.id,
+                    status_filter=status_filter,
+                    page=1,
+                    limit=10_000,
+                )
+                for app in apps:
+                    raw.append((app, internship.title, internship.id))
+
+            # Sort by application_time descending (newest first)
+            _epoch = datetime(1970, 1, 1, tzinfo=timezone.utc)
+            raw.sort(
+                key=lambda t: t[0].application_time or _epoch,
+                reverse=True,
+            )
+
+            total = len(raw)
+            total_pages = math.ceil(total / limit) if limit else 0
+
+            # Paginate in Python
+            start = (page - 1) * limit
+            page_slice = raw[start: start + limit]
+
+            items = []
+            for app, internship_title, internship_id in page_slice:
+                student_profile = await uow.users.get_student_profile_by_id(app.student_id)
+
+                # full_name is already resolved in _student_to_domain via the user JOIN —
+                # no need for a separate get_by_id(users) call (avoids N+1).
+                full_name = student_profile.full_name if student_profile else "Unknown"
+                nim = student_profile.nim if student_profile else ""
+                major = student_profile.major if student_profile else ""
+
+                items.append(
+                    HRApplicantListItemWithInternship(
+                        id=app.id,
+                        internship_id=internship_id,
+                        internship_title=internship_title,
+                        student=StudentBrief(
+                            id=app.student_id,
+                            full_name=full_name,
+                            nim=nim,
+                            major=major,
+                            application_time=app.application_time,
+                            status=app.status.value,
+                        ),
+                        application_time=app.application_time,
+                        status=app.status.value,
+                    )
+                )
+
+        return PaginatedHRAllApplicantResponse(
+            items=items,
+            total=total,
+            page=page,
+            limit=limit,
+            total_pages=total_pages,
+        )

@@ -18,11 +18,17 @@ from app.application.services.offer_service import OfferService
 from app.application.services.email_service import EmailService
 from app.infrastructure.unit_of_work import SQLAlchemyUnitOfWork
 from app.presentation.dependencies import get_uow, get_email_service, require_role
-from app.presentation.schemas.company import CompanyProfileUpdateRequest, CompanyProfileResponse
+from app.presentation.schemas.company import (
+    CompanyProfileUpdateRequest,
+    CompanyProfileResponse,
+    HRProfileResponse,
+    HRProfileUpdateRequest,
+)
 from app.presentation.schemas.application import (
     ApplicationStatusUpdateRequest,
     PaginatedHRApplicantResponse,
     HRApplicantDetailResponse,
+    PaginatedHRAllApplicantResponse,
 )
 from app.presentation.schemas.offer import OfferCreateRequest, OfferResponse
 
@@ -46,6 +52,55 @@ def get_offer_service(
     uow: SQLAlchemyUnitOfWork = Depends(get_uow),
 ) -> OfferService:
     return OfferService(uow=uow)
+
+
+# ─── HR Personal Profile ──────────────────────────────────────────────────────
+
+@router.get(
+    "/profile",
+    summary="Lihat profil pribadi HR saya",
+    response_model=HRProfileResponse,
+    tags=["HR - Profile"],
+)
+async def get_my_hr_profile(
+    current_user=Depends(require_role("HR")),
+    svc: HrService = Depends(get_hr_service),
+):
+    """Mengembalikan data pribadi HR yang sedang login (nama, posisi, nomor telepon)."""
+    hr = await svc.get_hr_profile(hr_user_id=current_user.id)
+    return HRProfileResponse(
+        id=hr.id,
+        full_name=hr.full_name,
+        email=hr.email,
+        position=hr.position,
+        phone_number=hr.phone_number,
+    )
+
+
+@router.put(
+    "/profile",
+    summary="Update profil pribadi HR",
+    response_model=HRProfileResponse,
+    tags=["HR - Profile"],
+)
+async def update_my_hr_profile(
+    body: HRProfileUpdateRequest,
+    current_user=Depends(require_role("HR")),
+    svc: HrService = Depends(get_hr_service),
+):
+    """
+    Update parsial profil pribadi HR (nama lengkap, posisi, nomor telepon).
+    Hanya field yang dikirim yang akan diubah.
+    """
+    data = body.model_dump(exclude_unset=True)
+    hr = await svc.update_hr_profile(hr_user_id=current_user.id, payload=data)
+    return HRProfileResponse(
+        id=hr.id,
+        full_name=hr.full_name,
+        email=hr.email,
+        position=hr.position,
+        phone_number=hr.phone_number,
+    )
 
 
 # ─── Company Profile ──────────────────────────────────────────────────────────
@@ -115,6 +170,32 @@ async def list_applicants(
     return await svc.list_hr_applicants(
         hr_user_id=current_user.id,
         internship_id=internship_id,
+        status_filter=status_filter,
+        page=page,
+        limit=limit,
+    )
+
+
+@router.get(
+    "/applications",
+    summary="Semua pelamar dari seluruh lowongan saya",
+    response_model=PaginatedHRAllApplicantResponse,
+    tags=["HR - Applications"],
+)
+async def list_all_applicants(
+    status_filter: Optional[str] = Query(default=None, alias="status", description="Filter by status"),
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=10, ge=1, le=100),
+    current_user=Depends(require_role("HR")),
+    svc: ApplicationService = Depends(get_application_service),
+):
+    """
+    Mengembalikan semua pelamar dari **seluruh** lowongan yang diposting oleh perusahaan HR.
+    Response menyertakan `internship_id` dan `internship_title` pada setiap item.
+    Mendukung filter status dan paginasi.
+    """
+    return await svc.list_all_hr_applicants(
+        hr_user_id=current_user.id,
         status_filter=status_filter,
         page=page,
         limit=limit,

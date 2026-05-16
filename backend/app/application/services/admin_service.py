@@ -23,7 +23,6 @@ class AdminService:
             result = []
             for hr in hrs:
                 company = await uow.companies.get_by_hr_id(hr.profile_id)
-                user = await uow.users.get_by_id(hr.id)
                 result.append({
                     "hr_profile_id": hr.profile_id,
                     "hr_id": hr.profile_id,
@@ -31,6 +30,7 @@ class AdminService:
                     "full_name": hr.full_name,
                     "email": hr.email,
                     "position": hr.position,
+                    "phone_number": hr.phone_number,
                     "company_name": company.company_name if company else None,
                     "registered_at": (
                         company.registration_date.isoformat()
@@ -45,7 +45,6 @@ class AdminService:
             result = []
             for hr in hrs:
                 company = await uow.companies.get_by_hr_id(hr.profile_id)
-                user = await uow.users.get_by_id(hr.id)
                 result.append({
                     "hr_profile_id": hr.profile_id,
                     "hr_id": hr.profile_id,
@@ -53,8 +52,9 @@ class AdminService:
                     "full_name": hr.full_name,
                     "email": hr.email,
                     "position": hr.position,
+                    "phone_number": hr.phone_number,
                     "company_name": company.company_name if company else None,
-                    "status": user.status.value if user else None,
+                    "status": hr.status.value if hr else None,
                     "registered_at": (
                         company.registration_date.isoformat()
                         if company and company.registration_date else None
@@ -90,6 +90,7 @@ class AdminService:
                 "full_name": hr.full_name,
                 "email": hr.email,
                 "position": hr.position,
+                "phone_number": hr.phone_number,
                 "status": user.status.value if user else None,
             },
             "company": {

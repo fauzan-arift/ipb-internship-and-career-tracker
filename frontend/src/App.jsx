@@ -18,7 +18,7 @@ import HRDetail from '@/pages/admin/HRDetail';
 import InternshipDetail from '@/pages/student/InternshipDetail';
 import InternshipSearch from '@/pages/student/InternshipSearch';
 import StudentProfile from '@/pages/student/StudentProfile';
-import MyApplications from '@/pages/student/MyApplications'; 
+import MyApplications from '@/pages/student/MyApplications';
 import OffersPage from '@/pages/student/OffersPage';
 
 import HRDashboard from '@/pages/hr/HRDashboard';
@@ -27,6 +27,8 @@ import EditInternship from '@/pages/hr/EditInternship';
 import ApplicantList from '@/pages/hr/ApplicantList';
 import ApplicantDetail from '@/pages/hr/ApplicantDetail';
 import OfferApplicant from '@/pages/hr/OfferApplicant';
+import CompanyProfile from '@/pages/hr/CompanyProfile'
+
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -39,13 +41,31 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 function AppRoutes() {
   return (
     <Routes>
+      {/* ── Public / Auth ── */}
       <Route path="/login" element={<Login />} />
-      <Route path="/register/student" element={<RegisterStudent />} />
-      <Route path="/register/hr" element={<RegisterHR />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
 
+      <Route
+        path="/register/student"
+        element={
+          <DashboardLayout showSidebar={false}>
+            <RegisterStudent />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/register/hr"
+        element={
+          <DashboardLayout showSidebar={false}>
+            <RegisterHR />
+          </DashboardLayout>
+        }
+      />
+
+      {/* ── Home ── */}
       <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
 
+      {/* ── Admin ── */}
       <Route
         path="/admin/dashboard"
         element={(
@@ -67,6 +87,7 @@ function AppRoutes() {
         )}
       />
 
+      {/* ── Student ── */}
       <Route
         path="/internship"
         element={(
@@ -97,7 +118,28 @@ function AppRoutes() {
           </ProtectedRoute>
         )}
       />
+      <Route
+        path="/my-application"
+        element={(
+          <ProtectedRoute allowedRoles={['MAHASISWA', 'STUDENT']}>
+            <DashboardLayout role="student">
+              <MyApplications />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/offers"
+        element={(
+          <ProtectedRoute allowedRoles={['STUDENT']}>
+            <DashboardLayout role="student">
+              <OffersPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
 
+      {/* ── HR ── */}
       <Route
         path="/hr/dashboard"
         element={(
@@ -129,31 +171,11 @@ function AppRoutes() {
         )}
       />
       <Route
-        path="/hr/applications"
+        path="/hr/applicants"
         element={(
           <ProtectedRoute allowedRoles={['HR']}>
             <DashboardLayout role="hr">
               <ApplicantList />
-            </DashboardLayout>
-          </ProtectedRoute>
-        )}
-      />
-      <Route
-        path="/hr/applications/:application_id"
-        element={(
-          <ProtectedRoute allowedRoles={['HR']}>
-            <DashboardLayout role="hr">
-              <ApplicantDetail />
-            </DashboardLayout>
-          </ProtectedRoute>
-        )}
-      />
-      <Route
-        path="/hr/applications/:application_id/offer"
-        element={(
-          <ProtectedRoute allowedRoles={['HR']}>
-            <DashboardLayout role="hr">
-              <OfferApplicant />
             </DashboardLayout>
           </ProtectedRoute>
         )}
@@ -168,6 +190,17 @@ function AppRoutes() {
             </DashboardLayout>
           </ProtectedRoute>
         }
+      />
+
+      <Route
+        path="/hr/profile"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <DashboardLayout role="hr">
+              <CompanyProfile />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
       />
 
       <Route

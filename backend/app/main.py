@@ -26,8 +26,29 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="IPB Internship & Career Tracker API",
+    description="""
+## IPB Internship & Career Tracker API
+
+API backend untuk portal magang IPB. Mendukung tiga role pengguna:
+
+| Role | Akses |
+|------|-------|
+| **Student** | Lihat lowongan, lamar, lihat status & penawaran |
+| **HR** | Kelola lowongan, review pelamar, kirim penawaran |
+| **Admin** | Approve/reject akun HR |
+
+### Autentikasi
+Semua endpoint yang membutuhkan login menggunakan **Bearer Token** (JWT).
+Dapatkan token via `POST /api/v1/auth/login`, lalu klik tombol **Authorize** di atas dan masukkan:
+```
+Bearer <token>
+```
+
+### Status Lamaran
+`Pending` → `Diproses` → `Review HR` → `Interview` → `Diterima` → `Ditawarkan` → `Diterima/Ditolak`
+    """,
     lifespan=lifespan,
+    contact={"name": "IPB Internship Portal"},
 )
 
 app.add_middleware(
@@ -44,7 +65,7 @@ app.include_router(internship_router, prefix=f"{settings.API_V1_STR}/internships
 app.include_router(hr_internship_router, prefix=f"{settings.API_V1_STR}/hr/internships", tags=["HR - Internships"])
 app.include_router(document_router, prefix=f"{settings.API_V1_STR}/documents", tags=["Documents"])
 app.include_router(student_router, prefix=f"{settings.API_V1_STR}/students", tags=["Students"])
-app.include_router(hr_profile_router, prefix=f"{settings.API_V1_STR}/hr", tags=["HR - Profile"])
+app.include_router(hr_profile_router, prefix=f"{settings.API_V1_STR}/hr")  # tags diatur per-endpoint
 app.include_router(skill_router, prefix=f"{settings.API_V1_STR}/skills", tags=["Skills"])
 
 

@@ -18,6 +18,162 @@ const SkillChip = ({ label, onRemove }) => (
   </div>
 )
 
+const SkillDropdown = ({ value, onChange, onAdd, globalSkills, selectedSkills }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const containerRef = useRef(null)
+
+  // Filter skills — belum dipilih + cocok dengan input
+  const filtered = globalSkills.filter(
+    (s) =>
+      !selectedSkills.includes(s) &&
+      s.toLowerCase().includes(value.toLowerCase())
+  )
+
+  // Tutup dropdown kalau klik di luar
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleSelect = (skill) => {
+    // Pilih dari dropdown langsung tambah ke skills
+    if (!selectedSkills.includes(skill)) {
+      onAdd(skill)
+    }
+    onChange('')
+    setIsOpen(false)
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (filtered.length > 0 && value) {
+        handleSelect(filtered[0])
+      } else {
+        onAdd()
+        setIsOpen(false)
+      }
+    }
+    if (e.key === 'Escape') setIsOpen(false)
+  }
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      {/* Input row */}
+      <div className="flex items-center w-full">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => { onChange(e.target.value); setIsOpen(true) }}
+          onFocus={() => setIsOpen(true)}
+          onKeyDown={handleKeyDown}
+          placeholder="Tambahkan keahlian..."
+          className="flex-1 text-gray-700 text-base outline-none bg-transparent placeholder-gray-400"
+        />
+        {/* Segitiga toggle */}
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg
+            width="18" height="18" viewBox="0 0 24 24" fill="none"
+            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+          >
+            <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Dropdown list */}
+      {isOpen && filtered.length > 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            left: 0,
+            right: 0,
+            backgroundColor: '#fff',
+            border: '1px solid #CBD0E0',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            maxHeight: '200px',
+            overflowY: 'auto',
+            zIndex: 50,
+          }}
+        >
+          {filtered.map((skill) => (
+            <button
+              key={skill}
+              type="button"
+              onMouseDown={(e) => e.preventDefault()} // prevent blur sebelum click
+              onClick={() => handleSelect(skill)}
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                padding: '10px 16px',
+                fontSize: '14px',
+                color: '#1B1B21',
+                backgroundColor: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Inter, sans-serif',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4FF'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              {skill}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Kalau ketik skill baru yang tidak ada di list, tetap bisa tambah */}
+      {isOpen && value.trim() && filtered.length === 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            left: 0,
+            right: 0,
+            backgroundColor: '#fff',
+            border: '1px solid #CBD0E0',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            zIndex: 50,
+          }}
+        >
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => { onAdd(); setIsOpen(false) }}
+            style={{
+              display: 'block',
+              width: '100%',
+              textAlign: 'left',
+              padding: '10px 16px',
+              fontSize: '14px',
+              color: '#4D44B5',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif',
+            }}
+          >
+            + Tambah "{value.trim()}"
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const ProfileSkeleton = () => (
   <div className="flex flex-col gap-6 animate-pulse">
     {[1, 2, 3].map((i) => (
@@ -161,12 +317,12 @@ export default function StudentProfile() {
   }
 
   // ── Skills ──
-  const addSkill = () => {
-    const trimmed = skillInput.trim()
-    if (!trimmed || skills.includes(trimmed)) return
-    setSkills((prev) => [...prev, trimmed])
-    setSkillInput('')
-  }
+  const addSkill = (skillToAdd) => {
+  const trimmed = (skillToAdd ?? skillInput).trim()
+  if (!trimmed || skills.includes(trimmed)) return
+  setSkills((prev) => [...prev, trimmed])
+  setSkillInput('')
+}
 
   const handleSkillKeyDown = (e) => {
     if (e.key === 'Enter') { e.preventDefault(); addSkill() }
@@ -244,14 +400,14 @@ export default function StudentProfile() {
 
   // ── Loading ──
   if (isLoading) return (
-    <div className="px-8 py-8 max-w-215 mx-auto">
+    <div className="px-8 py-8 max-w-5x1 mx-auto">
       <ProfileSkeleton />
     </div>
   )
 
   // ── Error ──
   if (isError) return (
-    <div className="px-8 py-8 max-w-215 mx-auto flex flex-col items-center gap-4 mt-16">
+    <div className="px-8 py-8 max-w-5x1 mx-auto flex flex-col items-center gap-4 mt-16">
       <p className="text-[#1B1B21] text-lg font-semibold">Gagal memuat profil</p>
       <p className="text-[#454651] text-sm">{errorMsg}</p>
       <button
@@ -265,7 +421,7 @@ export default function StudentProfile() {
 
   // ── Render ──
   return (
-    <div className="px-8 py-8 max-w-215 mx-auto flex flex-col gap-6">
+    <div className="px-8 py-8 max-w-250 mx-auto flex flex-col gap-6">
 
       {successMsg && (
         <div className="px-4 py-3 rounded-lg bg-[#D1FAE5] border border-[#6EE7B7] text-[#065F46] text-sm font-medium">
@@ -353,10 +509,11 @@ export default function StudentProfile() {
       </div>
 
       {/* ── Keahlian ── */}
-      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
-        <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Keahlian</h2>
-        {skills.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+        <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
+          <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Keahlian</h2>
+
+          {/* Skill chips */}
+          <div className="flex flex-wrap gap-2 min-h-[32px]">
             {skills.map((skill) => (
               <SkillChip
                 key={skill}
@@ -364,28 +521,23 @@ export default function StudentProfile() {
                 onRemove={() => setSkills((prev) => prev.filter((s) => s !== skill))}
               />
             ))}
+            {skills.length === 0 && (
+              <span className="text-gray-400 text-sm">Belum ada keahlian ditambahkan</span>
+            )}
           </div>
-        )}
-        <div className="flex items-center w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] bg-white">
-          <input
-            type="text"
+
+          {/* Garis pemisah */}
+          <div className="border-t border-[#DBD9E1]" />
+
+          {/* Input dropdown */}
+          <SkillDropdown
             value={skillInput}
-            onChange={(e) => setSkillInput(e.target.value)}
-            onKeyDown={handleSkillKeyDown}
-            placeholder="Tambahkan keahlian, tekan Enter"
-            className="flex-1 text-gray-500 text-base outline-none bg-transparent placeholder-gray-400"
-            list="global-skills-list"
+            onChange={setSkillInput}
+            onAdd={addSkill}
+            globalSkills={globalSkills}
+            selectedSkills={skills}
           />
-          <datalist id="global-skills-list">
-            {globalSkills.map((skill) => (
-              <option key={skill} value={skill} />
-            ))}
-          </datalist>
-          <button onClick={addSkill} className="ml-2 hover:opacity-60 transition-opacity">
-            <PlusIcon />
-          </button>
         </div>
-      </div>
 
       {/* ── Dokumen ── */}
       <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-3">

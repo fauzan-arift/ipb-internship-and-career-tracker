@@ -31,9 +31,6 @@ function ApplicationListItem({ logo, position, company, date, status, isActive, 
 
       <div className="flex justify-between items-center">
         <span className="text-xs text-gray-400">Dilamar: {date}</span>
-        <span className="text-indigo-600 text-sm font-medium cursor-pointer hover:underline">
-          Lihat Detail →
-        </span>
       </div>
     </div>
   );

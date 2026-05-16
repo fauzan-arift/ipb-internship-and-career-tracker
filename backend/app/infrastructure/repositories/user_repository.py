@@ -73,6 +73,7 @@ class SQLAlchemyUserRepository(IUserRepository):
             role=user_orm.role,
             status=user_orm.status,
             position=hr_orm.position,
+            phone_number=hr_orm.phone_number,
             created_at=user_orm.created_at,
             updated_at=user_orm.updated_at,
         )

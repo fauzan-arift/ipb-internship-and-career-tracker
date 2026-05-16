@@ -88,7 +88,8 @@ const sidebarMenus = {
   ],
   hr: [
     { label: "Kelola Lowongan", href: "/hr/dashboard", icon: <BriefcaseIcon /> },
-    { label: "Daftar Pelamar", href: "/hr/applications", icon: <UsersIcon /> },
+    { label: "Daftar Pelamar", href: "/hr/applicants", icon: <UsersIcon /> },
+    { label: "Profil Perusahaan", href: "/hr/profile",  icon: <BuildingIcon /> },
   ],
   company: [
     { label: "Dashboard",         href: "/company/dashboard", icon: <GridIcon />     },

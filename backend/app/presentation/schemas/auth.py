@@ -41,6 +41,7 @@ class StudentRegisterRequest(BaseModel):
 class HRRegisterRequest(BaseModel):
     full_name: str = Field(..., min_length=2, max_length=255)
     position: Optional[str] = Field(None, max_length=100)
+    phone_number: Optional[str] = Field(None, max_length=20)
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=72)
     company_name: str = Field(..., min_length=2, max_length=255)

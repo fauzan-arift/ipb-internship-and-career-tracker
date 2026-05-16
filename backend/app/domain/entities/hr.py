@@ -11,5 +11,6 @@ class HR(User):
     role: UserRole = UserRole.HR
     status: UserStatus = UserStatus.PENDING
     position: Optional[str] = None
+    phone_number: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

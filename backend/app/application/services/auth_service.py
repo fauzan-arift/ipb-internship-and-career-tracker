@@ -117,6 +117,7 @@ class AuthService:
                 role=UserRole.HR,
                 status=UserStatus.PENDING,
                 position=data.position,
+                phone_number=data.phone_number,
             )
             hr = await uow.users.save_hr(hr)
 
