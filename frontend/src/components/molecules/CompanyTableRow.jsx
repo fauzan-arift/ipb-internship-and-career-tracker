@@ -1,6 +1,7 @@
 import React from 'react';
 import AvatarSquare from '../atoms/AvatarSquare';
 import Badge from '../atoms/Badge';
+import ChevronRightButton from '../atoms/ChevronRightButton';
 
 function CompanyTableRow({ company, onAction }) {
   function onMenuAction(action) {
@@ -37,26 +38,7 @@ function CompanyTableRow({ company, onAction }) {
         {company.createdAt}
       </td>
       <td style={{ padding: '14px 16px' }}>
-        <button
-          type="button"
-          onClick={() => onMenuAction('detail')}
-          style={{
-            backgroundColor: '#3D3FA8',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#FFFFFF',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '8px 14px',
-            borderRadius: '8px',
-            fontSize: '13px',
-            fontFamily: 'Inter, sans-serif',
-            fontWeight: '600',
-          }}
-        >
-          Lihat Detail
-        </button>
+        <ChevronRightButton onClick={() => onMenuAction('detail')} />
       </td>
     </tr>
   );
