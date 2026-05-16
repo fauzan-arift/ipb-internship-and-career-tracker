@@ -7,6 +7,7 @@ import Button from '@/components/atoms/Button';
 import TextInput from '@/components/atoms/TextInput';
 import PasswordInput from '@/components/atoms/PasswordInput';
 import SelectInput from '@/components/atoms/SelectInput';
+import FormField from '@/components/molecules/FormField';
 import { IPB_FACULTIES } from '@/constants/ipbData';
 
 const RegisterStudent = () => {
@@ -26,9 +27,8 @@ const RegisterStudent = () => {
   };
 
   const facultyOptions = IPB_FACULTIES.map(f => ({ label: f.name, value: f.name }));
-  
   const selectedFaculty = IPB_FACULTIES.find(f => f.name === formData.faculty);
-  const majorOptions = selectedFaculty 
+  const majorOptions = selectedFaculty
     ? selectedFaculty.majors.map(m => ({ label: m, value: m }))
     : [];
 
@@ -101,55 +101,70 @@ const RegisterStudent = () => {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionTitle}>Data Pribadi</p>
 
-            <TextInput label="Nama Lengkap *" placeholder="Nama lengkap sesuai KTP"
-              value={formData.full_name} onChange={handleChange} name="full_name" required />
+            <FormField label="Nama Lengkap *">
+              <TextInput placeholder="Nama lengkap sesuai KTP"
+                value={formData.full_name} onChange={handleChange} name="full_name" required />
+            </FormField>
 
-            <TextInput label="NIM * (contoh: G6401231040)" placeholder="G6401231040"
-              value={formData.nim} onChange={handleChange} name="nim" required />
+            <FormField label="NIM * (contoh: G6401231040)">
+              <TextInput placeholder="G6401231040"
+                value={formData.nim} onChange={handleChange} name="nim" required />
+            </FormField>
 
-            <SelectInput 
-              label="Fakultas *" 
-              placeholder="Pilih Fakultas"
-              value={formData.faculty} 
-              onChange={handleFacultyChange} 
-              options={facultyOptions}
-            />
+            <FormField label="Fakultas *">
+              <SelectInput
+                placeholder="Pilih Fakultas"
+                value={formData.faculty}
+                onChange={handleFacultyChange}
+                options={facultyOptions}
+              />
+            </FormField>
 
-            <SelectInput 
-              label="Program Studi *" 
-              placeholder={formData.faculty ? "Pilih Program Studi" : "Pilih Fakultas terlebih dahulu"}
-              value={formData.major} 
-              onChange={handleChange} 
-              name="major"
-              options={majorOptions}
-              disabled={!formData.faculty}
-            />
+            <FormField label="Program Studi *">
+              <SelectInput
+                placeholder={formData.faculty ? 'Pilih Program Studi' : 'Pilih Fakultas terlebih dahulu'}
+                value={formData.major}
+                onChange={handleChange}
+                name="major"
+                options={majorOptions}
+                disabled={!formData.faculty}
+              />
+            </FormField>
 
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ flex: 1 }}>
-                <TextInput label="Tahun Lulus" placeholder="2026" type="number"
-                  value={formData.graduation_year} onChange={handleChange}
-                  name="graduation_year" min="2000" max="2100" />
+                <FormField label="Tahun Lulus">
+                  <TextInput placeholder="2026" type="number"
+                    value={formData.graduation_year} onChange={handleChange}
+                    name="graduation_year" min="2000" max="2100" />
+                </FormField>
               </div>
               <div style={{ flex: 1 }}>
-                <TextInput label="IPK" placeholder="3.50" type="number"
-                  value={formData.gpa} onChange={handleChange}
-                  name="gpa" min="0" max="4" step="0.01" />
+                <FormField label="IPK">
+                  <TextInput placeholder="3.50" type="number"
+                    value={formData.gpa} onChange={handleChange}
+                    name="gpa" min="0" max="4" step="0.01" />
+                </FormField>
               </div>
             </div>
 
-            <TextInput label="Nomor HP" placeholder="08123456789"
-              value={formData.phone_number} onChange={handleChange} name="phone_number" />
+            <FormField label="Nomor HP">
+              <TextInput placeholder="08123456789"
+                value={formData.phone_number} onChange={handleChange} name="phone_number" />
+            </FormField>
 
             <p style={sectionTitle}>Akun</p>
 
-            <TextInput label="Email IPB * (@apps.ipb.ac.id)" type="email"
-              placeholder="nama@apps.ipb.ac.id"
-              value={formData.email} onChange={handleChange} name="email" required />
+            <FormField label="Email IPB * (@apps.ipb.ac.id)">
+              <TextInput type="email" placeholder="nama@apps.ipb.ac.id"
+                value={formData.email} onChange={handleChange} name="email" required />
+            </FormField>
 
-            <PasswordInput label="Password * (minimal 8 karakter)" placeholder="Minimal 8 karakter"
-              value={formData.password} onChange={handleChange} name="password"
-              minLength={8} required />
+            <FormField label="Password * (minimal 8 karakter)">
+              <PasswordInput placeholder="Minimal 8 karakter"
+                value={formData.password} onChange={handleChange} name="password"
+                minLength={8} required />
+            </FormField>
 
             <Button type="submit" variant="primary" fullWidth disabled={isLoading} style={{ marginTop: '8px' }}>
               {isLoading ? 'Mendaftarkan...' : 'Daftar Mahasiswa'}

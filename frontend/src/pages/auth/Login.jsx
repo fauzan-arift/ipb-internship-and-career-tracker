@@ -5,6 +5,7 @@ import logoIPB from '@/assets/logo-ipb.png';
 import PageFooter from '@/components/organisms/PageFooter';
 import TextInput from '@/components/atoms/TextInput';
 import PasswordInput from '@/components/atoms/PasswordInput';
+import FormField from '@/components/molecules/FormField';
 import Button from '@/components/atoms/Button';
 import api from '@/api/axios';
 import { useAuth } from '@/hooks/useAuth';
@@ -74,8 +75,22 @@ function Login() {
           </div>
 
           <form onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <TextInput label="Email" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} error={errors.email} />
-            <PasswordInput label="Password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
+            <FormField label="Email" error={errors.email}>
+              <TextInput
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </FormField>
+
+            <FormField label="Password" error={errors.password}>
+              <PasswordInput
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </FormField>
 
             {apiError && (
               <div style={{ backgroundColor: '#FEE2E2', border: '1px solid #FECACA', borderRadius: '8px', padding: '10px 14px', color: '#DC2626', fontSize: '13px', fontFamily: 'Inter, sans-serif' }}>

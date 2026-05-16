@@ -1,46 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { studentService } from '@/services/studentService'
 import { IPB_FACULTIES } from '@/constants/ipbData'
+import TextInput from '@/components/atoms/TextInput'
+import SelectInput from '@/components/atoms/SelectInput'
+import FormField from '@/components/molecules/FormField'
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
-
-const FormField = ({ label, children }) => (
-  <div className="flex flex-col gap-2">
-    <label className="text-black font-medium text-base">{label}</label>
-    {children}
-  </div>
-)
-
-const TextInput = ({ value, onChange, type = 'text', placeholder = '', disabled = false }) => (
-  <input
-    type={type}
-    value={value ?? ''}
-    onChange={onChange}
-    placeholder={placeholder}
-    disabled={disabled}
-    className={`w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-black'}`}
-  />
-)
-
-const SelectInput = ({ value, onChange, options }) => (
-  <div className="relative">
-    <select
-      value={value ?? ''}
-      onChange={onChange}
-      className="w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] bg-white text-black text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors appearance-none pr-14 truncate"
-    >
-      <option value="" disabled>Pilih...</option>
-      {options.map((opt) => (
-        <option key={opt} value={opt}>{opt}</option>
-      ))}
-    </select>
-    <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-        <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    </div>
-  </div>
-)
 
 const SkillChip = ({ label, onRemove }) => (
   <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#E8F0FE]">
@@ -361,6 +326,7 @@ export default function StudentProfile() {
               value={faculty}
               onChange={handleFacultyChange}
               options={IPB_FACULTIES.map((f) => f.name)}
+              placeholder="Pilih..."
             />
           </FormField>
           <FormField label="Jurusan">
@@ -368,6 +334,7 @@ export default function StudentProfile() {
               value={major}
               onChange={(e) => setMajor(e.target.value)}
               options={majorOptions}
+              placeholder="Pilih..."
             />
           </FormField>
           <FormField label="IPK">

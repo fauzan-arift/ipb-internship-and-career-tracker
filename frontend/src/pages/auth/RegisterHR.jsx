@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '@/api/axios';
 import Navbar from '@/components/organisms/Navbar';
@@ -6,6 +6,10 @@ import PageFooter from '@/components/organisms/PageFooter';
 import Button from '@/components/atoms/Button';
 import TextInput from '@/components/atoms/TextInput';
 import PasswordInput from '@/components/atoms/PasswordInput';
+import TextArea from '@/components/atoms/TextArea';
+import FormField from '@/components/molecules/FormField';
+import UploadZone from '@/components/atoms/UploadZone';
+import UploadedFileRow from '@/components/molecules/UploadedFileRow';
 
 const RegisterHR = () => {
   const [formData, setFormData] = useState({
@@ -17,9 +21,13 @@ const RegisterHR = () => {
   const [status, setStatus] = useState({ type: '', msg: '' });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-  const handleFileChange = (e) => setNpwpFile(e.target.files[0]);
+
+  const handleFileSelect = (file) => {
+    if (file) setNpwpFile(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,13 +68,6 @@ const RegisterHR = () => {
     paddingBottom: '8px', margin: '8px 0 4px 0',
   };
 
-  const textareaStyle = {
-    width: '100%', padding: '10px 12px', borderRadius: '8px',
-    border: '1.5px solid #CBD0E0', fontSize: '14px',
-    fontFamily: 'Inter, sans-serif', color: '#1A1A2E',
-    outline: 'none', resize: 'vertical', boxSizing: 'border-box',
-  };
-
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
       <Navbar variant="auth" />
@@ -89,74 +90,96 @@ const RegisterHR = () => {
           )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {/* Akun HR */}
             <p style={sectionTitle}>Data Akun HR</p>
+
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ flex: 1 }}>
-                <TextInput label="Nama Lengkap *" placeholder="Nama lengkap"
-                  value={formData.full_name} onChange={handleChange} name="full_name" required />
+                <FormField label="Nama Lengkap *">
+                  <TextInput placeholder="Nama lengkap"
+                    value={formData.full_name} onChange={handleChange} name="full_name" required />
+                </FormField>
               </div>
               <div style={{ flex: 1 }}>
-                <TextInput label="Jabatan" placeholder="HR Manager"
-                  value={formData.position} onChange={handleChange} name="position" />
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ flex: 1 }}>
-                <TextInput label="Email *" type="email" placeholder="email@perusahaan.com"
-                  value={formData.email} onChange={handleChange} name="email" required />
-              </div>
-              <div style={{ flex: 1 }}>
-                <PasswordInput label="Password * (min. 8 karakter)" placeholder="Minimal 8 karakter"
-                  value={formData.password} onChange={handleChange} name="password"
-                  minLength={8} required />
+                <FormField label="Jabatan">
+                  <TextInput placeholder="HR Manager"
+                    value={formData.position} onChange={handleChange} name="position" />
+                </FormField>
               </div>
             </div>
 
-            {/* Perusahaan */}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <FormField label="Email *">
+                  <TextInput type="email" placeholder="email@perusahaan.com"
+                    value={formData.email} onChange={handleChange} name="email" required />
+                </FormField>
+              </div>
+              <div style={{ flex: 1 }}>
+                <FormField label="Password * (min. 8 karakter)">
+                  <PasswordInput placeholder="Minimal 8 karakter"
+                    value={formData.password} onChange={handleChange} name="password"
+                    minLength={8} required />
+                </FormField>
+              </div>
+            </div>
+
             <p style={sectionTitle}>Data Perusahaan</p>
-            <TextInput label="Nama Perusahaan *" placeholder="PT. Nama Perusahaan"
-              value={formData.company_name} onChange={handleChange} name="company_name" required />
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}>
-                Alamat Perusahaan
-              </label>
-              <textarea style={textareaStyle} name="address" value={formData.address}
-                onChange={handleChange} rows={2} placeholder="Jl. Contoh No. 1, Jakarta" />
-            </div>
+            <FormField label="Nama Perusahaan *">
+              <TextInput placeholder="PT. Nama Perusahaan"
+                value={formData.company_name} onChange={handleChange} name="company_name" required />
+            </FormField>
+
+            <FormField label="Alamat Perusahaan">
+              <TextArea placeholder="Jl. Contoh No. 1, Jakarta"
+                value={formData.address} onChange={handleChange} name="address" rows={2} />
+            </FormField>
 
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ flex: 1 }}>
-                <TextInput label="Industri" placeholder="Teknologi"
-                  value={formData.industry} onChange={handleChange} name="industry" />
+                <FormField label="Industri">
+                  <TextInput placeholder="Teknologi"
+                    value={formData.industry} onChange={handleChange} name="industry" />
+                </FormField>
               </div>
               <div style={{ flex: 1 }}>
-                <TextInput label="Website" placeholder="https://perusahaan.com"
-                  value={formData.website} onChange={handleChange} name="website" />
+                <FormField label="Website">
+                  <TextInput placeholder="https://perusahaan.com"
+                    value={formData.website} onChange={handleChange} name="website" />
+                </FormField>
               </div>
             </div>
 
-            <TextInput label="Email Perusahaan" type="email" placeholder="info@perusahaan.com"
-              value={formData.company_email} onChange={handleChange} name="company_email" />
+            <FormField label="Email Perusahaan">
+              <TextInput type="email" placeholder="info@perusahaan.com"
+                value={formData.company_email} onChange={handleChange} name="company_email" />
+            </FormField>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}>
-                Deskripsi Perusahaan
-              </label>
-              <textarea style={textareaStyle} name="description" value={formData.description}
-                onChange={handleChange} rows={3} placeholder="Deskripsi singkat tentang perusahaan..." />
-            </div>
+            <FormField label="Deskripsi Perusahaan">
+              <TextArea placeholder="Deskripsi singkat tentang perusahaan..."
+                value={formData.description} onChange={handleChange} name="description" rows={3} />
+            </FormField>
 
-            {/* Dokumen */}
             <p style={sectionTitle}>Dokumen Legalitas</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}>
-                Upload NPWP * (PDF/JPG/PNG - Max 5MB)
-              </label>
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleFileChange} required
-                style={{ fontSize: '13px', fontFamily: 'Inter, sans-serif' }} />
-            </div>
+
+            <FormField label="Upload NPWP * (PDF/JPG/PNG - Max 5MB)">
+              {npwpFile ? (
+                <UploadedFileRow
+                  fileName={npwpFile.name}
+                  fileSize={`${(npwpFile.size / (1024 * 1024)).toFixed(1)} MB`}
+                  onDelete={() => {
+                    setNpwpFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                  }}
+                />
+              ) : (
+                <UploadZone
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onFileSelect={handleFileSelect}
+                  fileInputRef={fileInputRef}
+                />
+              )}
+            </FormField>
 
             <Button type="submit" variant="primary" fullWidth disabled={isLoading} style={{ marginTop: '8px' }}>
               {isLoading ? 'Mendaftarkan...' : 'Daftar HR & Perusahaan'}
