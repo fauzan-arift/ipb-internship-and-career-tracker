@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Briefcase, List, Save, FileText } from 'lucide-react';
+import { Save, FileText } from 'lucide-react';
 import hrService from '@/services/hrService';
-import api from '@/api/axios';
-import Navbar from '@/components/organisms/Navbar';
-import PageFooter from '@/components/organisms/PageFooter';
-import Sidebar from '@/components/organisms/Sidebar';
-import SidebarLayout from '@/components/organisms/SidebarLayout';
 import FormSectionCard from '@/components/organisms/FormSectionCard';
 import Breadcrumb from '@/components/molecules/Breadcrumb';
 import FormActionBar from '@/components/molecules/FormActionBar';
+import FormField from '@/components/molecules/FormField';
 import TextInput from '@/components/atoms/TextInput';
 import TextArea from '@/components/atoms/TextArea';
 import SelectInput from '@/components/atoms/SelectInput';
@@ -17,11 +13,6 @@ import DateRangePicker from '@/components/atoms/DateRangePicker';
 import DatePicker from '@/components/atoms/DatePicker';
 import useToast from '@/hooks/useToast';
 import Toast from '@/components/atoms/Toast';
-
-const MENU_HR = [
-  { label: 'Kelola Lowongan', icon: Briefcase, href: '/hr/dashboard' },
-  { label: 'Daftar Pelamar', icon: List, href: '/hr/applicants' },
-];
 
 const STATUS_GAJI_OPTIONS = [
   { value: 'PAID', label: 'Paid Internship' },
@@ -84,13 +75,8 @@ function EditInternship() {
         setIsFetching(false);
       }
     }
-
     fetchInternship();
   }, [internship_id]);
-
-  function onLogout() {
-    navigate('/login');
-  }
 
   function validate() {
     const newErrors = {};
@@ -156,154 +142,127 @@ function EditInternship() {
     }
   }
 
+  if (isFetching) return (
+    <div style={{ textAlign: 'center', padding: '40px', fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+      Memuat data lowongan...
+    </div>
+  );
+
   return (
-    <div style={{ minHeight: '100dvh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
-      <Navbar variant="app" user={{ name: 'HR Manager' }} onLogout={onLogout} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <Breadcrumb
+        items={[
+          { label: 'Kelola Lowongan', href: '/hr/dashboard' },
+          { label: 'Edit Lowongan' },
+        ]}
+      />
 
-      <div style={{ flex: 1 }}>
-        <SidebarLayout
-          sidebar={<Sidebar menuItems={MENU_HR} activeHref="/hr/dashboard" />}
-        >
-          <div style={{ marginBottom: '20px' }}>
-            <Breadcrumb
-              items={[
-                { label: 'Kelola Lowongan', href: '/hr/dashboard' },
-                { label: 'Edit Lowongan' },
-              ]}
-            />
-          </div>
+      <FormSectionCard title="Informasi Umum" icon={<FileText size={18} />}>
+        <FormField label="Posisi yang Ditawarkan" error={errors.posisi}>
+          <TextInput
+            placeholder="Contoh: UI/UX Designer"
+            value={posisi}
+            onChange={(e) => setPosisi(e.target.value)}
+          />
+        </FormField>
+        <FormField label="Deskripsi Pekerjaan" error={errors.deskripsi}>
+          <TextArea
+            placeholder="Jelaskan peran dan tanggung jawab..."
+            value={deskripsi}
+            onChange={(e) => setDeskripsi(e.target.value)}
+            rows={3}
+          />
+        </FormField>
+        <FormField label="Persyaratan">
+          <TextArea
+            placeholder="Persyaratan..."
+            value={persyaratan}
+            onChange={(e) => setPersyaratan(e.target.value)}
+            rows={3}
+          />
+        </FormField>
+        <FormField label="Benefit">
+          <TextArea
+            placeholder="Sebutkan benefit yang didapatkan kandidat..."
+            value={benefit}
+            onChange={(e) => setBenefit(e.target.value)}
+            rows={3}
+          />
+        </FormField>
+      </FormSectionCard>
 
-          {isFetching ? (
-            <div style={{ textAlign: 'center', padding: '40px', fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-              Memuat data lowongan...
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <FormSectionCard title="Informasi Umum" icon={<FileText size={18} />}>
-                <TextInput
-                  label="Posisi yang Ditawarkan"
-                  placeholder="Contoh: UI/UX Designer"
-                  value={posisi}
-                  onChange={(e) => setPosisi(e.target.value)}
-                  error={errors.posisi}
-                />
-                <TextArea
-                  label="Deskripsi Pekerjaan"
-                  placeholder="Jelaskan peran dan tanggung jawab..."
-                  value={deskripsi}
-                  onChange={(e) => setDeskripsi(e.target.value)}
-                  error={errors.deskripsi}
-                  rows={3}
-                />
-                <TextArea
-                  label="Persyaratan"
-                  placeholder="Persyaratan..."
-                  value={persyaratan}
-                  onChange={(e) => setPersyaratan(e.target.value)}
-                  rows={3}
-                />
-                <TextArea
-                  label="Benefit"
-                  placeholder="Sebutkan benefit yang didapatkan kandidat..."
-                  value={benefit}
-                  onChange={(e) => setBenefit(e.target.value)}
-                  rows={3}
-                />
-              </FormSectionCard>
+      <FormSectionCard title="Detail Lowongan" icon={<FileText size={18} />}>
+        <FormField label="Lokasi" error={errors.lokasi}>
+          <TextInput
+            placeholder="Alamat perusahaan..."
+            value={lokasi}
+            onChange={(e) => setLokasi(e.target.value)}
+          />
+        </FormField>
+        <FormField label="Industri" error={errors.industri}>
+          <TextInput
+            placeholder="Bidang industri..."
+            value={industri}
+            onChange={(e) => setIndustri(e.target.value)}
+          />
+        </FormField>
+        <FormField label="Waktu Mulai Magang dan Akhir Magang" error={errors.waktuMagang}>
+          <DateRangePicker
+            placeholder="Pilih waktu"
+            value={waktuMagang}
+            onChange={setWaktuMagang}
+          />
+        </FormField>
+        <FormField label="Kuota" error={errors.kuota}>
+          <TextInput
+            placeholder="Jumlah kuota..."
+            value={kuota}
+            onChange={(e) => setKuota(e.target.value)}
+            type="number"
+          />
+        </FormField>
+        <FormField label="Status Gaji" error={errors.statusGaji}>
+          <SelectInput
+            placeholder="Pilih status gaji..."
+            value={statusGaji}
+            onChange={(e) => setStatusGaji(e.target.value)}
+            options={STATUS_GAJI_OPTIONS}
+          />
+        </FormField>
+        <FormField label="Status Pelaksanaan" error={errors.statusPelaksanaan}>
+          <SelectInput
+            placeholder="Pilih status pelaksanaan..."
+            value={statusPelaksanaan}
+            onChange={(e) => setStatusPelaksanaan(e.target.value)}
+            options={STATUS_PELAKSANAAN_OPTIONS}
+          />
+        </FormField>
+        <FormField label="Tanggal Lowongan Ditutup" error={errors.tanggalDitutup}>
+          <DatePicker
+            placeholder="dd/mm/yyyy"
+            value={tanggalDitutup}
+            onChange={setTanggalDitutup}
+          />
+        </FormField>
+      </FormSectionCard>
 
-              <FormSectionCard title="Detail Lowongan" icon={<FileText size={18} />}>
-                <TextInput
-                  label="Lokasi"
-                  placeholder="Alamat perusahaan..."
-                  value={lokasi}
-                  onChange={(e) => setLokasi(e.target.value)}
-                  error={errors.lokasi}
-                />
-                <TextInput
-                  label="Industri"
-                  placeholder="Bidang industri..."
-                  value={industri}
-                  onChange={(e) => setIndustri(e.target.value)}
-                  error={errors.industri}
-                />
-                <DateRangePicker
-                  label="Waktu Mulai Magang dan Akhir Magang"
-                  placeholder="Pilih waktu"
-                  value={waktuMagang}
-                  onChange={setWaktuMagang}
-                  error={errors.waktuMagang}
-                />
-                <TextInput
-                  label="Kuota"
-                  placeholder="Jumlah kuota..."
-                  value={kuota}
-                  onChange={(e) => setKuota(e.target.value)}
-                  error={errors.kuota}
-                  type="number"
-                />
-                <SelectInput
-                  label="Status Gaji"
-                  placeholder="Pilih status gaji..."
-                  value={statusGaji}
-                  onChange={(e) => setStatusGaji(e.target.value)}
-                  options={STATUS_GAJI_OPTIONS}
-                  error={errors.statusGaji}
-                />
-                <SelectInput
-                  label="Status Pelaksanaan"
-                  placeholder="Pilih status pelaksanaan..."
-                  value={statusPelaksanaan}
-                  onChange={(e) => setStatusPelaksanaan(e.target.value)}
-                  options={STATUS_PELAKSANAAN_OPTIONS}
-                  error={errors.statusPelaksanaan}
-                />
-                <DatePicker
-                  label="Tanggal Lowongan Ditutup"
-                  placeholder="dd/mm/yyyy"
-                  value={tanggalDitutup}
-                  onChange={setTanggalDitutup}
-                  error={errors.tanggalDitutup}
-                />
-              </FormSectionCard>
+      {apiError && (
+        <div style={{ padding: '12px 16px', backgroundColor: '#FDECEA', color: '#8B1A1A', borderRadius: '8px', fontSize: '14px', fontFamily: 'Inter, sans-serif' }}>
+          {apiError}
+        </div>
+      )}
 
-              <div style={{ marginTop: '4px' }}>
-                {apiError && (
-                  <div
-                    style={{
-                      marginBottom: '12px',
-                      padding: '12px 16px',
-                      backgroundColor: '#FDECEA',
-                      color: '#8B1A1A',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontFamily: 'Inter, sans-serif',
-                    }}
-                  >
-                    {apiError}
-                  </div>
-                )}
-                <FormActionBar
-                  onCancel={() => navigate('/hr/dashboard')}
-                  onSubmit={onSubmitHandler}
-                  cancelLabel="Batal"
-                  submitLabel={isLoading ? 'Menyimpan...' : 'Simpan Perubahan'}
-                  submitIcon={<Save size={15} />}
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-          )}
-        </SidebarLayout>
-      </div>
-
-      <PageFooter />
+      <FormActionBar
+        onCancel={() => navigate('/hr/dashboard')}
+        onSubmit={onSubmitHandler}
+        cancelLabel="Batal"
+        submitLabel={isLoading ? 'Menyimpan...' : 'Simpan Perubahan'}
+        submitIcon={<Save size={15} />}
+        disabled={isLoading}
+      />
 
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
+        <Toast message={toast.message} type={toast.type} onClose={hideToast} />
       )}
     </div>
   );
