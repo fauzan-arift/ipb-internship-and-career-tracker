@@ -11,7 +11,7 @@ import UploadedFileRow from '@/components/molecules/UploadedFileRow';
 
 const RegisterHR = () => {
   const [formData, setFormData] = useState({
-    full_name: '', position: '', email: '', password: '',
+    full_name: '', phone_number: '', position: '', email: '', password: '',
     company_name: '', address: '', industry: '',
     website: '', description: '', company_email: ''
   });
@@ -89,9 +89,23 @@ const RegisterHR = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <form
+            onSubmit={handleSubmit} 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '14px',
+              backgroundColor: 'transparent',
+              borderRadius: '0',
+              padding: '0',
+              boxShadow: 'none',
+              width: '100%',
+              maxWidth: '100%',
+            }}
+          >
           <p style={sectionTitle}>Data Akun HR</p>
 
+          {/* Baris 1: Nama - No. Telepon */}
           <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ flex: 1 }}>
               <FormField label="Nama Lengkap *">
@@ -100,28 +114,35 @@ const RegisterHR = () => {
               </FormField>
             </div>
             <div style={{ flex: 1 }}>
+              <FormField label="No. Telepon (WhatsApp)">
+                <TextInput placeholder="08123456789" type="tel"
+                  value={formData.phone_number} onChange={handleChange} name="phone_number" />
+              </FormField>
+            </div>
+          </div>
+
+          {/* Baris 2: Jabatan - Email */}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ flex: 1 }}>
               <FormField label="Jabatan">
                 <TextInput placeholder="HR Manager"
                   value={formData.position} onChange={handleChange} name="position" />
               </FormField>
             </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ flex: 1 }}>
               <FormField label="Email *">
                 <TextInput type="email" placeholder="email@perusahaan.com"
                   value={formData.email} onChange={handleChange} name="email" required />
               </FormField>
             </div>
-            <div style={{ flex: 1 }}>
-              <FormField label="Password * (min. 8 karakter)">
-                <PasswordInput placeholder="Minimal 8 karakter"
-                  value={formData.password} onChange={handleChange} name="password"
-                  minLength={8} required />
-              </FormField>
-            </div>
           </div>
+
+          {/* Baris 3: Password */}
+          <FormField label="Password * (min. 8 karakter)">
+            <PasswordInput placeholder="Minimal 8 karakter"
+              value={formData.password} onChange={handleChange} name="password"
+              minLength={8} required />
+          </FormField>
 
           <p style={sectionTitle}>Data Perusahaan</p>
 

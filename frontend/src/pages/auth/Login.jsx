@@ -74,7 +74,20 @@ function Login() {
             </h1>
           </div>
 
-          <form onSubmit={onSubmitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form 
+            onSubmit={onSubmitHandler} 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '16px',
+              backgroundColor: 'transparent',
+              borderRadius: '0',
+              padding: '0',
+              boxShadow: 'none',
+              width: '100%',
+              maxWidth: '100%',
+            }}
+          >
             <FormField label="Email" error={errors.email}>
               <TextInput
                 type="email"
