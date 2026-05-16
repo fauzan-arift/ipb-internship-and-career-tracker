@@ -100,19 +100,20 @@ const HRDetail = () => {
     { label: 'Nama Perusahaan', value: detail.company?.company_name },
     { label: 'Industri', value: detail.company?.industry },
     { label: 'Email Kontak', value: detail.company?.company_email },
+    { label: 'No. Telepon HR', value: detail.hr?.phone_number },
     { label: 'Website', value: detail.company?.website },
     { label: 'Alamat Lengkap', value: detail.company?.address },
   ];
 
   const documents = detail.npwp_document
     ? [
-        {
-          name: detail.npwp_document.file_name,
-          format: `FORMAT ${detail.npwp_document.file_format?.toUpperCase()}`,
-          date: `Diunggah: ${detail.npwp_document.upload_date ? new Date(detail.npwp_document.upload_date).toLocaleDateString('id-ID') : '-'}`,
-          href: detail.npwp_document.download_url,
-        },
-      ]
+      {
+        name: detail.npwp_document.file_name,
+        format: `FORMAT ${detail.npwp_document.file_format?.toUpperCase()}`,
+        date: `Diunggah: ${detail.npwp_document.upload_date ? new Date(detail.npwp_document.upload_date).toLocaleDateString('id-ID') : '-'}`,
+        href: detail.npwp_document.download_url,
+      },
+    ]
     : [];
 
   const headerActions = (
@@ -160,7 +161,7 @@ const HRDetail = () => {
     </div>
   );
 
-  const registeredAtRaw = detail?.hr?.registered_at ?? detail?.registered_at ?? detail?.company?.registered_at ?? detail?.created_at ?? detail?.hr?.created_at ?? detail?.npwp_document?.upload_date ?? null;
+  const registeredAtRaw = detail.npwp_document?.upload_date ?? detail?.hr?.registered_at ?? detail?.registered_at ?? detail?.company?.registered_at ?? detail?.created_at ?? detail?.hr?.created_at ?? null;
 
   const registeredAt = registeredAtRaw
     ? new Date(registeredAtRaw).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -209,7 +210,7 @@ const HRDetail = () => {
             name={detail.hr?.full_name}
             position={detail.hr?.position}
             email={detail.hr?.email}
-            phone={detail.hr?.phone}
+            phone={detail.hr?.phone_number}
           />
         }
       />
