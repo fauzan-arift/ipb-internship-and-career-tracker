@@ -13,15 +13,62 @@ import StudentInfoCard from '@/components/molecules/StudentInfoCard';
 import Badge from '@/components/atoms/Badge';
 import { useHrApplication } from '@/hooks/useHrApplication';
 
-// ── Timeline Component ──────────────────────────────────────────────────────
 function TimelineProgress({ timeline }) {
-  // ... (kode timeline tetap sama seperti sebelumnya)
+  if (!timeline || timeline.length === 0) {
+    return <div className="text-sm text-gray-400">Belum ada riwayat status.</div>;
+  }
+
+  return (
+    <div className="flex flex-col">
+      {timeline.map((item, index) => {
+        const isCompleted = item.status === 'completed';
+        const isInProgress = item.status === 'in-progress';
+        const isPending = item.status === 'pending';
+        const isCancelled = item.status === 'cancelled';
+        const isRejected = item.status === 'rejected';
+        const isAccepted = item.status === 'accepted';
+
+        let dotColor = 'bg-gray-300';
+        let lineColor = 'bg-gray-200';
+        let textColor = 'text-gray-400';
+
+        if (isCompleted || isAccepted) {
+          dotColor = 'bg-emerald-500';
+          lineColor = 'bg-emerald-500';
+          textColor = 'text-gray-900';
+        } else if (isInProgress) {
+          dotColor = 'bg-amber-500';
+          lineColor = 'bg-amber-500';
+          textColor = 'text-gray-900';
+        } else if (isCancelled || isRejected) {
+          dotColor = 'bg-red-500';
+          lineColor = 'bg-red-500';
+          textColor = 'text-gray-900';
+        }
+
+        return (
+          <div key={index} className="relative flex gap-4 pb-8 last:pb-0">
+            {index < timeline.length - 1 && (
+              <div className={`absolute left-[11px] top-5 bottom-0 w-0.5 ${lineColor}`} />
+            )}
+            <div className={`w-5 h-5 rounded-full ${dotColor} flex-shrink-0 relative z-10 border-2 border-white shadow-sm`} />
+            <div className="flex-1 pt-0.5">
+              <div className={`font-semibold text-sm ${textColor}`}>{item.stage}</div>
+              <div className="text-xs text-gray-500 mt-0.5">
+                {item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function ApplicantDetail() {
   const { application_id } = useParams();
   const navigate = useNavigate();
-  const { application, loading, error, updateStatus } = useHrApplication(application_id);
+  const { application, loading, usingDummy, updateStatus } = useHrApplication(application_id);
 
   if (loading) {
     return (
@@ -31,12 +78,16 @@ export default function ApplicantDetail() {
     );
   }
 
-  if (error || !application) {
+  if (!application) {
     return (
-      <div className="flex items-center justify-center h-64 text-red-500">
-        {error || 'Data tidak ditemukan'}
+      <div className="flex items-center justify-center h-64 text-gray-500">
+        Data tidak ditemukan.
       </div>
     );
+  }
+
+  if (usingDummy) {
+    console.info('Menggunakan data dummy untuk aplikasi ini (API belum tersedia).');
   }
 
   const student = application.student || {};
@@ -55,13 +106,11 @@ export default function ApplicantDetail() {
   };
 
   const handleStatusChange = () => {
-    // Implementasi update status (bisa pakai dialog/modal)
     alert('Fitur ubah status akan segera hadir');
   };
 
   return (
     <div className="flex flex-col gap-6 p-4">
-      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500">
         <Link to="/hr/applicants" className="hover:text-indigo-600 transition-colors">
           Daftar Pelamar
@@ -70,7 +119,6 @@ export default function ApplicantDetail() {
         <span className="text-gray-900 font-medium">Detail Pelamar</span>
       </div>
 
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 font-inter">
@@ -94,16 +142,13 @@ export default function ApplicantDetail() {
             onClick={() => navigate(`/hr/applications/${application.id}/offer`)}
             className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
           >
-            <PlusCircle size={16} /> Kasih Offering →
+            <PlusCircle size={16} /> Kasih Offering 
           </Button>
         </div>
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Kolom Kiri */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Dokumen CV */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h2 className="flex items-center gap-2 text-lg font-bold text-gray-900 mb-4">
               <FileText size={20} className="text-gray-500" />
@@ -112,7 +157,6 @@ export default function ApplicantDetail() {
             <CVDocumentCard cvDocument={cvDocument} />
           </div>
 
-          {/* Informasi Mahasiswa */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h2 className="flex items-center gap-2 text-lg font-bold text-gray-900 mb-6">
               <User size={20} className="text-gray-500" />
@@ -131,9 +175,7 @@ export default function ApplicantDetail() {
           </div>
         </div>
 
-        {/* Kolom Kanan */}
         <div className="space-y-6">
-          {/* Informasi Lamaran */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900 mb-6">
               <Briefcase size={20} className="text-gray-500" />
@@ -165,7 +207,6 @@ export default function ApplicantDetail() {
             </div>
           </div>
 
-          {/* Timeline Progress */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h4 className="text-base font-bold text-gray-900 mb-4">
               Timeline Progress

@@ -11,9 +11,8 @@ import { useHrApplication } from '@/hooks/useHrApplication';
 export default function OfferApplicant() {
   const { application_id } = useParams();
   const navigate = useNavigate();
-  const { application, loading, submitting, createOffer, uploadFile } = useHrApplication(application_id);
+  const { application, loading, submitting, usingDummy, createOffer, uploadFile } = useHrApplication(application_id);
 
-  // Form state
   const [formData, setFormData] = useState({
     offerDate: '',
     duration: '',
@@ -73,14 +72,12 @@ export default function OfferApplicant() {
     if (!application) return;
 
     try {
-      // Step 1: Upload file
       let offeringFileId = null;
       if (formData.file) {
         const uploadResult = await uploadFile(formData.file);
         offeringFileId = uploadResult.id;
       }
 
-      // Step 2: Create offer
       const payload = {
         offer_date: formData.offerDate,
         expiry_date: formData.acceptBy,
@@ -107,6 +104,10 @@ export default function OfferApplicant() {
     );
   }
 
+  if (usingDummy) {
+    console.info('Menggunakan data dummy untuk aplikasi ini (API belum tersedia).');
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6 w-full">
       <OfferBreadcrumb applicantId={application_id} />
@@ -123,7 +124,7 @@ export default function OfferApplicant() {
           <h2 className="text-base font-bold text-gray-900">Detail Penawaran</h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 w-full">
+        <form onSubmit={handleSubmit} className="space-y-6 w-full" style={{ width: '100%', maxWidth: '100%' }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-5 w-full">
             <OfferFormInput
               label="Tanggal Penawaran"

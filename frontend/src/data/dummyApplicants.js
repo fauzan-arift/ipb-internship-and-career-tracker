@@ -1,6 +1,6 @@
 const dummyApplicants = [
   {
-    id: 1,
+    id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
     name: 'Muhammad Arif Agung Wijaya',
     major: 'Ilmu Komputer',
     appliedDate: '2023-10-12',
