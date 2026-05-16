@@ -88,7 +88,7 @@ const sidebarMenus = {
   ],
   hr: [
     { label: "Kelola Lowongan", href: "/hr/dashboard", icon: <BriefcaseIcon /> },
-    { label: "Daftar Pelamar", href: "/hr/applicants", icon: <UsersIcon /> },
+    { label: "Daftar Pelamar", href: "/hr/applications", icon: <UsersIcon /> },
   ],
   company: [
     { label: "Dashboard",         href: "/company/dashboard", icon: <GridIcon />     },
@@ -102,6 +102,7 @@ const sidebarMenus = {
     { label: "Lowongan",    href: "/admin/lowongan",   icon: <BriefcaseIcon /> },
     { label: "Pengaturan",  href: "/admin/settings",   icon: <SettingsIcon /> },
   ],
+
 };
 
 // ─── Sidebar Component ────────────────────────────────────────────────────────

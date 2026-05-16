@@ -24,7 +24,9 @@ import OffersPage from '@/pages/student/OffersPage';
 import HRDashboard from '@/pages/hr/HRDashboard';
 import CreateInternship from '@/pages/hr/CreateInternship';
 import EditInternship from '@/pages/hr/EditInternship';
-import ApplicantList from '@/pages/hr/ApplicantList';        // ← TAMBAH
+import ApplicantList from '@/pages/hr/ApplicantList';
+import ApplicantDetail from '@/pages/hr/ApplicantDetail';
+import OfferApplicant from '@/pages/hr/OfferApplicant';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -126,16 +128,36 @@ function AppRoutes() {
           </ProtectedRoute>
         )}
       />
-      <Route                                                  
-        path="/hr/applicants"                                 
-        element={(                                            
-          <ProtectedRoute allowedRoles={['HR']}>             
-            <DashboardLayout role="hr">                      
-              <ApplicantList />                              
-            </DashboardLayout>                               
-          </ProtectedRoute>                                  
-        )}                                                   
-      />                                                     {/* ← TAMBAH */}
+      <Route
+        path="/hr/applications"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <DashboardLayout role="hr">
+              <ApplicantList />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/hr/applications/:application_id"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <DashboardLayout role="hr">
+              <ApplicantDetail />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/hr/applications/:application_id/offer"
+        element={(
+          <ProtectedRoute allowedRoles={['HR']}>
+            <DashboardLayout role="hr">
+              <OfferApplicant />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
 
       <Route
         path="/my-application"
