@@ -46,7 +46,7 @@ function MyApplications() {
         <StatCard label="Ditolak" value={stats.rejected_count || 0} variant="red" />
       </div>
 
-      <div className="flex gap-6 h-[calc(100vh-250px)]">
+      <div className="flex gap-6 items-start" style={{ paddingBottom: '24px' }}>
         <div className="w-7/12 bg-white rounded-xl border border-gray-200 p-4 overflow-y-auto">
           <h3 className="font-semibold text-gray-800 mb-4">Daftar Lamaran Magang</h3>
           {isLoadingList && applications.length === 0 ? (
@@ -76,7 +76,7 @@ function MyApplications() {
           )}
         </div>
 
-        <div className="w-5/12 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto">
           {isLoadingDetail && !isUsingDummy ? (
             <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
               Memuat detail...
