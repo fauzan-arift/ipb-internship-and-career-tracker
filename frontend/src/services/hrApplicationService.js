@@ -1,25 +1,23 @@
 import axios from '@/api/axios';
 
 export const hrApplicationService = {
-  // Get detail application (student info, status history, etc.)
   getApplicationDetail: async (applicationId) => {
     const response = await axios.get(`/hr/applications/${applicationId}`);
     return response.data;
   },
 
-  // Update application status
-  updateApplicationStatus: async (applicationId, status) => {
-    const response = await axios.patch(`/hr/applications/${applicationId}/status`, { new_status: status });
+  updateStatus: async (applicationId, newStatus) => {
+    const response = await axios.patch(`/hr/applications/${applicationId}/status`, {
+      new_status: newStatus,
+    });
     return response.data;
   },
 
-  // Create offer for application
   createOffer: async (applicationId, offerData) => {
     const response = await axios.post(`/hr/applications/${applicationId}/offers`, offerData);
     return response.data;
   },
 
-  // Upload document (for offering file)
   uploadDocument: async (file) => {
     const formData = new FormData();
     formData.append('file', file);

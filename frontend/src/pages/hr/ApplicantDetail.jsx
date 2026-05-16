@@ -12,6 +12,9 @@ import CVDocumentCard from '@/components/molecules/CVDocumentCard';
 import StudentInfoCard from '@/components/molecules/StudentInfoCard';
 import Badge from '@/components/atoms/Badge';
 import { useHrApplication } from '@/hooks/useHrApplication';
+import { useHrApplicationStatus } from '@/hooks/useHrApplicationStatus';
+import StatusUpdateModal from '@/components/organisms/StatusUpdateModal';
+import ConfirmationDialog from '@/components/organisms/ConfirmationDialog';
 
 function TimelineProgress({ timeline }) {
   if (!timeline || timeline.length === 0) {
@@ -66,9 +69,23 @@ function TimelineProgress({ timeline }) {
 }
 
 export default function ApplicantDetail() {
-  const { application_id } = useParams();
+  const { applicant_id } = useParams();
   const navigate = useNavigate();
-  const { application, loading, usingDummy, updateStatus } = useHrApplication(application_id);
+  const { application, loading, usingDummy } = useHrApplication(applicant_id);
+  const {
+    isOpen,
+    openModal,
+    closeModal,
+    selectedStatus,
+    handleStatusSelect,
+    saveStatus,
+    isSaving,
+    error,
+    isStatusSelected,
+    statuses,
+    confirmation,
+    closeConfirmation,
+  } = useHrApplicationStatus(applicant_id, application?.status);
 
   if (loading) {
     return (
@@ -105,10 +122,6 @@ export default function ApplicantDetail() {
     url: student.cv_url,
   };
 
-  const handleStatusChange = () => {
-    alert('Fitur ubah status akan segera hadir');
-  };
-
   return (
     <div className="flex flex-col gap-6 p-4">
       <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -132,14 +145,14 @@ export default function ApplicantDetail() {
         <div className="flex gap-3 flex-wrap">
           <Button 
             variant="primary" 
-            onClick={handleStatusChange}
+            onClick={openModal}
             className="flex items-center gap-2"
           >
             <Edit2 size={16} /> Ubah Status
           </Button>
           <Button 
             variant="primary" 
-            onClick={() => navigate(`/hr/applications/${application.id}/offer`)}
+            onClick={() => navigate(`/hr/applicant/${application.id}/offer`)}
             className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
           >
             <PlusCircle size={16} /> Kasih Offering 
@@ -215,6 +228,28 @@ export default function ApplicantDetail() {
           </div>
         </div>
       </div>
+
+      <StatusUpdateModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        statuses={statuses}
+        currentStatus={application.status}
+        selectedStatus={selectedStatus}
+        onSelect={handleStatusSelect}
+        onSave={saveStatus}
+        isSaving={isSaving}
+        isStatusSelected={isStatusSelected}
+        error={error}
+      />
+
+      <ConfirmationDialog
+        isOpen={confirmation.isOpen}
+        onClose={closeConfirmation}
+        onConfirm={confirmation.onConfirm}
+        title={confirmation.title}
+        message={confirmation.message}
+        confirmLabel={confirmation.confirmLabel}
+      />
     </div>
   );
 }

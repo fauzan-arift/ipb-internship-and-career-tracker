@@ -55,7 +55,7 @@ function ApplicantList() {
               major={item.major}
               appliedDate={item.appliedDate}
               status={item.status}
-              onClick={() => navigate(`/hr/applications/${item.id}`)}
+              onClick={() => navigate(`/hr/applicants/${item.id}`)}
             />
           )}
         />
