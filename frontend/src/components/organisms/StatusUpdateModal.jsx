@@ -16,6 +16,8 @@ export default function StatusUpdateModal({
 }) {
   if (!isOpen) return null;
 
+  const currentIndex = statuses.findIndex((s) => s.value === currentStatus);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
@@ -34,13 +36,14 @@ export default function StatusUpdateModal({
         </p>
 
         <div className="space-y-2">
-          {statuses.map((status) => {
+          {statuses.map((status, index) => {
             const isCurrent = status.value === currentStatus;
             const isSelected = status.value === selectedStatus;
             const isAuto = status.automatic && status.value !== 'Ditolak';
             const isFinal = status.isFinal;
             const isChecked = isStatusSelected(status.value);
-            const isDisabled = isAuto;
+
+            const isDisabled = isAuto || (index <= currentIndex && status.value !== selectedStatus);
 
             return (
               <div
@@ -70,7 +73,7 @@ export default function StatusUpdateModal({
                     </span>
                     {isCurrent && (
                       <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
-                        Saat ini
+                        Final
                       </span>
                     )}
                     {isAuto && (

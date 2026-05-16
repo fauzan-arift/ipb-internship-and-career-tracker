@@ -59,6 +59,14 @@ export function useHrApplicationStatus(applicationId, currentStatus) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
 
+  const [confirmation, setConfirmation] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmLabel: 'Ya, Lanjutkan',
+    onConfirm: null,
+  });
+
   const openModal = useCallback(() => {
     setSelectedStatus(currentStatus);
     setIsOpen(true);
@@ -71,19 +79,39 @@ export function useHrApplicationStatus(applicationId, currentStatus) {
     setError(null);
   }, []);
 
+  const closeConfirmation = useCallback(() => {
+    setConfirmation((prev) => ({ ...prev, isOpen: false }));
+  }, []);
+
+  const showConfirmation = useCallback(({ title, message, confirmLabel, onConfirm }) => {
+    setConfirmation({
+      isOpen: true,
+      title,
+      message,
+      confirmLabel: confirmLabel || 'Ya, Lanjutkan',
+      onConfirm: () => {
+        if (onConfirm) onConfirm();
+        closeConfirmation();
+      },
+    });
+  }, [closeConfirmation]);
+
   const handleStatusSelect = useCallback((statusValue) => {
     const statusConfig = STATUS_FLOW.find((s) => s.value === statusValue);
     if (!statusConfig) return;
 
     if (statusConfig.isFinal) {
-      const confirm = window.confirm(
-        `Apakah Anda yakin ingin mengubah status menjadi "${statusConfig.label}"?\n\nTindakan ini bersifat final dan tidak dapat diubah kembali.`
-      );
-      if (!confirm) return;
+      showConfirmation({
+        title: 'Peringatan',
+        message: `Apakah Anda yakin ingin mengubah status menjadi "${statusConfig.label}"?\n.`,
+        confirmLabel: 'Ya, Pilih Status Ini',
+        onConfirm: () => setSelectedStatus(statusValue),
+      });
+      return;
     }
 
     setSelectedStatus(statusValue);
-  }, []);
+  }, [showConfirmation]);
 
   const saveStatus = useCallback(async () => {
     if (!selectedStatus || selectedStatus === currentStatus) {
@@ -91,30 +119,29 @@ export function useHrApplicationStatus(applicationId, currentStatus) {
       return;
     }
 
-    const statusConfig = STATUS_FLOW.find((s) => s.value === selectedStatus);
-    if (statusConfig?.isFinal) {
-      const confirm = window.confirm(
-        `Anda akan mengubah status menjadi "${statusConfig.label}".\n\nTindakan ini bersifat FINAL dan tidak dapat dibatalkan. Lanjutkan?`
-      );
-      if (!confirm) return;
-    }
+    showConfirmation({
+      title: 'Konfirmasi Perubahan',
+      message: 'Apakah Anda yakin ingin menyimpan perubahan status lamaran?\n\nPerubahan ini bersifat FINAL dan tidak dapat dibatalkan.',
+      confirmLabel: 'Ya, Simpan Perubahan',
+      onConfirm: async () => {
+        setIsSaving(true);
+        setError(null);
 
-    setIsSaving(true);
-    setError(null);
-
-    try {
-      await hrApplicationService.updateStatus(applicationId, selectedStatus);
-      closeModal();
-      if (window.location.pathname.includes('/hr/applications/')) {
-        window.location.reload();
-      }
-    } catch (err) {
-      console.error('Failed to update status:', err);
-      setError(err.response?.data?.detail || err.message || 'Gagal mengubah status.');
-    } finally {
-      setIsSaving(false);
-    }
-  }, [applicationId, selectedStatus, currentStatus, closeModal]);
+        try {
+          await hrApplicationService.updateStatus(applicationId, selectedStatus);
+          closeModal();
+          if (window.location.pathname.includes('/hr/applications/')) {
+            window.location.reload();
+          }
+        } catch (err) {
+          console.error('Failed to update status:', err);
+          setError(err.response?.data?.detail || err.message || 'Gagal mengubah status.');
+        } finally {
+          setIsSaving(false);
+        }
+      },
+    });
+  }, [applicationId, selectedStatus, currentStatus, closeModal, showConfirmation]);
 
   const isStatusSelected = useCallback((statusValue) => {
     if (!selectedStatus) return false;
@@ -146,5 +173,7 @@ export function useHrApplicationStatus(applicationId, currentStatus) {
     isStatusSelected,
     getStatusConfig,
     statuses: STATUS_FLOW,
+    confirmation,
+    closeConfirmation,
   };
 }
