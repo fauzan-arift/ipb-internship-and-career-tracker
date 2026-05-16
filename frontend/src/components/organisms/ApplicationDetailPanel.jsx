@@ -32,14 +32,8 @@ function ApplicationDetailPanel({ application }) {
         </div>
       </div>
 
-      <div className="flex-1 py-6 overflow-y-auto">
+      <div className="flex-1 py-6 overflow-y-auto" style={{ paddingBottom: '0px' }}>
         <StatusTimeline items={timelineItems} />
-      </div>
-
-      <div className="border-t pt-6 shrink-0">
-        <Button variant="primary" fullWidth>
-          Unduh Resume
-        </Button>
       </div>
     </div>
   );
