@@ -23,8 +23,8 @@ class InternshipORM(Base):
     industry = Column(String(100), nullable=False)
     quota = Column(Integer, nullable=False)
 
-    work_status = Column(SAEnum(WorkStatus), nullable=False)
-    payment_status = Column(SAEnum(PaymentStatus), nullable=False)
+    work_status = Column(SAEnum(WorkStatus, native_enum=False), nullable=False)
+    payment_status = Column(SAEnum(PaymentStatus, native_enum=False), nullable=False)
 
     open_date = Column(Date, nullable=True, server_default=func.current_date())
     close_date = Column(Date, nullable=True)

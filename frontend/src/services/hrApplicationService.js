@@ -9,7 +9,7 @@ export const hrApplicationService = {
 
   // Update application status
   updateApplicationStatus: async (applicationId, status) => {
-    const response = await axios.patch(`/hr/applications/${applicationId}/status`, { status });
+    const response = await axios.patch(`/hr/applications/${applicationId}/status`, { new_status: status });
     return response.data;
   },
 

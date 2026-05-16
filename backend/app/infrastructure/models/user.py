@@ -15,8 +15,8 @@ class UserORM(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=False)
-    role = Column(SAEnum(UserRole), nullable=False)
-    status = Column(SAEnum(UserStatus), nullable=False, default=UserStatus.UNVERIFIED)
+    role = Column(SAEnum(UserRole, native_enum=False), nullable=False)
+    status = Column(SAEnum(UserStatus, native_enum=False), nullable=False, default=UserStatus.UNVERIFIED)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

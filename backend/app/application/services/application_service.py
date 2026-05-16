@@ -331,9 +331,15 @@ class ApplicationService:
 
             old_status = app.status.value
 
-            # Validate new status value
+            # Validate new status value (Case-Insensitive)
             try:
-                updated_status = ApplicationStatus(new_status)
+                target = new_status.strip().lower()
+                updated_status = next(
+                    (s for s in ApplicationStatus if s.value.lower() == target),
+                    None
+                )
+                if not updated_status:
+                    raise ValueError()
             except ValueError:
                 raise HTTPException(
                     status_code=422,

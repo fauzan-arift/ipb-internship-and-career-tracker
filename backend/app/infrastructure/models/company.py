@@ -24,7 +24,7 @@ class CompanyORM(Base):
     email = Column(String(255), nullable=True)
 
     verification_status = Column(
-        SAEnum(CompanyVerificationStatus),
+        SAEnum(CompanyVerificationStatus, native_enum=False),
         nullable=False,
         default=CompanyVerificationStatus.PENDING,
     )
