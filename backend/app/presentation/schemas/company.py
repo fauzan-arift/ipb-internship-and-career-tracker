@@ -40,3 +40,23 @@ class CompanyProfileResponse(BaseModel):
     updated_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
+
+
+# ─── HR Personal Profile Schemas ─────────────────────────────────────────────
+
+class HRProfileResponse(BaseModel):
+    """HR's own personal profile (not the company profile)."""
+    id: UUID                          # users.id
+    full_name: str
+    email: str
+    position: Optional[str] = None
+    phone_number: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class HRProfileUpdateRequest(BaseModel):
+    """Partial update of the HR's personal profile. All fields optional."""
+    full_name: Optional[str] = Field(None, min_length=2, max_length=255)
+    position: Optional[str] = Field(None, max_length=100)
+    phone_number: Optional[str] = Field(None, max_length=20)

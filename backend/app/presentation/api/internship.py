@@ -29,13 +29,18 @@ def get_internship_service(uow: SQLAlchemyUnitOfWork = Depends(get_uow)) -> Inte
     "",
     summary="Daftar lowongan magang aktif",
     response_model=PaginatedInternshipResponse,
+    tags=["Internships"],
 )
 async def list_active_internships(
-    page: int = Query(default=1, ge=1, description="Nomor halaman"),
-    limit: int = Query(default=10, ge=1, le=100, description="Jumlah per halaman"),
-    search: Optional[str] = Query(default=None, description="Cari berdasarkan judul atau deskripsi"),
+    page: int = Query(default=1, ge=1, description="Nomor halaman (mulai dari 1)"),
+    limit: int = Query(default=10, ge=1, le=100, description="Jumlah item per halaman (maks 100)"),
+    search: Optional[str] = Query(default=None, description="Cari berdasarkan judul atau deskripsi lowongan"),
     svc: InternshipService = Depends(get_internship_service),
 ):
+    """
+    Mengembalikan daftar lowongan magang yang **aktif** dan belum melewati `close_date`.
+    Mendukung pencarian teks dan paginasi.
+    """
     return await svc.list_active_internships(page=page, limit=limit, search=search)
 
 
@@ -43,11 +48,13 @@ async def list_active_internships(
     "/{internship_id}",
     summary="Detail lowongan magang",
     response_model=InternshipDetailResponse,
+    tags=["Internships"],
 )
 async def get_internship_detail(
     internship_id: UUID,
     svc: InternshipService = Depends(get_internship_service),
 ):
+    """Mengembalikan detail lengkap satu lowongan magang beserta informasi perusahaan."""
     return await svc.get_internship_detail(internship_id)
 
 
@@ -56,6 +63,7 @@ async def get_internship_detail(
     summary="Lamar ke lowongan magang",
     response_model=ApplicationResponse,
     status_code=status.HTTP_201_CREATED,
+    tags=["Internships"],
 )
 async def apply_to_internship(
     internship_id: UUID,
@@ -64,7 +72,13 @@ async def apply_to_internship(
     uow: SQLAlchemyUnitOfWork = Depends(get_uow),
     svc: InternshipService = Depends(get_internship_service),
 ):
-    # Resolve the authenticated student's profile_id
+    """
+    Kirimkan lamaran ke lowongan magang (hanya untuk role **Student**).
+
+    - `submitted_cv_id` harus berupa `id` dokumen CV yang sudah diupload via `POST /documents/upload`.
+    - CV harus sudah terverifikasi sebelum bisa melamar.
+    - Mahasiswa tidak bisa melamar ke lowongan yang sama dua kali.
+    """
     async with uow as u:
         student = await u.users.get_student_profile_by_user_id(current_user.id)
     if not student:

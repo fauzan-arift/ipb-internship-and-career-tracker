@@ -162,3 +162,24 @@ class HRApplicantDetailResponse(BaseModel):
     status_history: List[ApplicationStatusHistoryResponse] = []
 
     model_config = {"from_attributes": True}
+
+
+class HRApplicantListItemWithInternship(BaseModel):
+    """Like HRApplicantListItem but includes internship context — used when
+    listing applicants across ALL of the HR's internships at once."""
+    id: UUID
+    internship_id: UUID
+    internship_title: str
+    student: StudentBrief
+    application_time: Optional[datetime] = None
+    status: str
+
+    model_config = {"from_attributes": True}
+
+
+class PaginatedHRAllApplicantResponse(BaseModel):
+    items: List[HRApplicantListItemWithInternship]
+    total: int
+    page: int
+    limit: int
+    total_pages: int

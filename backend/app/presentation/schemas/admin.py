@@ -13,8 +13,15 @@ class PendingHRItem(BaseModel):
     full_name: str
     email: str
     position: Optional[str] = None
+    phone_number: Optional[str] = None
     company_name: Optional[str] = None
     registered_at: Optional[str] = None
+
+
+class ProcessedHRItem(PendingHRItem):
+    """Extends PendingHRItem with status and verified_at for the HR history list."""
+    status: Optional[str] = None
+    verified_at: Optional[str] = None
 
 
 class HRInfo(BaseModel):
@@ -24,6 +31,8 @@ class HRInfo(BaseModel):
     full_name: str
     email: str
     position: Optional[str] = None
+    phone_number: Optional[str] = None
+    status: Optional[str] = None
 
 
 class CompanyInfo(BaseModel):
