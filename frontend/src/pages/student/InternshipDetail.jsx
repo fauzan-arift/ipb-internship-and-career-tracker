@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { internshipService } from '@/services/internshipService'
+import { applicationService } from '@/services/applicationService'
+import api from '@/api/axios'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -39,48 +41,67 @@ const getPaymentStatusBadge = (status) => {
   return map[status] ?? { label: status, className: 'bg-gray-100 text-gray-600' }
 }
 
+// Maps application status → button appearance
+// Status values match what the API returns: Pending, Diproses, Review HR, Interview, Diterima, Ditolak, Ditawarkan
+const APPLICATION_STATUS_CONFIG = {
+  'Pending':    { label: 'Lamaran Terkirim',    className: 'bg-[#FFF2DF] text-[#A65E34] border border-[#F6C28B]',   disabled: true },
+  'Diproses':   { label: 'Sedang Diproses',     className: 'bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD]',   disabled: true },
+  'Review HR':  { label: 'Dalam Review HR',     className: 'bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD]',   disabled: true },
+  'Interview':  { label: 'Tahap Interview',     className: 'bg-[#EDE9FE] text-[#5B21B6] border border-[#C4B5FD]',   disabled: true },
+  'Diterima':   { label: 'Lamaran Diterima ✓',  className: 'bg-[#D1FAE5] text-[#065F46] border border-[#6EE7B7]',   disabled: true },
+  'Ditolak':    { label: 'Lamaran Ditolak',     className: 'bg-[#FEE2E2] text-[#991B1B] border border-[#FCA5A5]',   disabled: true },
+  'Ditawarkan': { label: 'Ada Penawaran! 🎉',   className: 'bg-[#D1FAE5] text-[#065F46] border border-[#6EE7B7]',   disabled: true },
+}
+
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
 const FileTextIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M14 2H6C5.46957 2 4.96086 2.21072 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8M14 2C14.3166 1.99949 14.6301 2.06161 14.9225 2.18277C15.215 2.30394 15.4806 2.48176 15.704 2.706L19.292 6.294C19.5168 6.51751 19.6952 6.78335 19.8167 7.07616C19.9382 7.36898 20.0005 7.68297 20 8M14 2V7C14 7.26522 14.1054 7.51957 14.2929 7.70711C14.4804 7.89465 14.7348 8 15 8L20 8M10 9H8M16 13H8M16 17H8" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
 const CalendarIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M8 2V6M16 2V6M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
 const ClockIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
 const UsersIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H6C4.93913 15 3.92172 15.4214 3.17157 16.1716C2.42143 16.9217 2 17.9391 2 19V21M16 3.128C16.8578 3.35037 17.6174 3.85126 18.1597 4.55206C18.702 5.25286 18.9962 6.11389 18.9962 7C18.9962 7.88611 18.702 8.74714 18.1597 9.44794C17.6174 10.1487 16.8578 10.6496 16 10.872M22 21V19C21.9993 18.1137 21.7044 17.2528 21.1614 16.5523C20.6184 15.8519 19.8581 15.3516 19 15.13M13 7C13 9.20914 11.2091 11 9 11C6.79086 11 5 9.20914 5 7C5 4.79086 6.79086 3 9 3C11.2091 3 13 4.79086 13 7Z" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
 const LocationIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M20 10C20 14.993 14.461 20.193 12.601 21.799C12.4277 21.9293 12.2168 21.9998 12 21.9998C11.7832 21.9998 11.5723 21.9293 11.399 21.799C9.539 20.193 4 14.993 4 10C4 7.87827 4.84285 5.84344 6.34315 4.34315C7.84344 2.84285 9.87827 2 12 2C14.1217 2 16.1566 2.84285 17.6569 4.34315C19.1571 5.84344 20 7.87827 20 10Z" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
     <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
 const GlobeIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M22 12C22 17.5228 17.5228 22 12 22M22 12C22 6.47715 17.5228 2 12 2M22 12H2M12 22C6.47715 22 2 17.5228 2 12M12 22C9.43223 19.3038 8 15.7233 8 12C8 8.27674 9.43223 4.69615 12 2M12 22C14.5678 19.3038 16 15.7233 16 12C16 8.27674 14.5678 4.69615 12 2M2 12C2 6.47715 6.47715 2 12 2" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
 const ChevronRightIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M9 18L15 12L9 6" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+const AlertCircleIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
@@ -141,14 +162,48 @@ const TextBlock = ({ text }) => {
   )
 }
 
+// Company logo: real photo_profile_url if set, else initial fallback
+const CompanyLogo = ({ company }) => (
+  <div className="w-20 h-20 rounded-2xl border border-[#E5E1EB] bg-white shadow-sm shrink-0 overflow-hidden flex items-center justify-center">
+    {company?.photo_profile_url
+      ? <img src={company.photo_profile_url} alt={company.company_name} className="w-full h-full object-cover" />
+      : <span className="text-2xl font-bold text-[#4D44B5]">{company?.company_name?.charAt(0) ?? '?'}</span>
+    }
+  </div>
+)
+
+// Auto-dismissing toast
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const t = setTimeout(onClose, 5000)
+    return () => clearTimeout(t)
+  }, [onClose])
+
+  const styles = {
+    success: 'bg-[#D1FAE5] text-[#065F46] border-[#6EE7B7]',
+    error:   'bg-[#FEE2E2] text-[#991B1B] border-[#FCA5A5]',
+    warning: 'bg-[#FFF2DF] text-[#A65E34] border-[#F6C28B]',
+  }
+
+  return (
+    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg text-sm font-medium max-w-sm ${styles[type]}`}>
+      <span className="flex-1">{message}</span>
+      <button onClick={onClose} className="opacity-60 hover:opacity-100 text-lg leading-none shrink-0">&times;</button>
+    </div>
+  )
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 /**
  * InternshipDetail page
+ * Route: /lowongan/:internship_id
  *
- * Route   : /lowongan/:internship_id
- * Layout  : DashboardLayout (role="student") wraps this in App.jsx
- * This component renders ONLY the page content — no sidebar, no layout shell.
+ * Apply flow:
+ *   1. Fetch student profile → get cv_id (required for apply body)
+ *   2. Fetch applications list → detect if already applied to this internship
+ *   3. On "Lamar Sekarang": POST { submitted_cv_id: cv_id } to /internships/:id/apply
+ *   4. On success: set applicationStatus to 'Pending' (button changes immediately)
  */
 export default function InternshipDetail() {
   const { internship_id } = useParams()
@@ -158,12 +213,22 @@ export default function InternshipDetail() {
   const [isLoading, setIsLoading]   = useState(false)
   const [isError, setIsError]       = useState(false)
   const [error, setError]           = useState(null)
-  const [isApplying, setIsApplying] = useState(false)
 
-  // ── Fetch detail ──
+  // Student CV — from GET /students/profile
+  const [studentCvId, setStudentCvId]   = useState(null)
+  const [studentCvUrl, setStudentCvUrl] = useState(null)
+
+  // Apply
+  const [isApplying, setIsApplying]               = useState(false)
+  const [applicationStatus, setApplicationStatus] = useState(null) // null = not yet applied
+
+  const [toast, setToast] = useState(null)
+  const showToast = (message, type = 'success') => setToast({ message, type })
+
+  // ── 1. Internship detail ──
   useEffect(() => {
     if (!internship_id) return
-    const fetchDetail = async () => {
+    const run = async () => {
       setIsLoading(true)
       setIsError(false)
       try {
@@ -176,52 +241,112 @@ export default function InternshipDetail() {
         setIsLoading(false)
       }
     }
-    fetchDetail()
+    run()
   }, [internship_id])
 
-  // ── Apply ──
+  // ── 2. Student profile → cv_id ──
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const res = await api.get('/students/profile')
+        setStudentCvId(res.data?.cv_id ?? null)
+        setStudentCvUrl(res.data?.cv_url ?? null)
+      } catch {
+        // Non-critical — button will warn user to upload CV
+      }
+    }
+    run()
+  }, [])
+
+  // ── 3. Check existing application for this internship ──
+  useEffect(() => {
+    if (!internship_id) return
+    const run = async () => {
+      try {
+        const data = await applicationService.listApplications()
+        // Response: { stats: {...}, applications: [...] }  OR  plain array
+        const list = Array.isArray(data) ? data : (data?.applications ?? [])
+        const existing = list.find(
+          (app) => String(app.internship_id) === String(internship_id)
+        )
+        if (existing) setApplicationStatus(existing.status)
+      } catch {
+        // Non-critical
+      }
+    }
+    run()
+  }, [internship_id])
+
+  // ── Apply handler ──
   const handleApply = async () => {
+    if (!studentCvId) {
+      showToast('CV belum diupload. Lengkapi profilmu terlebih dahulu.', 'warning')
+      return
+    }
     setIsApplying(true)
     try {
-      await internshipService.apply(internship_id)
-      alert('Lamaran berhasil dikirim!')
+      await internshipService.apply(internship_id, studentCvId)
+      setApplicationStatus('Pending')
+      showToast('Lamaran berhasil dikirim!', 'success')
     } catch (err) {
-      const message = err?.response?.data?.detail ?? 'Gagal mengirim lamaran. Coba lagi.'
-      alert(message)
+      const detail = err?.response?.data?.detail
+      const message = typeof detail === 'string'
+        ? detail
+        : Array.isArray(detail)
+          ? detail.map((d) => d.msg).join(', ')
+          : 'Gagal mengirim lamaran. Coba lagi.'
+      showToast(message, 'error')
     } finally {
       setIsApplying(false)
     }
   }
 
+  // ── Button state ──
+  const appConfig  = APPLICATION_STATUS_CONFIG[applicationStatus] ?? null
+  const isInactive = internship && !internship.is_active
+  const noCv       = !studentCvId
+
+  const btnDisabled = isApplying || !!appConfig?.disabled || isInactive
+
+  const btnLabel = isApplying
+    ? 'Mengirim...'
+    : appConfig
+      ? appConfig.label
+      : isInactive
+        ? 'Lowongan Ditutup'
+        : noCv
+          ? 'Upload CV Dulu'
+          : 'Lamar Sekarang'
+
+  const btnClassName = appConfig
+    ? appConfig.className
+    : isInactive
+      ? 'bg-gray-200 text-gray-400'
+      : noCv
+        ? 'bg-[#FFF2DF] text-[#A65E34] border border-[#F6C28B]'
+        : 'bg-[#4D44B5] text-white hover:bg-[#3d369a]'
+
   const workBadge    = internship ? getWorkStatusBadge(internship.work_status) : null
   const paymentBadge = internship ? getPaymentStatusBadge(internship.payment_status) : null
 
-  // ── Render ──
-  // No flex wrapper, no sidebar, no min-h-screen here.
-  // DashboardLayout in App.jsx handles all of that.
   return (
     <div className="px-8 py-8 max-w-275 mx-auto flex flex-col gap-6">
 
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-3">
-        <Link
-          to="/lowongan"
-          className="text-[#454651] text-base font-normal leading-5 hover:underline"
-        >
+        <Link to="/lowongan" className="text-[#454651] text-base font-normal leading-5 hover:underline">
           Lowongan Magang
         </Link>
         <ChevronRightIcon />
-        <span className="text-[#1B1B21] text-base font-medium leading-5">
-          Detail Lowongan
-        </span>
+        <span className="text-[#1B1B21] text-base font-medium leading-5">Detail Lowongan</span>
       </nav>
 
       {/* Error state */}
       {isError && (
         <div className="flex flex-col items-center gap-4 mt-16">
-          <p className="text-[#1B1B21] text-lg font-semibold">
-            Lowongan tidak ditemukan
-          </p>
+          <p className="text-[#1B1B21] text-lg font-semibold">Lowongan tidak ditemukan</p>
           <p className="text-[#454651] text-sm">
             {error?.response?.data?.detail ?? 'Terjadi kesalahan saat memuat data.'}
           </p>
@@ -235,9 +360,7 @@ export default function InternshipDetail() {
       )}
 
       {/* Hero Header Card */}
-      {isLoading ? (
-        <HeroSkeleton />
-      ) : internship && (
+      {isLoading ? <HeroSkeleton /> : internship && (
         <div className="flex items-center justify-between bg-white rounded-xl border border-[#DBD9E1] px-8 py-8 gap-4 flex-wrap">
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
@@ -249,12 +372,10 @@ export default function InternshipDetail() {
               </p>
               <div className="flex items-center gap-1">
                 <LocationIcon />
-                <span className="text-[#454651] text-base font-normal leading-6">
-                  {internship.location}
-                </span>
+                <span className="text-[#454651] text-base font-normal leading-6">{internship.location}</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className={`px-2.5 py-1 rounded-full text-xs font-medium leading-4 ${workBadge.className}`}>
                 {workBadge.label}
               </span>
@@ -263,24 +384,49 @@ export default function InternshipDetail() {
               </span>
             </div>
           </div>
-          <button
-            onClick={handleApply}
-            disabled={isApplying || !internship.is_active}
-            className="flex items-center justify-center px-5 py-2 rounded-lg bg-[#4D44B5] text-white text-base font-medium leading-6 tracking-wide hover:bg-[#3d369a] transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isApplying ? 'Mengirim...' : 'Lamar Sekarang'}
-          </button>
+
+          {/* Apply button + sub-messages */}
+          <div className="flex flex-col items-end gap-2">
+            <button
+              onClick={btnDisabled ? undefined : handleApply}
+              disabled={btnDisabled}
+              className={`flex items-center justify-center px-5 py-2 rounded-lg text-base font-medium leading-6 tracking-wide transition-colors whitespace-nowrap disabled:cursor-not-allowed ${btnClassName}`}
+            >
+              {btnLabel}
+            </button>
+
+            {/* Warn: no CV uploaded */}
+            {noCv && !applicationStatus && !isInactive && (
+              <div className="flex items-center gap-1.5 text-xs text-[#A65E34]">
+                <AlertCircleIcon />
+                <span>
+                  CV belum ada.{' '}
+                  <Link to="/profile" className="underline font-medium">Lengkapi profil</Link>
+                </span>
+              </div>
+            )}
+
+            {/* Show CV link once applied */}
+            {studentCvUrl && applicationStatus && (
+              <a
+                href={studentCvUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#35299D] hover:underline"
+              >
+                Lihat CV yang dikirim →
+              </a>
+            )}
+          </div>
         </div>
       )}
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-        {/* Left Column — job description, requirements, benefits */}
+        {/* Left Column — description, requirements, benefits */}
         <div className="lg:col-span-2 flex flex-col gap-5">
-          {isLoading ? (
-            <CardSkeleton />
-          ) : internship && (
+          {isLoading ? <CardSkeleton /> : internship && (
             <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
               <SectionHeader icon={<FileTextIcon />} title="Deskripsi Pekerjaan" />
               <TextBlock text={internship.description} />
@@ -298,57 +444,35 @@ export default function InternshipDetail() {
           )}
         </div>
 
-        {/* Right Column — internship info + company info */}
+        {/* Right Column — internship info + company */}
         <div className="flex flex-col gap-6">
 
           {/* Informasi Magang */}
-          {isLoading ? (
-            <CardSkeleton />
-          ) : internship && (
+          {isLoading ? <CardSkeleton /> : internship && (
             <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
               <div className="pb-3 border-b border-[#DBD9E1]">
-                <h2 className="text-[#1B1B21] text-xl font-semibold leading-7">
-                  Informasi Magang
-                </h2>
+                <h2 className="text-[#1B1B21] text-xl font-semibold leading-7">Informasi Magang</h2>
               </div>
               <div className="flex flex-col gap-4">
-                <InfoRow
-                  icon={<CalendarIcon />}
-                  label="Batas Pendaftaran"
-                  value={formatDate(internship.close_date)}
-                />
-                <InfoRow
-                  icon={<ClockIcon />}
-                  label="Durasi Magang"
-                  value={formatDuration(internship.start_date, internship.end_date)}
-                />
-                <InfoRow
-                  icon={<UsersIcon />}
-                  label="Kapasitas"
-                  value={`${internship.quota} Orang`}
-                />
+                <InfoRow icon={<CalendarIcon />} label="Batas Pendaftaran" value={formatDate(internship.close_date)} />
+                <InfoRow icon={<ClockIcon />}    label="Durasi Magang"     value={formatDuration(internship.start_date, internship.end_date)} />
+                <InfoRow icon={<UsersIcon />}    label="Kapasitas"         value={`${internship.quota} Orang`} />
               </div>
             </div>
           )}
 
           {/* Tentang Perusahaan */}
-          {isLoading ? (
-            <CardSkeleton />
-          ) : internship && (
+          {isLoading ? <CardSkeleton /> : internship && (
             <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
               <div className="pb-3 border-b border-[#DBD9E1]">
-                <h2 className="text-[#1B1B21] text-xl font-semibold leading-7">
-                  Tentang Perusahaan
-                </h2>
+                <h2 className="text-[#1B1B21] text-xl font-semibold leading-7">Tentang Perusahaan</h2>
               </div>
-              <div className="flex items-center gap-2 pt-2">
-                <div className="w-20 h-20 flex items-center justify-center rounded-2xl border border-[#E5E1EB] bg-white shadow-sm shrink-0">
-                  <span className="text-2xl font-bold text-[#4D44B5]">
-                    {internship.company.company_name.charAt(0)}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <p className="text-[#1B1B21] text-sm font-semibold leading-tight tracking-wide">
+
+              {/* Logo + name row */}
+              <div className="flex items-center gap-3 pt-1">
+                <CompanyLogo company={internship.company} />
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-[#1B1B21] text-sm font-semibold leading-tight">
                     {internship.company.company_name}
                   </p>
                   <p className="text-[#454651] text-xs font-normal leading-4">
@@ -356,31 +480,34 @@ export default function InternshipDetail() {
                   </p>
                 </div>
               </div>
+
               <div className="flex flex-col gap-4">
+                {/* Description — shown only if company has one */}
+                {internship.company.description && (
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[#787584] text-xs font-semibold leading-4 tracking-widest uppercase">Tentang</p>
+                    <p className="text-[#474553] text-sm font-normal leading-5">{internship.company.description}</p>
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-1">
-                  <p className="text-[#787584] text-xs font-semibold leading-4 tracking-widest uppercase">
-                    Industri
-                  </p>
+                  <p className="text-[#787584] text-xs font-semibold leading-4 tracking-widest uppercase">Industri</p>
                   <p className="text-[#474553] text-sm font-normal leading-5">
-                    {internship.industry}
+                    {internship.company.industry ?? internship.industry}
                   </p>
                 </div>
+
                 <div className="flex flex-col gap-1">
-                  <p className="text-[#787584] text-xs font-semibold leading-4 tracking-widest uppercase">
-                    Alamat
-                  </p>
+                  <p className="text-[#787584] text-xs font-semibold leading-4 tracking-widest uppercase">Alamat</p>
                   <div className="flex items-start gap-2">
-                    <LocationIcon />
-                    <p className="text-[#474553] text-sm font-normal leading-5">
-                      {internship.company.address}
-                    </p>
+                    <div className="shrink-0 mt-0.5"><LocationIcon /></div>
+                    <p className="text-[#474553] text-sm font-normal leading-5">{internship.company.address}</p>
                   </div>
                 </div>
+
                 {internship.company.website && (
                   <div className="flex flex-col gap-1">
-                    <p className="text-[#787584] text-xs font-semibold leading-4 tracking-widest uppercase">
-                      Website
-                    </p>
+                    <p className="text-[#787584] text-xs font-semibold leading-4 tracking-widest uppercase">Website</p>
                     <div className="flex items-center gap-2">
                       <GlobeIcon />
                       <a
