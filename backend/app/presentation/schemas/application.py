@@ -158,6 +158,7 @@ class HRApplicantDetailResponse(BaseModel):
     id: UUID
     status: str
     application_time: Optional[datetime] = None
+    position: Optional[str] = None
     student: StudentDetail
     status_history: List[ApplicationStatusHistoryResponse] = []
 

@@ -10,6 +10,7 @@ import useApplicants from '@/hooks/useApplicants';
 const COLUMNS = [
   { key: 'name', label: 'Nama Mahasiswa' },
   { key: 'major', label: 'Jurusan' },
+  { key: 'internshipTitle', label: 'Posisi' },
   { key: 'appliedDate', label: 'Tanggal Melamar' },
   { key: 'status', label: 'Status' },
   { key: 'action', label: 'Aksi', align: 'center' },
@@ -17,7 +18,7 @@ const COLUMNS = [
 
 function ApplicantList() {
   const navigate = useNavigate();
-  const { items, total, totalPages, page, from, to, setPage } = useApplicants();
+  const { items, total, totalPages, page, from, to, setPage, loading, error } = useApplicants();
 
   return (
     <div>
@@ -44,21 +45,32 @@ function ApplicantList() {
           </button>
         </div>
 
-        <DataTable
-          columns={COLUMNS}
-          data={items}
-          emptyMessage="Tidak ada pelamar ditemukan"
-          renderRow={(item) => (
-            <ApplicantTableRow
-              key={item.id}
-              name={item.name}
-              major={item.major}
-              appliedDate={item.appliedDate}
-              status={item.status}
-              onClick={() => navigate(`/hr/applications/${item.id}`)}
-            />
-          )}
-        />
+        {error ? (
+          <div style={{ textAlign: 'center', padding: '32px 0', color: '#E53E3E' }}>
+            <p>{error}</p>
+          </div>
+        ) : loading ? (
+          <div style={{ textAlign: 'center', padding: '32px 0', color: '#6B7280' }}>
+            <p>Memuat data pelamar...</p>
+          </div>
+        ) : (
+          <DataTable
+            columns={COLUMNS}
+            data={items}
+            emptyMessage="Tidak ada pelamar ditemukan"
+            renderRow={(item) => (
+              <ApplicantTableRow
+                key={item.id}
+                name={item.name}
+                major={item.major}
+                internshipTitle={item.internshipTitle}
+                appliedDate={item.appliedDate}
+                status={item.status}
+                onClick={() => navigate(`/hr/applicants/${item.id}`)}
+              />
+            )}
+          />
+        )}
 
         {totalPages > 1 && (
           <div style={{ marginTop: '16px' }}>
