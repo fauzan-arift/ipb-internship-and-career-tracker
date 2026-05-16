@@ -1,6 +1,35 @@
 import { useState, useEffect, useCallback } from 'react';
 import { offerService } from '@/services/offerService';
 
+function formatDate(dateStr) {
+  if (!dateStr) return '-';
+  return new Date(dateStr).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+// Maps the exact API response shape → OfferCard props
+function mapOffer(raw) {
+  return {
+    id:             raw.id,
+    status:         raw.status ?? 'Pending',
+    // OfferCard props
+    companyInitial: raw.internship?.company_name?.charAt(0).toUpperCase() ?? '?',
+    companyName:    raw.internship?.company_name ?? '-',
+    position:       raw.internship?.title ?? '-',
+    location:       raw.internship?.location ?? '-',
+    deadline:       formatDate(raw.expiry_date),
+    offerDate:      formatDate(raw.offer_date),
+    duration:       raw.duration ?? '-',
+    salary:         raw.compensation ?? '-',
+    documentName:   'Dokumen Offering',
+    documentUrl:    raw.offering_file_url ?? null,
+    companyMessage: raw.offer_detail ?? '-',
+  };
+}
+
 export function useOffers() {
   const [offers, setOffers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -11,18 +40,8 @@ export function useOffers() {
     setError(null);
     try {
       const data = await offerService.getOffers();
-      console.log('[useOffers] raw response:', data);
-
-      // Handle whatever shape the API returns
-      const list = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.data)
-        ? data.data
-        : Array.isArray(data?.offers)
-        ? data.offers
-        : [];
-
-      setOffers(list);
+      const list = data?.offers ?? [];
+      setOffers(list.map(mapOffer));
     } catch (err) {
       console.error('[useOffers] fetch error:', err);
       setError(err?.response?.data?.message ?? 'Gagal memuat tawaran. Silakan coba lagi.');
