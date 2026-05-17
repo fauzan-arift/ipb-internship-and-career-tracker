@@ -1,47 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 
 function Breadcrumb({ items = [] }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+    <nav className="flex items-center gap-2 text-sm text-gray-500" aria-label="breadcrumb">
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
-
         return (
           <React.Fragment key={index}>
             {isLast ? (
-              <span
-                style={{
-                  fontSize: '13px',
-                  color: '#1A1A2E',
-                  fontFamily: 'Inter, sans-serif',
-                  fontWeight: '500',
-                }}
-              >
-                {item.label}
-              </span>
+              <span className="text-gray-900 font-medium">{item.label}</span>
             ) : (
-              <Link
-                to={item.href}
-                style={{
-                  fontSize: '13px',
-                  color: '#3D3FA8',
-                  fontFamily: 'Inter, sans-serif',
-                  textDecoration: 'none',
-                }}
-              >
+              <Link to={item.href} className="hover:text-indigo-600 transition-colors">
                 {item.label}
               </Link>
             )}
-            {!isLast && (
-              <span style={{ fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-                ›
-              </span>
-            )}
+            {!isLast && <ChevronRight size={16} className="text-gray-400" />}
           </React.Fragment>
         );
       })}
-    </div>
+    </nav>
   );
 }
 

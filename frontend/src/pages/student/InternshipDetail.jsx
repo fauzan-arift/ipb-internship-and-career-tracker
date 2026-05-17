@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom'
 import { internshipService } from '@/services/internshipService'
 import { applicationService } from '@/services/applicationService'
 import api from '@/api/axios'
+import Breadcrumb from '@/components/molecules/Breadcrumb';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -195,16 +196,6 @@ const Toast = ({ message, type, onClose }) => {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-/**
- * InternshipDetail page
- * Route: /lowongan/:internship_id
- *
- * Apply flow:
- *   1. Fetch student profile → get cv_id (required for apply body)
- *   2. Fetch applications list → detect if already applied to this internship
- *   3. On "Lamar Sekarang": POST { submitted_cv_id: cv_id } to /internships/:id/apply
- *   4. On success: set applicationStatus to 'Pending' (button changes immediately)
- */
 export default function InternshipDetail() {
   const { internship_id } = useParams()
   const navigate = useNavigate()
@@ -338,13 +329,12 @@ export default function InternshipDetail() {
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-3">
-        <Link to="/lowongan" className="text-[#454651] text-base font-normal leading-5 hover:underline">
-          Lowongan Magang
-        </Link>
-        <ChevronRightIcon />
-        <span className="text-[#1B1B21] text-base font-medium leading-5">Detail Lowongan</span>
-      </nav>
+      <Breadcrumb
+        items={[
+          { label: 'Lowongan Magang', href: '/internship' },
+          { label: 'Detail Lowongan' },
+        ]}
+      />
 
       {/* Error state */}
       {isError && (
