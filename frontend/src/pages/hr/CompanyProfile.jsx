@@ -41,7 +41,7 @@ const VerificationBadge = ({ status }) => {
   }
   const badge = map[status] ?? { label: status, className: 'bg-gray-100 text-gray-600' }
   return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${badge.className}`}>
+    <span className={`w-fit px-2.5 py-1 rounded-full text-xs font-medium ${badge.className}`}>
       {badge.label}
     </span>
   )
@@ -301,8 +301,7 @@ export default function CompanyProfile() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ceritakan tentang perusahaan Anda..."
-                rows={4}
-                className="w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] bg-white text-black text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors resize-none"
+                rows={3}
               />
             </FormField>
           </div>

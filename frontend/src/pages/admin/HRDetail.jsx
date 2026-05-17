@@ -235,13 +235,7 @@ const HRDetail = () => {
         {
           name: detail.npwp_document.file_name,
           format: `FORMAT ${detail.npwp_document.file_format?.toUpperCase()}`,
-          date: `Diunggah: ${
-            detail.npwp_document.upload_date
-              ? new Date(
-                  detail.npwp_document.upload_date
-                ).toLocaleDateString('id-ID')
-              : '-'
-          }`,
+          date: detail.npwp_document.upload_date,
           href: detail.npwp_document.download_url,
         },
       ]
