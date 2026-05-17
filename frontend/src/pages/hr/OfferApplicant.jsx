@@ -7,6 +7,7 @@ import CandidateInfo from '@/components/molecules/CandidateInfo';
 import OfferFormInput from '@/components/molecules/OfferFormInput';
 import OfferFileUpload from '@/components/molecules/OfferFileUpload';
 import { useHrApplication } from '@/hooks/useHrApplication';
+import UploadZone from '@/components/atoms/UploadZone';
 
 export default function OfferApplicant() {
   const { application_id } = useParams();
@@ -187,10 +188,11 @@ export default function OfferApplicant() {
                 Unggah File Penawaran Anda (Offering Letter).
               </div>
             </div>
-            <OfferFileUpload
+            <UploadZone
+              accept=".pdf,.doc,.docx"
               file={formData.file}
-              onFileSelect={handleFileSelect}
-              onFileRemove={handleFileRemove}
+              hint="PDF/DOC/DOCX"
+              onChange={(file) => setFormData((prev) => ({ ...prev, file }))}
             />
           </div>
 

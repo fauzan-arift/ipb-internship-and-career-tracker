@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
 import InfoSectionCard from './InfoSectionCard';
-import DocumentRow from '../molecules/DocumentRow';
+import FileViewRow from '../molecules/FileViewRow';
 
 function DocumentsCard({ documents = [] }) {
   return (
@@ -11,13 +11,13 @@ function DocumentsCard({ documents = [] }) {
           Tidak ada dokumen
         </p>
       ) : (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {documents.map((doc, index) => (
-            <DocumentRow
+            <FileViewRow
               key={index}
-              name={doc.name}
-              format={doc.format}
-              date={doc.date}
+              fileName={doc.name}
+              fileSize={doc.format}
+              uploadedAt={doc.date}
               href={doc.href}
             />
           ))}

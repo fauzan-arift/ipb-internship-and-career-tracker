@@ -184,22 +184,15 @@ const RegisterHR = () => {
           <p style={sectionTitle}>Dokumen Legalitas</p>
 
           <FormField label="Upload NPWP * (PDF/JPG/PNG - Max 5MB)">
-            {npwpFile ? (
-              <UploadedFileRow
-                fileName={npwpFile.name}
-                fileSize={`${(npwpFile.size / (1024 * 1024)).toFixed(1)} MB`}
-                onDelete={() => {
-                  setNpwpFile(null);
-                  if (fileInputRef.current) fileInputRef.current.value = '';
-                }}
-              />
-            ) : (
-              <UploadZone
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={handleFileSelect}
-                fileInputRef={fileInputRef}
-              />
-            )}
+            <UploadZone
+              accept=".pdf,.jpg,.jpeg,.png"
+              file={npwpFile}
+              hint="PDF/JPG/PNG - Max 5MB"
+              onChange={(file) => {
+                setNpwpFile(file);
+                if (!file && fileInputRef.current) fileInputRef.current.value = '';
+              }}
+            />
           </FormField>
 
           <Button type="submit" variant="primary" fullWidth disabled={isLoading} style={{ marginTop: '8px' }}>

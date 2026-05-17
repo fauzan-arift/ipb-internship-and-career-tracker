@@ -3,6 +3,7 @@ import { MapPin, CheckCircle, XCircle } from 'lucide-react';
 import AvatarSquare from '../atoms/AvatarSquare';
 import Button from '../atoms/Button';
 import DocumentLink from '../molecules/DocumentLink';
+import FileViewRow from '../molecules/FileViewRow';
 
 const STATUS_CONFIG = {
   Accepted: {
@@ -96,10 +97,12 @@ function OfferCard({ offer, onAccept, onReject }) {
           </div>
           <div>
             <span className="text-gray-500 text-xs uppercase">Dokumen Offering</span>
-            <DocumentLink
-              fileName={offer.documentName}
-              fileUrl={offer.documentUrl}
-            />
+            <div className="mt-1">
+              <FileViewRow
+                fileName={offer.documentName || 'Offering Letter'}
+                href={offer.documentUrl}
+              />
+            </div>
           </div>
         </div>
       </div>

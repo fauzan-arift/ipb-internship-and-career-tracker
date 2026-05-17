@@ -7,7 +7,7 @@ import AvatarSquare from '../atoms/AvatarSquare';
 
 function HRDInfoCard({ name, position, email, phone }) {
   return (
-    <InfoSectionCard title="Informasi HRD" icon={<User size={18} />}>
+    <InfoSectionCard title="Informasi Narhubung" icon={<User size={18} />}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <AvatarSquare name={name || 'HR'} bg="#EEF0FF" color="#3D3FA8" size={44} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
