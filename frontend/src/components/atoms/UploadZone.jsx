@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, FileText, X } from 'lucide-react';
 
-function UploadZone({ onChange, hint, error, accept, file, existingFileUrl, existingFileName }) {
+function UploadZone({ onChange, hint, error, accept, file, existingFileUrl, existingFileName, allowRemove = true }) {
   const [dragging, setDragging] = useState(false);
   const [hovering, setHovering] = useState(false);
   const inputRef = useRef(null);
@@ -126,20 +126,22 @@ function UploadZone({ onChange, hint, error, accept, file, existingFileUrl, exis
               </span>
             </div>
 
-            <button
-              type="button"
-              onClick={onRemove}
-              title="Hapus file"
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: '#6B7280', padding: '4px', display: 'flex',
-                alignItems: 'center', borderRadius: '4px', flexShrink: 0,
-              }}
-              onMouseEnter={e => e.currentTarget.style.color = '#DC2626'}
-              onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
-            >
-              <X size={16} />
-            </button>
+            {allowRemove && (
+              <button
+                type="button"
+                onClick={onRemove}
+                title="Hapus file"
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: '#6B7280', padding: '4px', display: 'flex',
+                  alignItems: 'center', borderRadius: '4px', flexShrink: 0,
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = '#DC2626'}
+                onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
+              >
+                <X size={16} />
+              </button>
+            )}
           </>
         ) : (
           <>

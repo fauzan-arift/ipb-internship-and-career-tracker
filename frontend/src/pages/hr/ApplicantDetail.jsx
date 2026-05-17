@@ -16,6 +16,7 @@ import { useHrApplicationStatus } from '@/hooks/useHrApplicationStatus';
 import StatusUpdateModal from '@/components/organisms/StatusUpdateModal';
 import ConfirmationDialog from '@/components/organisms/ConfirmationDialog';
 import Breadcrumb from '@/components/molecules/Breadcrumb';
+import FileViewRow from '@/components/molecules/FileViewRow';
 
 function TimelineProgress({ timeline }) {
   if (!timeline || timeline.length === 0) {
@@ -178,7 +179,12 @@ export default function ApplicantDetail() {
               <FileText size={20} className="text-gray-500" />
               Dokumen CV
             </h2>
-            <CVDocumentCard cvDocument={cvDocument} />
+            <FileViewRow
+              fileName={cvDocument.name}
+              fileSize={cvDocument.size}
+              uploadedAt={cvDocument.uploadedDate}
+              href={cvDocument.url}
+            />
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">

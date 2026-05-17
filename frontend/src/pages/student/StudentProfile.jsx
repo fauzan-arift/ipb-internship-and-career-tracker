@@ -4,6 +4,7 @@ import { IPB_FACULTIES } from '@/constants/ipbData'
 import TextInput from '@/components/atoms/TextInput'
 import SelectInput from '@/components/atoms/SelectInput'
 import FormField from '@/components/molecules/FormField'
+import UploadZone from '@/components/atoms/UploadZone'
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -541,75 +542,15 @@ export default function StudentProfile() {
 
       {/* ── Dokumen ── */}
       <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-3">
-        <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Dokumen</h2>
-        <p className="text-[#6B7280] text-sm">Unggah Kurikulum Vitae (CV) terbaru Anda.</p>
-
-        {/* Global hidden file input for CV */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          style={{ display: 'none' }}
+        <UploadZone
           accept=".pdf,.doc,.docx"
-          onChange={(e) => { if (e.target.files?.[0]) setNewCvFile(e.target.files[0]) }}
+          file={newCvFile}
+          existingFileUrl={cvUrl}
+          existingFileName="CV Tersimpan"
+          hint="PDF/DOC/DOCX"
+          allowRemove={!!newCvFile}  // hanya bisa hapus kalau file baru, bukan file server
+          onChange={(file) => setNewCvFile(file)}
         />
-
-        {newCvFile ? (
-          /* State 1: New file selected (ready to save) */
-          <div className="flex items-center gap-3 px-3 py-4 rounded-lg border border-[#DBD9E1] bg-[#F8F9FE]">
-            <FileIcon />
-            <div className="flex flex-col gap-0.5 flex-1 overflow-hidden">
-              <span className="text-[#1B1B21] font-semibold text-sm truncate">{newCvFile.name}</span>
-              <span className="text-[#6B7280] text-xs">
-                {(newCvFile.size / (1024 * 1024)).toFixed(1)} MB — belum diunggah
-              </span>
-            </div>
-            <button
-              onClick={() => { setNewCvFile(null); if (fileInputRef.current) fileInputRef.current.value = '' }}
-              className="hover:opacity-60 transition-opacity"
-            >
-              <TrashIcon />
-            </button>
-          </div>
-        ) : cvUrl ? (
-          /* State 2: Existing CV on server */
-          <div className="flex items-center gap-3 px-3 py-4 rounded-lg border border-[#DBD9E1] bg-[#F8F9FE]">
-            <FileIcon />
-            <div className="flex flex-col gap-0.5 flex-1 overflow-hidden">
-              <span className="text-[#1B1B21] font-semibold text-sm truncate">CV Tersimpan</span>
-              <a
-                href={cvUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#35299D] text-xs hover:underline truncate"
-              >
-                Lihat Dokumen Saat Ini
-              </a>
-            </div>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="text-[#4D44B5] text-xs font-medium hover:underline shrink-0"
-            >
-              Ganti File
-            </button>
-          </div>
-        ) : (
-          /* State 3: Drop zone (No file) */
-          <div
-            className={`flex flex-col items-center justify-center gap-4 h-36.75 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging ? 'border-[#4D44B5] bg-[#E8F0FE]/30' : 'border-gray-300 hover:border-[#4D44B5]'}`}
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className="w-13 h-13 rounded-full bg-[#E8F0FE] flex items-center justify-center">
-              <UploadIcon />
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-[#4D44B5] font-semibold text-sm">Klik untuk memilih file</span>
-              <span className="text-[#6B7280] text-sm">atau drag and drop file di sini</span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* ── Save ── */}
