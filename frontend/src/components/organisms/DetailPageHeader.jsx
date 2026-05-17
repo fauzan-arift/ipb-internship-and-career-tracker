@@ -6,16 +6,14 @@ import Breadcrumb from '../molecules/Breadcrumb';
 
 function DetailPageHeader({ name, badge, badgeVariant, date, onBack, actions, breadcrumb }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+    <div>
 
-      {breadcrumb ? (
+      {breadcrumb && (
         <Breadcrumb items={breadcrumb} />
-      ) : (
-        <BackButton onClick={onBack} />
       )}
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <AvatarSquare name={name || 'N A'} bg="#EEF0FF" color="#3D3FA8" size={56} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif', margin: 0 }}>
