@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FileText } from 'lucide-react';
 import Button from '@/components/atoms/Button';
-import OfferBreadcrumb from '@/components/molecules/OfferBreadcrumb';
+import Breadcrumb from '@/components/molecules/Breadcrumb';
 import CandidateInfo from '@/components/molecules/CandidateInfo';
 import OfferFormInput from '@/components/molecules/OfferFormInput';
 import OfferFileUpload from '@/components/molecules/OfferFileUpload';
@@ -116,7 +116,13 @@ export default function OfferApplicant() {
 
   return (
     <div className="flex flex-col gap-6 p-6 w-full">
-      <OfferBreadcrumb applicantId={application_id} />
+      <Breadcrumb
+        items={[
+          { label: 'Daftar Pelamar', href: '/hr/applicants' },
+          { label: 'Detail Pelamar', href: `/hr/applicants/${application_id}` },
+          { label: 'Berikan Penawaran Magang' },
+        ]}
+      />
       
       <CandidateInfo 
         name={candidate.name} 

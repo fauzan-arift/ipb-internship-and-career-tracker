@@ -191,7 +191,10 @@ const HRDetail = () => {
         badge={badgeLabel}
         badgeVariant={isVerified ? 'green' : 'yellow'}
         date={registeredAt}
-        onBack={() => navigate('/admin/dashboard')}
+        breadcrumb={[
+          { label: 'Dashboard', href: '/admin/dashboard' },
+          { label: 'Detail Perusahaan' },
+        ]}
         actions={headerActions}
       />
 
