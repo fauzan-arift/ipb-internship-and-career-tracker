@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FileText } from 'lucide-react';
 import Button from '@/components/atoms/Button';
+import DatePicker from '@/components/atoms/DatePicker';
 import Breadcrumb from '@/components/molecules/Breadcrumb';
 import CandidateInfo from '@/components/molecules/CandidateInfo';
 import OfferFormInput from '@/components/molecules/OfferFormInput';
-import OfferFileUpload from '@/components/molecules/OfferFileUpload';
-import { useHrApplication } from '@/hooks/useHrApplication';
 import UploadZone from '@/components/atoms/UploadZone';
+import { useHrApplication } from '@/hooks/useHrApplication';
+import { format } from 'date-fns';
 
 export default function OfferApplicant() {
   const { application_id } = useParams();
@@ -15,10 +16,10 @@ export default function OfferApplicant() {
   const { application, loading, submitting, usingDummy, createOffer, uploadFile } = useHrApplication(application_id);
 
   const [formData, setFormData] = useState({
-    offerDate: '',
+    offerDate: new Date(),
     duration: '',
     pocketMoney: '',
-    acceptBy: '',
+    acceptBy: null,
     message: '',
     file: null,
   });
@@ -27,12 +28,8 @@ export default function OfferApplicant() {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleFileSelect = (file) => {
-    setFormData((prev) => ({ ...prev, file }));
-  };
-
-  const handleFileRemove = () => {
-    setFormData((prev) => ({ ...prev, file: null }));
+  const handleDateChange = (field) => (date) => {
+    setFormData((prev) => ({ ...prev, [field]: date }));
   };
 
   const student = application?.student || {};
@@ -49,6 +46,11 @@ export default function OfferApplicant() {
     .slice(0, 2)
     .join('')
     .toUpperCase();
+
+  const toDateString = (date) => {
+    if (!date) return '';
+    return format(date, 'yyyy-MM-dd');
+  };
 
   const validateForm = () => {
     const errors = [];
@@ -84,8 +86,8 @@ export default function OfferApplicant() {
       }
 
       const payload = {
-        offer_date: formData.offerDate,
-        expiry_date: formData.acceptBy,
+        offer_date: toDateString(formData.offerDate),
+        expiry_date: toDateString(formData.acceptBy),
         duration: formData.duration,
         compensation: formData.pocketMoney,
         offer_detail: formData.message,
@@ -124,11 +126,11 @@ export default function OfferApplicant() {
           { label: 'Berikan Penawaran Magang' },
         ]}
       />
-      
-      <CandidateInfo 
-        name={candidate.name} 
-        major={candidate.major} 
-        initials={initials} 
+
+      <CandidateInfo
+        name={candidate.name}
+        major={candidate.major}
+        initials={initials}
         photoUrl={student.photo_profile_url}
       />
 
@@ -138,36 +140,35 @@ export default function OfferApplicant() {
           <h2 className="text-base font-bold text-gray-900">Detail Penawaran</h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 w-full" style={{ width: '100%', maxWidth: '100%' }}>
+        <form onSubmit={handleSubmit} className="space-y-6 w-full" style={{ width: '100%', maxWidth: '100%', padding: '0', boxShadow: 'none' }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-5 w-full">
-            <OfferFormInput
+            <DatePicker
               label="Tanggal Penawaran"
-              type="date"
+              placeholder="Pilih tanggal"
               value={formData.offerDate}
-              onChange={handleChange('offerDate')}
-              placeholder="Input tanggal"
+              onChange={handleDateChange('offerDate')}
+            />
+            <DatePicker
+              label="Tenggat Waktu Offering"
+              placeholder="Pilih tanggal"
+              value={formData.acceptBy}
+              onChange={handleDateChange('acceptBy')}
             />
             <OfferFormInput
               label="Durasi Posisi"
               type="text"
               value={formData.duration}
               onChange={handleChange('duration')}
-              placeholder="Input waktu"
+              placeholder="Misal: 3 bulan, 6 bulan, dst."
             />
             <OfferFormInput
               label="Uang Saku / Kompensasi"
               type="text"
               value={formData.pocketMoney}
               onChange={handleChange('pocketMoney')}
-              placeholder="Input nominal"
+              placeholder="Input nominal (Misal: Rp x.xxx.xxx)"
             />
-            <OfferFormInput
-              label="Tenggat Waktu Offering"
-              type="date"
-              value={formData.acceptBy}
-              onChange={handleChange('acceptBy')}
-              placeholder="Input tanggal"
-            />
+            
           </div>
 
           <div className="flex flex-col gap-1.5">

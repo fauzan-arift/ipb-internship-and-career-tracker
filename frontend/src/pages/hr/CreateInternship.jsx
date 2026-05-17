@@ -113,7 +113,7 @@ function CreateInternship() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      
+
         <Breadcrumb
           items={[
             { label: 'Kelola Lowongan', href: '/hr/dashboard' },
@@ -198,22 +198,29 @@ function CreateInternship() {
             className="w-full px-4 py-3.5 rounded-lg border border-[#CBD0E0] text-base outline-none focus:border-[#4D44B5] focus:ring-1 focus:ring-[#4D44B5] transition-colors bg-white text-black"
           />
         </FormField>
-        <FormField label="Status Gaji" error={errors.statusGaji}>
-          <SelectInput
-            value={statusGaji}
-            onChange={(e) => setStatusGaji(e.target.value)}
-            options={STATUS_GAJI_OPTIONS}
-            placeholder="Pilih status gaji..."
-          />
-        </FormField>
-        <FormField label="Status Pelaksanaan" error={errors.statusPelaksanaan}>
-          <SelectInput
-            value={statusPelaksanaan}
-            onChange={(e) => setStatusPelaksanaan(e.target.value)}
-            options={STATUS_PELAKSANAAN_OPTIONS}
-            placeholder="Pilih status pelaksanaan..."
-          />
-        </FormField>
+
+        <div className="grid grid-cols-2 gap-4">
+          
+          <FormField label="Status Gaji" error={errors.statusGaji}>
+            <SelectInput
+              value={statusGaji}
+              onChange={(e) => setStatusGaji(e.target.value)}
+              options={STATUS_GAJI_OPTIONS}
+              placeholder="Pilih status gaji..."
+            />
+          </FormField>
+
+          <FormField label="Status Pelaksanaan" error={errors.statusPelaksanaan}>
+            <SelectInput
+              value={statusPelaksanaan}
+              onChange={(e) => setStatusPelaksanaan(e.target.value)}
+              options={STATUS_PELAKSANAAN_OPTIONS}
+              placeholder="Pilih status pelaksanaan..."
+            />
+          </FormField>
+
+        </div>
+
         <FormField label="Tanggal Lowongan Ditutup" error={errors.tanggalDitutup}>
           <DatePicker
             placeholder="dd/mm/yyyy"
