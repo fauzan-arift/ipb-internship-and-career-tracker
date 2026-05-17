@@ -2,7 +2,7 @@ import React from 'react';
 import AvatarSquare from '../atoms/AvatarSquare';
 import Badge from '../atoms/Badge';
 
-function ApplicationListItem({ logo, position, company, date, status, isActive, onClick }) {
+function ApplicationListItem({ logo, logoUrl, position, company, date, status, isActive, onClick }) {
   let badgeVariant = 'gray';
   if (status === 'Diproses') badgeVariant = 'blue';
   if (status === 'Diterima') badgeVariant = 'green';
@@ -18,7 +18,7 @@ function ApplicationListItem({ logo, position, company, date, status, isActive, 
     >
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-start gap-3">
-          <AvatarSquare name={logo} bg="#1A1A1A" color="#FFFFFF" size={48} />
+          <AvatarSquare name={logo} imageUrl={logoUrl} bg="#1A1A1A" color="#FFFFFF" size={48} />
           <div>
             <h4 className="font-semibold text-gray-900 text-lg leading-tight">{position}</h4>
             <p className="text-sm text-gray-500">{company}</p>

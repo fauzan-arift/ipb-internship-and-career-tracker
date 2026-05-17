@@ -73,6 +73,7 @@ class StudentDetail(BaseModel):
     email: str
     skills: List[str] = []
     cv_url: Optional[str] = None
+    photo_profile_url: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

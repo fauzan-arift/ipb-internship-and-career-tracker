@@ -42,6 +42,7 @@ class OfferInternshipBrief(BaseModel):
     title: str
     company_name: str
     location: str
+    photo_profile_url: Optional[str] = None
 
 
 class StudentOfferListItem(BaseModel):

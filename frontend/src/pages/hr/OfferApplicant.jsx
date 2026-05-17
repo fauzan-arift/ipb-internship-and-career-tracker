@@ -122,6 +122,7 @@ export default function OfferApplicant() {
         name={candidate.name} 
         major={candidate.major} 
         initials={initials} 
+        photoUrl={student.photo_profile_url}
       />
 
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
@@ -177,7 +178,7 @@ export default function OfferApplicant() {
             <div className="mb-2">
               <div className="text-sm font-semibold text-gray-900 mb-1">Dokumen</div>
               <div className="text-sm text-gray-500">
-                Unggah Kurikulum Vitae (CV) terbaru Anda.
+                Unggah File Penawaran Anda (Offering Letter).
               </div>
             </div>
             <OfferFileUpload

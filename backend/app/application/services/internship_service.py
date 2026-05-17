@@ -64,9 +64,13 @@ class InternshipService:
     ) -> PaginatedInternshipResponse:
         async with self.uow as uow:
             items, total = await uow.internships.get_active_list(page, limit, search)
+            internship_ids = [i.id for i in items]
+            accepted_counts = await uow.applications.count_accepted_by_internship_ids(internship_ids)
+            
             result_items = []
             for internship in items:
                 company_summary = await self._build_company_summary(uow, internship.company_id)
+                internship.filled_quota = accepted_counts.get(internship.id, 0)
                 result_items.append(
                     InternshipListItem(
                         **internship.model_dump(exclude={"created_at", "updated_at", "description", "requirement", "benefit"}),
@@ -91,8 +95,12 @@ class InternshipService:
                     detail="Lowongan tidak ditemukan.",
                 )
             company_summary = await self._build_company_summary(uow, internship.company_id)
+            internship.filled_quota = await uow.applications.count_accepted_by_internship(internship.id)
 
-        return InternshipDetailResponse(**internship.model_dump(exclude={"company_id"}), company=company_summary)
+        return InternshipDetailResponse(
+            **internship.model_dump(exclude={"company_id"}),
+            company=company_summary,
+        )
 
     async def apply_to_internship(
         self,
@@ -112,6 +120,13 @@ class InternshipService:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Lowongan sudah melewati batas pendaftaran.",
+                )
+
+            accepted_count = await uow.applications.count_accepted_by_internship(internship.id)
+            if accepted_count >= internship.quota:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Mohon maaf, kuota penerimaan untuk lowongan magang ini sudah penuh.",
                 )
 
             # Critical business rule: student MUST have uploaded a CV to their profile
@@ -179,13 +194,18 @@ class InternshipService:
         async with self.uow as uow:
             items, total = await uow.internships.get_by_company(company_id, page, limit, search)
             company_summary = await self._build_company_summary(uow, company_id)
-            result_items = [
-                InternshipListItem(
-                    **i.model_dump(exclude={"created_at", "updated_at", "description", "requirement", "benefit"}),
-                    company=company_summary,
+            internship_ids = [i.id for i in items]
+            accepted_counts = await uow.applications.count_accepted_by_internship_ids(internship_ids)
+            
+            result_items = []
+            for i in items:
+                i.filled_quota = accepted_counts.get(i.id, 0)
+                result_items.append(
+                    InternshipListItem(
+                        **i.model_dump(exclude={"created_at", "updated_at", "description", "requirement", "benefit"}),
+                        company=company_summary,
+                    )
                 )
-                for i in items
-            ]
 
         return PaginatedInternshipResponse(
             items=result_items,
@@ -221,8 +241,12 @@ class InternshipService:
             saved = await uow.internships.save(internship)
             await uow.commit()
             company_summary = await self._build_company_summary(uow, company_id)
+            saved.filled_quota = await uow.applications.count_accepted_by_internship(saved.id)
 
-        return InternshipDetailResponse(**saved.model_dump(exclude={"company_id"}), company=company_summary)
+        return InternshipDetailResponse(
+            **saved.model_dump(exclude={"company_id"}),
+            company=company_summary,
+        )
 
     async def update_internship(
         self,
@@ -248,8 +272,12 @@ class InternshipService:
             saved = await uow.internships.save(updated)
             await uow.commit()
             company_summary = await self._build_company_summary(uow, company_id)
+            saved.filled_quota = await uow.applications.count_accepted_by_internship(saved.id)
 
-        return InternshipDetailResponse(**saved.model_dump(exclude={"company_id"}), company=company_summary)
+        return InternshipDetailResponse(
+            **saved.model_dump(exclude={"company_id"}),
+            company=company_summary,
+        )
 
     async def close_internship(
         self,
@@ -273,8 +301,12 @@ class InternshipService:
             saved = await uow.internships.save(closed)
             await uow.commit()
             company_summary = await self._build_company_summary(uow, company_id)
+            saved.filled_quota = await uow.applications.count_accepted_by_internship(saved.id)
 
-        return InternshipDetailResponse(**saved.model_dump(exclude={"company_id"}), company=company_summary)
+        return InternshipDetailResponse(
+            **saved.model_dump(exclude={"company_id"}),
+            company=company_summary,
+        )
 
     async def delete_internship(
         self,
@@ -346,5 +378,9 @@ class InternshipService:
             saved = await uow.internships.save(reopened)
             await uow.commit()
             company_summary = await self._build_company_summary(uow, company_id)
+            saved.filled_quota = await uow.applications.count_accepted_by_internship(saved.id)
 
-        return InternshipDetailResponse(**saved.model_dump(exclude={"company_id"}), company=company_summary)
+        return InternshipDetailResponse(
+            **saved.model_dump(exclude={"company_id"}),
+            company=company_summary,
+        )

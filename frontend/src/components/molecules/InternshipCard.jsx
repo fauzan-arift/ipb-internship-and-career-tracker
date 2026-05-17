@@ -4,7 +4,7 @@ import Badge from '../atoms/Badge';
 import AvatarSquare from '../atoms/AvatarSquare';
 import Button from '../atoms/Button';
 
-function InternshipCard({ tags, companyName, companyInitial, position, location, duration, deadline, onDetailClick }) {
+function InternshipCard({ tags, companyName, companyInitial, companyLogoUrl, position, location, duration, deadline, onDetailClick }) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
       
@@ -21,7 +21,7 @@ function InternshipCard({ tags, companyName, companyInitial, position, location,
       </div>
 
       <div className="flex items-center gap-4 mb-3">
-        <AvatarSquare name={companyInitial} bg="#1A1A1A" color="#FFFFFF" size={48} />
+        <AvatarSquare name={companyInitial} imageUrl={companyLogoUrl} bg="#1A1A1A" color="#FFFFFF" size={48} />
         <div>
           <h3 className="text-[15px] font-bold text-gray-900 leading-snug">{position}</h3>
           <p className="text-xs text-gray-500 font-medium">{companyName}</p>

@@ -146,7 +146,8 @@ export default function ApplicantDetail() {
           <Button 
             variant="primary" 
             onClick={openModal}
-            className="flex items-center gap-2"
+            disabled={['Ditawarkan', 'Diterima'].includes(application.status)}
+            className={`flex items-center gap-2 ${['Ditawarkan', 'Diterima'].includes(application.status) ? 'opacity-50 cursor-not-allowed bg-gray-400 border-none' : ''}`}
           >
             <Edit2 size={16} /> Ubah Status
           </Button>

@@ -55,6 +55,7 @@ function MyApplications() {
             <div className="space-y-3">
               {applications.map((app) => {
                 const logo = app.logo || app.internship?.company?.company_name?.[0] || '?';
+                const logoUrl = app.internship?.company?.photo_profile_url;
                 const position = app.position || app.internship?.title || 'Posisi Tidak Diketahui';
                 const company = app.company || app.internship?.company?.company_name || 'Perusahaan Tidak Diketahui';
                 const date = app.date || app.application_time;
@@ -63,6 +64,7 @@ function MyApplications() {
                   <ApplicationListItem
                     key={app.id}
                     logo={logo}
+                    logoUrl={logoUrl}
                     position={position}
                     company={company}
                     date={date}

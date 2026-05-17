@@ -24,7 +24,7 @@ function ApplicationDetailPanel({ application }) {
     <div className="bg-white rounded-xl border border-gray-200 p-6 h-full flex flex-col">
       
       <div className="flex flex-col items-center border-b pb-6 shrink-0">
-        <AvatarSquare name={application.logo} bg="#1A1A1A" color="#FFFFFF" size={64} />
+        <AvatarSquare name={application.logo} imageUrl={application.logoUrl} bg="#1A1A1A" color="#FFFFFF" size={64} />
         <h4 className="text-lg font-bold mt-3">{application.position}</h4>
         <p className="text-sm text-gray-500">{application.company}</p>
         <div className="mt-2">

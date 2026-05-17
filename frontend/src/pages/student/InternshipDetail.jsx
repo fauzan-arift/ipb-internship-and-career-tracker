@@ -44,13 +44,13 @@ const getPaymentStatusBadge = (status) => {
 // Maps application status → button appearance
 // Status values match what the API returns: Pending, Diproses, Review HR, Interview, Diterima, Ditolak, Ditawarkan
 const APPLICATION_STATUS_CONFIG = {
-  'Pending':    { label: 'Lamaran Terkirim',    className: 'bg-[#FFF2DF] text-[#A65E34] border border-[#F6C28B]',   disabled: true },
-  'Diproses':   { label: 'Sedang Diproses',     className: 'bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD]',   disabled: true },
-  'Review HR':  { label: 'Dalam Review HR',     className: 'bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD]',   disabled: true },
-  'Interview':  { label: 'Tahap Interview',     className: 'bg-[#EDE9FE] text-[#5B21B6] border border-[#C4B5FD]',   disabled: true },
-  'Diterima':   { label: 'Lamaran Diterima ✓',  className: 'bg-[#D1FAE5] text-[#065F46] border border-[#6EE7B7]',   disabled: true },
-  'Ditolak':    { label: 'Lamaran Ditolak',     className: 'bg-[#FEE2E2] text-[#991B1B] border border-[#FCA5A5]',   disabled: true },
-  'Ditawarkan': { label: 'Ada Penawaran! 🎉',   className: 'bg-[#D1FAE5] text-[#065F46] border border-[#6EE7B7]',   disabled: true },
+  'Pending':    { label: 'Lamaran Terkirim', className: 'bg-[#FFF2DF] text-[#A65E34] border border-[#F6C28B]', disabled: true },
+  'Diproses':   { label: 'Sedang Diproses', className: 'bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD]', disabled: true },
+  'Review HR':  { label: 'Dalam Review HR', className: 'bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD]', disabled: true },
+  'Interview':  { label: 'Tahap Interview', className: 'bg-[#EDE9FE] text-[#5B21B6] border border-[#C4B5FD]', disabled: true },
+  'Diterima':   { label: 'Lamaran Diterima',  className: 'bg-[#D1FAE5] text-[#065F46] border border-[#6EE7B7]', disabled: true },
+  'Ditolak':    { label: 'Lamaran Ditolak', className: 'bg-[#FEE2E2] text-[#991B1B] border border-[#FCA5A5]', disabled: true },
+  'Ditawarkan': { label: 'Ada Penawaran!', className: 'bg-[#D1FAE5] text-[#065F46] border border-[#6EE7B7]', disabled: true },
 }
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ export default function InternshipDetail() {
         // Response: { stats: {...}, applications: [...] }  OR  plain array
         const list = Array.isArray(data) ? data : (data?.applications ?? [])
         const existing = list.find(
-          (app) => String(app.internship_id) === String(internship_id)
+          (app) => String(app.internship?.id || app.internship_id) === String(internship_id)
         )
         if (existing) setApplicationStatus(existing.status)
       } catch {
@@ -304,9 +304,10 @@ export default function InternshipDetail() {
   // ── Button state ──
   const appConfig  = APPLICATION_STATUS_CONFIG[applicationStatus] ?? null
   const isInactive = internship && !internship.is_active
+  const isFull     = internship && internship.filled_quota >= internship.quota
   const noCv       = !studentCvId
 
-  const btnDisabled = isApplying || !!appConfig?.disabled || isInactive
+  const btnDisabled = isApplying || !!appConfig?.disabled || isInactive || isFull
 
   const btnLabel = isApplying
     ? 'Mengirim...'
@@ -314,13 +315,15 @@ export default function InternshipDetail() {
       ? appConfig.label
       : isInactive
         ? 'Lowongan Ditutup'
-        : noCv
-          ? 'Upload CV Dulu'
-          : 'Lamar Sekarang'
+        : isFull
+          ? 'Kuota Penuh'
+          : noCv
+            ? 'Upload CV Dulu'
+            : 'Lamar Sekarang'
 
   const btnClassName = appConfig
     ? appConfig.className
-    : isInactive
+    : (isInactive || isFull)
       ? 'bg-gray-200 text-gray-400'
       : noCv
         ? 'bg-[#FFF2DF] text-[#A65E34] border border-[#F6C28B]'
@@ -456,7 +459,7 @@ export default function InternshipDetail() {
               <div className="flex flex-col gap-4">
                 <InfoRow icon={<CalendarIcon />} label="Batas Pendaftaran" value={formatDate(internship.close_date)} />
                 <InfoRow icon={<ClockIcon />}    label="Durasi Magang"     value={formatDuration(internship.start_date, internship.end_date)} />
-                <InfoRow icon={<UsersIcon />}    label="Kapasitas"         value={`${internship.quota} Orang`} />
+                <InfoRow icon={<UsersIcon />}    label="Kapasitas"         value={`${internship.filled_quota || 0}/${internship.quota} Orang`} />
               </div>
             </div>
           )}

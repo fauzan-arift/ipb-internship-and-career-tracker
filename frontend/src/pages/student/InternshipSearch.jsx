@@ -33,6 +33,7 @@ function InternshipSearch() {
     tags: [item.work_status, getTagLabel(item.payment_status)].filter(Boolean),
     companyName: item.company?.company_name || 'Perusahaan Tidak Diketahui',
     companyInitial: getCompanyInitial(item.company?.company_name || item.title),
+    companyLogoUrl: item.company?.photo_profile_url,
     position: item.title,
     location: item.location || 'Lokasi tidak tersedia',
     duration: item.start_date && item.end_date
@@ -80,6 +81,7 @@ function InternshipSearch() {
             tags={item.tags}
             companyName={item.companyName}
             companyInitial={item.companyInitial}
+            companyLogoUrl={item.companyLogoUrl}
             position={item.position}
             location={item.location}
             duration={item.duration}

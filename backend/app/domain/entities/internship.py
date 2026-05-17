@@ -26,5 +26,6 @@ class Internship(BaseModel):
     is_active: bool = True
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    filled_quota: int = 0
 
     model_config = {"from_attributes": True}

@@ -104,6 +104,7 @@ class InternshipListItem(BaseModel):
     end_date: Optional[date] = None
     is_active: bool
     company: Optional[CompanySummary] = None
+    filled_quota: int = 0
 
     model_config = {"from_attributes": True}
 
@@ -127,6 +128,7 @@ class InternshipDetailResponse(BaseModel):
     company: Optional[CompanySummary] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    filled_quota: int = 0
 
     model_config = {"from_attributes": True}
 

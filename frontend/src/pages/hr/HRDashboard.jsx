@@ -139,7 +139,7 @@ function HRDashboard() {
             title={item.title}
             location={item.location}
             industry={item.industry}
-            quota={item.quota}
+            quota={{ filled: item.filled_quota || 0, total: item.quota }}
                     status={
                       (function detectStatus(it) {
                         if (it == null) return 'open';

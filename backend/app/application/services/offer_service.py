@@ -67,6 +67,14 @@ class OfferService:
                     detail="Penawaran untuk lamaran ini sudah ada.",
                 )
 
+            # Check if quota is full
+            accepted_count = await uow.applications.count_accepted_by_internship(internship.id)
+            if accepted_count >= internship.quota:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Kuota magang sudah terpenuhi, tidak bisa memberikan penawaran lagi."
+                )
+
             # Validate offering file document exists
             doc = await uow.documents.get_by_id(payload.offering_file_id)
             if not doc:
@@ -138,6 +146,37 @@ class OfferService:
             if not student:
                 raise HTTPException(status_code=404, detail="Profil mahasiswa tidak ditemukan.")
 
+            # Auto-expire pending offers
+            pending_offers = await uow.offers.list_by_student_id(
+                student_id=student.profile_id,
+                status_filter="Pending",
+            )
+            any_expired = False
+            for offer in pending_offers:
+                if date.today() > offer.expiry_date:
+                    # Update offer status to Rejected
+                    updated_offer = offer.model_copy(update={"status": "Rejected"})
+                    await uow.offers.save(updated_offer)
+
+                    # Update application status to Ditolak
+                    app = await uow.applications.get_by_id(offer.application_id)
+                    if app:
+                        old_status = app.status.value
+                        updated_app = app.model_copy(update={"status": ApplicationStatus.DITOLAK})
+                        await uow.applications.save(updated_app)
+
+                        # Write history
+                        history = ApplicationStatusHistory(
+                            application_id=app.id,
+                            previous_status=old_status,
+                            new_status=ApplicationStatus.DITOLAK.value,
+                        )
+                        await uow.applications.save_status_history(history)
+                    any_expired = True
+
+            if any_expired:
+                await uow.commit()
+
             offers = await uow.offers.list_by_student_id(
                 student_id=student.profile_id,
                 status_filter=status_filter,
@@ -156,6 +195,7 @@ class OfferService:
                 internship_title = "Unknown"
                 company_name = "Unknown"
                 location = ""
+                company_photo = None
                 if app:
                     internship = await uow.internships.get_by_id(app.internship_id)
                     if internship:
@@ -164,6 +204,10 @@ class OfferService:
                         company = await uow.companies.get_by_id(internship.company_id)
                         if company:
                             company_name = company.company_name
+                            if company.photo_profile_id:
+                                doc_comp = await uow.documents.get_by_id(company.photo_profile_id)
+                                if doc_comp:
+                                    company_photo = doc_comp.file_url
 
                 items.append(
                     StudentOfferListItem(
@@ -178,6 +222,7 @@ class OfferService:
                             title=internship_title,
                             company_name=company_name,
                             location=location,
+                            photo_profile_url=company_photo,
                         ),
                         status=offer.status,
                     )

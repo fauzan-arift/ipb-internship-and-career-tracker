@@ -108,6 +108,34 @@ class SQLAlchemyApplicationRepository(IApplicationRepository):
         )
         return r.scalar_one()
 
+    async def count_accepted_by_internship(self, internship_id: UUID) -> int:
+        from app.domain.entities.enums import ApplicationStatus
+        r = await self._session.execute(
+            select(func.count())
+            .select_from(ApplicationORM)
+            .where(
+                ApplicationORM.internship_id == internship_id,
+                ApplicationORM.status.in_([ApplicationStatus.ACCEPTED, ApplicationStatus.DITERIMA])
+            )
+        )
+        return r.scalar_one()
+
+    async def count_accepted_by_internship_ids(self, internship_ids: List[UUID]) -> dict[UUID, int]:
+        if not internship_ids:
+            return {}
+            
+        from app.domain.entities.enums import ApplicationStatus
+        r = await self._session.execute(
+            select(ApplicationORM.internship_id, func.count())
+            .select_from(ApplicationORM)
+            .where(
+                ApplicationORM.internship_id.in_(internship_ids),
+                ApplicationORM.status.in_([ApplicationStatus.ACCEPTED, ApplicationStatus.DITERIMA])
+            )
+            .group_by(ApplicationORM.internship_id)
+        )
+        return {row[0]: row[1] for row in r.all()}
+
     async def save(self, application: Application) -> Application:
         existing = None
         if application.id:

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-function AvatarSquare({ name, bg = '#3D3FA8', color = '#FFFFFF', size = 40 }) {
+function AvatarSquare({ name, imageUrl, bg = '#3D3FA8', color = '#FFFFFF', size = 40 }) {
+  const [hasError, setHasError] = useState(false);
+  
   // 🛡️ Guard: Jika name undefined/null/empty, pakai '?'
   const safeName = name || '?';
   const initials = safeName
@@ -8,6 +10,24 @@ function AvatarSquare({ name, bg = '#3D3FA8', color = '#FFFFFF', size = 40 }) {
     .slice(0, 2)
     .map((word) => word[0].toUpperCase())
     .join('');
+
+  if (imageUrl && !hasError) {
+    return (
+      <img
+        src={imageUrl}
+        alt={safeName}
+        onError={() => setHasError(true)}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: '8px',
+          objectFit: 'cover',
+          border: '1px solid #E5E7EB',
+          flexShrink: 0,
+        }}
+      />
+    );
+  }
 
   return (
     <div

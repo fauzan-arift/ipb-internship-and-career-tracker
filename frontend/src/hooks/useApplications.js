@@ -164,6 +164,7 @@ export function useApplications() {
         position: data.internship?.title || 'Posisi Tidak Diketahui',
         company: data.internship?.company?.company_name || 'Perusahaan Tidak Diketahui',
         logo: getInitials(data.internship?.company?.company_name) || '?',
+        logoUrl: data.internship?.company?.photo_profile_url,
         status: data.status,
         application_time: data.application_time,
         status_history: transformedHistory,

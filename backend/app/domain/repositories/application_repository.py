@@ -40,6 +40,14 @@ class IApplicationRepository(ABC):
         ...
 
     @abstractmethod
+    async def count_accepted_by_internship(self, internship_id: UUID) -> int:
+        ...
+
+    @abstractmethod
+    async def count_accepted_by_internship_ids(self, internship_ids: List[UUID]) -> dict[UUID, int]:
+        ...
+
+    @abstractmethod
     async def save(self, application: Application) -> Application:
         ...
 

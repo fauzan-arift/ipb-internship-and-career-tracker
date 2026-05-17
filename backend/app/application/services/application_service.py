@@ -84,6 +84,38 @@ class ApplicationService:
 
         return InternshipBrief(id=internship_id, title=internship.title, company=company_brief)
 
+    async def _auto_expire_pending_offers(self, uow, student_id: UUID) -> None:
+        from datetime import date
+        pending_offers = await uow.offers.list_by_student_id(
+            student_id=student_id,
+            status_filter="Pending",
+        )
+        any_expired = False
+        for offer in pending_offers:
+            if date.today() > offer.expiry_date:
+                # Update offer status to Rejected
+                updated_offer = offer.model_copy(update={"status": "Rejected"})
+                await uow.offers.save(updated_offer)
+
+                # Update application status to Ditolak
+                app = await uow.applications.get_by_id(offer.application_id)
+                if app:
+                    old_status = app.status.value
+                    updated_app = app.model_copy(update={"status": ApplicationStatus.DITOLAK})
+                    await uow.applications.save(updated_app)
+
+                    # Write history
+                    history = ApplicationStatusHistory(
+                        application_id=app.id,
+                        previous_status=old_status,
+                        new_status=ApplicationStatus.DITOLAK.value,
+                    )
+                    await uow.applications.save_status_history(history)
+                any_expired = True
+
+        if any_expired:
+            await uow.commit()
+
     # ─────────────────────────────────────────────────────────────
     # Student-facing
     # ─────────────────────────────────────────────────────────────
@@ -93,9 +125,10 @@ class ApplicationService:
     ) -> StudentApplicationListResponse:
         async with self.uow as uow:
             student = await self._resolve_student_profile(uow, student_user_id)
+            await self._auto_expire_pending_offers(uow, student.profile_id)
             # student.profile_id = students table PK, used as FK in applications
             apps = await uow.applications.list_by_student(student.profile_id)
-
+            
             total = len(apps)
             accepted = sum(1 for a in apps if a.status.value in _ACCEPTED_STATUSES)
             rejected = sum(1 for a in apps if a.status.value in _REJECTED_STATUSES)
@@ -128,6 +161,7 @@ class ApplicationService:
     ) -> StudentApplicationDetailResponse:
         async with self.uow as uow:
             student = await self._resolve_student_profile(uow, student_user_id)
+            await self._auto_expire_pending_offers(uow, student.profile_id)
             app = await uow.applications.get_by_id(application_id)
 
             if not app or app.student_id != student.profile_id:
@@ -271,6 +305,12 @@ class ApplicationService:
                 if doc:
                     cv_url = doc.file_url
 
+            photo_profile_url = None
+            if getattr(student_profile, 'photo_profile_id', None):
+                doc = await uow.documents.get_by_id(student_profile.photo_profile_id)
+                if doc:
+                    photo_profile_url = doc.file_url
+
             # student_profile.skills is already List[str] from the domain mapper
             skill_names = student_profile.skills if student_profile.skills else []
 
@@ -301,6 +341,7 @@ class ApplicationService:
                 email=user_orm.email if user_orm else "",
                 skills=skill_names,
                 cv_url=cv_url,
+                photo_profile_url=photo_profile_url,
             ),
             status_history=history_resp,
         )

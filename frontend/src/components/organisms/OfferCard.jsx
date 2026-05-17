@@ -52,6 +52,7 @@ function OfferCard({ offer, onAccept, onReject }) {
         <div className="flex items-start gap-4">
           <AvatarSquare
             name={offer.companyInitial}
+            imageUrl={offer.companyLogoUrl}
             bg="#1A1A1A"
             color="#FFFFFF"
             size={56}

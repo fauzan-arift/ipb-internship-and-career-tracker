@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { offerService } from "@/services/offerService";
+import { hrApplicationService } from "@/services/hrApplicationService";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -119,6 +121,47 @@ export default function Sidebar({ role = "student" }) {
   const [collapsed, setCollapsed] = useState(false);
   const items = sidebarMenus[role] ?? [];
 
+  const [offersCount, setOffersCount] = useState(0);
+  const [applicantsCount, setApplicantsCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+
+    const fetchCounts = async () => {
+      if (role === "student") {
+        try {
+          const data = await offerService.getOffers();
+          const list = data?.offers ?? [];
+          const pending = list.filter((o) => o.status === "Pending" || o.status === "PENDING").length;
+          if (active) setOffersCount(pending);
+        } catch (err) {
+          console.warn("Failed to fetch sidebar offers count:", err);
+        }
+      } else if (role === "hr") {
+        try {
+          const data = await hrApplicationService.getAllApplicants({ status: "Pending" });
+          const total = data?.total ?? 0;
+          if (active) setApplicantsCount(total);
+        } catch (err) {
+          console.warn("Failed to fetch sidebar applicants count:", err);
+        }
+      }
+    };
+
+    fetchCounts();
+
+    window.addEventListener("refresh-sidebar-badge", fetchCounts);
+
+    // Refetch on location change & interval of 15 seconds
+    const interval = setInterval(fetchCounts, 15000);
+
+    return () => {
+      active = false;
+      window.removeEventListener("refresh-sidebar-badge", fetchCounts);
+      clearInterval(interval);
+    };
+  }, [role, location.pathname]);
+
   return (
     <aside
       style={{
@@ -174,6 +217,10 @@ export default function Sidebar({ role = "student" }) {
             location.pathname === item.href ||
             location.pathname.startsWith(item.href + "/");
 
+          const hasBadge = (item.label === "Tawaran Lowongan" && offersCount > 0) ||
+                            (item.label === "Daftar Pelamar" && applicantsCount > 0);
+          const badgeValue = item.label === "Tawaran Lowongan" ? offersCount : applicantsCount;
+
           return (
             <Link
               key={item.href}
@@ -184,7 +231,7 @@ export default function Sidebar({ role = "student" }) {
                 alignItems: "center",
                 gap: "12px",
                 padding: collapsed ? "12px 0" : "12px 16px",
-                justifyContent: collapsed ? "center" : "flex-start",
+                justifyContent: collapsed ? "center" : "space-between",
                 borderLeft: `4px solid ${isActive ? "#4D44B5" : "transparent"}`,
                 backgroundColor: isActive ? "#E8F0FE" : "transparent",
                 color: isActive ? "#4D44B5" : "#6B7280",
@@ -197,15 +244,44 @@ export default function Sidebar({ role = "student" }) {
                 fontFamily: "Inter, sans-serif",
               }}
             >
-              {/* Icon inherits color from parent via currentColor */}
-              <span style={{ flexShrink: 0, display: "flex" }}>
-                {item.icon}
-              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", overflow: "hidden" }}>
+                {/* Icon inherits color from parent via currentColor */}
+                <span style={{ flexShrink: 0, display: "flex", position: "relative" }}>
+                  {item.icon}
+                  {collapsed && hasBadge && (
+                    <span style={{
+                      position: "absolute",
+                      top: "-2px",
+                      right: "-2px",
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      backgroundColor: "#EF4444",
+                      border: "1px solid #FFFFFF"
+                    }} />
+                  )}
+                </span>
 
-              {/* Label hidden when collapsed */}
-              {!collapsed && (
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {item.label}
+                {/* Label hidden when collapsed */}
+                {!collapsed && (
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {item.label}
+                  </span>
+                )}
+              </div>
+
+              {!collapsed && hasBadge && (
+                <span style={{
+                  backgroundColor: "#EF4444",
+                  color: "#FFFFFF",
+                  fontSize: "11px",
+                  fontWeight: "700",
+                  padding: "2px 6px",
+                  borderRadius: "9999px",
+                  lineHeight: "1",
+                  marginRight: "4px"
+                }}>
+                  {badgeValue}
                 </span>
               )}
             </Link>

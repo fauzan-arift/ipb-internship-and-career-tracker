@@ -17,6 +17,7 @@ function mapOffer(raw) {
     status:         raw.status ?? 'Pending',
     // OfferCard props
     companyInitial: raw.internship?.company_name?.charAt(0).toUpperCase() ?? '?',
+    companyLogoUrl: raw.internship?.photo_profile_url,
     companyName:    raw.internship?.company_name ?? '-',
     position:       raw.internship?.title ?? '-',
     location:       raw.internship?.location ?? '-',
@@ -60,6 +61,7 @@ export function useOffers() {
     );
     try {
       await offerService.respondOffer(offerId, 'Accepted');
+      window.dispatchEvent(new Event("refresh-sidebar-badge"));
     } catch (err) {
       console.error('[useOffers] accept error:', err);
       setOffers((prev) =>
@@ -75,6 +77,7 @@ export function useOffers() {
     );
     try {
       await offerService.respondOffer(offerId, 'Rejected');
+      window.dispatchEvent(new Event("refresh-sidebar-badge"));
     } catch (err) {
       console.error('[useOffers] reject error:', err);
       setOffers((prev) =>

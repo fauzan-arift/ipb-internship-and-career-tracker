@@ -91,6 +91,7 @@ export function useHrApplication(applicationId) {
     setSubmitting(true);
     try {
       const result = await hrApplicationService.createOffer(applicationId, offerData);
+      window.dispatchEvent(new Event("refresh-sidebar-badge"));
       return result;
     } catch (err) {
       console.error('Failed to create offer:', err);
@@ -114,6 +115,7 @@ export function useHrApplication(applicationId) {
     try {
       const result = await hrApplicationService.updateApplicationStatus(applicationId, status);
       setApplication(prev => ({ ...prev, status }));
+      window.dispatchEvent(new Event("refresh-sidebar-badge"));
       return result;
     } catch (err) {
       console.error('Failed to update status:', err);
