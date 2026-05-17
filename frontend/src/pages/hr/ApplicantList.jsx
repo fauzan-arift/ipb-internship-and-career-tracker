@@ -8,6 +8,7 @@ import PaginationInfo from '@/components/molecules/PaginationInfo';
 import SingleStatCard from '@/components/molecules/SingleStatCard';
 import SearchBar from '@/components/molecules/SearchBar';
 import useApplicants from '@/hooks/useApplicants';
+import FilterButton from '@/components/molecules/FilterButton';
 
 const COLUMNS = [
   { key: 'name', label: 'Nama Mahasiswa' },
@@ -47,46 +48,20 @@ function ApplicantList() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <PaginationInfo from={from} to={to} total={total} label="pelamar" />
           
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              style={{
-                backgroundColor: '#3D3FA8',
-                color: '#FFFFFF',
-                padding: '6px 32px 6px 14px',
-                fontSize: '13px',
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: '600',
-                border: 'none',
-                borderRadius: '8px',
-                appearance: 'none',
-                cursor: 'pointer',
-                outline: 'none',
-              }}
-            >
-              <option value="">Filter: Semua Status</option>
-              <option value="Pending">Status: Pending</option>
-              <option value="Diproses">Status: Diproses</option>
-              <option value="Review HR">Status: Review HR</option>
-              <option value="Interview">Status: Interview</option>
-              <option value="Ditawarkan">Status: Ditawarkan</option>
-              <option value="Diterima">Status: Diterima</option>
-              <option value="Ditolak">Status: Ditolak</option>
-            </select>
-            <div style={{
-              position: 'absolute',
-              right: '10px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              pointerEvents: 'none',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-            }}>
-              <ChevronDown size={14} />
-            </div>
-          </div>
+          <FilterButton
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            defaultLabel="Semua Status"
+            options={[
+              { value: 'Pending', label: 'Pending' },
+              { value: 'Diproses', label: 'Diproses' },
+              { value: 'Review HR', label: 'Review HR' },
+              { value: 'Interview', label: 'Interview' },
+              { value: 'Ditawarkan', label: 'Ditawarkan' },
+              { value: 'Diterima', label: 'Diterima' },
+              { value: 'Ditolak', label: 'Ditolak' },
+            ]}
+          />
         </div>
 
         {error ? (
