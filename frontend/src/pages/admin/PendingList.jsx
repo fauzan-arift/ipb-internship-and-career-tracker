@@ -5,6 +5,7 @@ import api from '@/api/axios';
 import DashboardStatsRow from '@/components/organisms/DashboardStatsRow';
 import DataTable from '@/components/organisms/DataTable';
 import SearchBar from '@/components/molecules/SearchBar';
+import FilterButton from '@/components/molecules/FilterButton';
 
 const COLUMNS = [
   { key: 'name', label: 'Nama Perusahaan' },
@@ -150,42 +151,16 @@ const PendingList = () => {
           >
             Daftar Perusahaan Terbaru
           </span>
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              style={{
-                backgroundColor: '#3D3FA8',
-                color: '#FFFFFF',
-                padding: '6px 32px 6px 14px',
-                fontSize: '13px',
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: '600',
-                border: 'none',
-                borderRadius: '8px',
-                appearance: 'none',
-                cursor: 'pointer',
-                outline: 'none',
-              }}
-            >
-              <option value="all">Filter: Semua</option>
-              <option value="pending">Status: Belum Verifikasi</option>
-              <option value="verified">Status: Terverifikasi</option>
-              <option value="rejected">Status: Ditolak</option>
-            </select>
-            <div style={{
-              position: 'absolute',
-              right: '10px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              pointerEvents: 'none',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-            }}>
-              <ChevronDown size={14} />
-            </div>
-          </div>
+          <FilterButton
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            defaultLabel="Semua"
+            options={[
+              { value: 'pending', label: 'Belum Verifikasi' },
+              { value: 'verified', label: 'Terverifikasi' },
+              { value: 'rejected', label: 'Ditolak' },
+            ]}
+          />
         </div>
 
         {isLoading ? (

@@ -15,8 +15,8 @@ import useToast from '@/hooks/useToast';
 import Toast from '@/components/atoms/Toast';
 
 const STATUS_GAJI_OPTIONS = [
-  { value: 'PAID', label: 'Paid Internship' },
-  { value: 'UNPAID', label: 'Unpaid Internship' },
+  { value: 'Paid', label: 'Paid Internship' },
+  { value: 'Unpaid', label: 'Unpaid Internship' },
 ];
 
 const STATUS_PELAKSANAAN_OPTIONS = [
