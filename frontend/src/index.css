@@ -40,3 +40,17 @@ input::-webkit-credentials-auto-fill-button,
 input::-webkit-strong-password-auto-fill-button {
   display: none;
 }
+
+@font-face {
+  font-family: 'Barmeno';
+  src: url('./assets/fonts/Barmen Regular.ttf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Barmeno';
+  src: url('./assets/fonts/Barmeno Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}

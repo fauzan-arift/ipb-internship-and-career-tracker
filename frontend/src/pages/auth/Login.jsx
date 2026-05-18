@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/organisms/Navbar';
-import logoIPB from '@/assets/logo-ipb.png';
 import PageFooter from '@/components/organisms/PageFooter';
 import TextInput from '@/components/atoms/TextInput';
 import PasswordInput from '@/components/atoms/PasswordInput';
@@ -75,18 +74,45 @@ function Login() {
       <Navbar variant="auth" />
       <div className="p-0" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="p-6" style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', width: '100%', maxWidth: '440px', boxSizing: 'border-box' }}>
-          <div className="mb-6 gap-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <img src={logoIPB} alt="IPB Logo" style={{ height: '64px', width: 'auto' }} />
-            <h1 className="m-0" style={{ fontSize: '22px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif' }}>
-              IPB Internship Portal
-            </h1>
-          </div>
+          <div
+  className="mb-6"
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '10px',
+  }}
+>
+  <img
+    src="/Logo IPB Internship Portal - i nya doang.svg"
+    alt="IPB Logo"
+    style={{
+      height: '76px',
+      width: 'auto',
+    }}
+  />
 
-          <form 
-            onSubmit={onSubmitHandler} 
-            style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
+  <h1
+    className="m-0"
+    style={{
+      fontSize: '28px',
+      fontWeight: '700',
+      color: '#3D3FA8',
+      fontFamily: 'Barmeno, sans-serif',
+      letterSpacing: '0.4px',
+      lineHeight: 1.1,
+      textAlign: 'center',
+    }}
+  >
+    Internship Portal
+  </h1>
+</div>
+
+          <form
+            onSubmit={onSubmitHandler}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
               gap: '16px',
               backgroundColor: 'transparent',
               borderRadius: '0',
