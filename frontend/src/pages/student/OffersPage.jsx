@@ -34,9 +34,9 @@ function OffersPage() {
 
   if (error && offers.length === 0) {
     return (
-      <div className="h-full">
+      <div className="h-full p-0">
         <h1 className="text-2xl font-bold mb-6 text-gray-900">Tawaran Lowongan</h1>
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 flex items-center justify-between gap-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6 flex items-center justify-between gap-4">
           <span className="text-sm">{error}</span>
           <button
             onClick={refetch}
@@ -50,12 +50,12 @@ function OffersPage() {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full p-0">
       <h1 className="text-2xl font-bold mb-6 text-gray-900">Tawaran Lowongan</h1>
 
       {/* Non-fatal error (e.g. accept/reject failed) */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-5 flex items-center justify-between gap-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6 flex items-center justify-between gap-4">
           <span className="text-sm">{error}</span>
           <button
             onClick={refetch}
@@ -67,7 +67,7 @@ function OffersPage() {
       )}
 
       {offers.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500">
           Tidak ada tawaran lowongan saat ini.
         </div>
       ) : (

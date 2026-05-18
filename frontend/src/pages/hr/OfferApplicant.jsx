@@ -118,7 +118,7 @@ export default function OfferApplicant() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 w-full">
+    <div className="flex flex-col gap-6 p-0 w-full">
       <Breadcrumb
         items={[
           { label: 'Daftar Pelamar', href: '/hr/applicants' },
@@ -171,7 +171,7 @@ export default function OfferApplicant() {
             
           </div>
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-gray-800">Detail / Pesan Penawaran</label>
             <textarea
               value={formData.message}
@@ -184,7 +184,7 @@ export default function OfferApplicant() {
 
           <div>
             <div className="mb-2">
-              <div className="text-sm font-semibold text-gray-900 mb-1">Dokumen</div>
+              <div className="text-sm font-semibold text-gray-900 mb-2">Dokumen</div>
               <div className="text-sm text-gray-500">
                 Unggah File Penawaran Anda (Offering Letter).
               </div>
@@ -197,7 +197,7 @@ export default function OfferApplicant() {
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+          <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
             <Button variant="secondary" type="button" onClick={() => navigate('/hr/applicants')}>
               Batal
             </Button>

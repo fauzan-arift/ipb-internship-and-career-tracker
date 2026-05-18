@@ -9,7 +9,7 @@ import UploadZone from '@/components/atoms/UploadZone'
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 const SkillChip = ({ label, onRemove }) => (
-  <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#E8F0FE]">
+  <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#E8F0FE]">
     <span className="text-[#3730A3] font-medium text-xs leading-4">{label}</span>
     <button onClick={onRemove} className="flex items-center justify-center text-black hover:opacity-60 transition-opacity">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -64,7 +64,7 @@ const SkillDropdown = ({ value, onChange, onAdd, globalSkills, selectedSkills })
   }
 
   return (
-    <div ref={containerRef} style={{ position: 'relative' }}>
+    <div ref={containerRef} className="relative">
       {/* Input row */}
       <div className="flex items-center w-full">
         <input
@@ -94,19 +94,7 @@ const SkillDropdown = ({ value, onChange, onAdd, globalSkills, selectedSkills })
       {/* Dropdown list */}
       {isOpen && filtered.length > 0 && (
         <div
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 4px)',
-            left: 0,
-            right: 0,
-            backgroundColor: '#fff',
-            border: '1px solid #CBD0E0',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            maxHeight: '200px',
-            overflowY: 'auto',
-            zIndex: 50,
-          }}
+          className="absolute top-full mt-1 left-0 right-0 bg-white border border-[#CBD0E0] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-h-[200px] overflow-y-auto z-50"
         >
           {filtered.map((skill) => (
             <button
@@ -114,18 +102,8 @@ const SkillDropdown = ({ value, onChange, onAdd, globalSkills, selectedSkills })
               type="button"
               onMouseDown={(e) => e.preventDefault()} // prevent blur sebelum click
               onClick={() => handleSelect(skill)}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                padding: '10px 16px',
-                fontSize: '14px',
-                color: '#1B1B21',
-                backgroundColor: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'Inter, sans-serif',
-              }}
+              className="block w-full text-left px-4 py-3 text-sm text-[#1B1B21] bg-transparent border-none cursor-pointer"
+              style={{ fontFamily: 'Inter, sans-serif' }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4FF'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
@@ -138,34 +116,14 @@ const SkillDropdown = ({ value, onChange, onAdd, globalSkills, selectedSkills })
       {/* Kalau ketik skill baru yang tidak ada di list, tetap bisa tambah */}
       {isOpen && value.trim() && filtered.length === 0 && (
         <div
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 4px)',
-            left: 0,
-            right: 0,
-            backgroundColor: '#fff',
-            border: '1px solid #CBD0E0',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            zIndex: 50,
-          }}
+          className="absolute top-full mt-1 left-0 right-0 bg-white border border-[#CBD0E0] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-50"
         >
           <button
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => { onAdd(); setIsOpen(false) }}
-            style={{
-              display: 'block',
-              width: '100%',
-              textAlign: 'left',
-              padding: '10px 16px',
-              fontSize: '14px',
-              color: '#4D44B5',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontFamily: 'Inter, sans-serif',
-            }}
+            className="block w-full text-left px-4 py-3 text-sm text-[#4D44B5] bg-transparent border-none cursor-pointer"
+            style={{ fontFamily: 'Inter, sans-serif' }}
           >
             + Tambah "{value.trim()}"
           </button>
@@ -401,19 +359,19 @@ export default function StudentProfile() {
 
   // ── Loading ──
   if (isLoading) return (
-    <div className="px-8 py-8 max-w-5x1 mx-auto">
+    <div className="p-0 max-w-5x1 mx-auto">
       <ProfileSkeleton />
     </div>
   )
 
   // ── Error ──
   if (isError) return (
-    <div className="px-8 py-8 max-w-5x1 mx-auto flex flex-col items-center gap-4 mt-16">
+    <div className="p-0 max-w-5x1 mx-auto flex flex-col items-center gap-4 mt-16">
       <p className="text-[#1B1B21] text-lg font-semibold">Gagal memuat profil</p>
       <p className="text-[#454651] text-sm">{errorMsg}</p>
       <button
         onClick={() => window.location.reload()}
-        className="px-5 py-2 rounded-lg bg-[#4D44B5] text-white text-sm font-medium hover:bg-[#3d369a] transition-colors"
+        className="px-4 py-3.5 rounded-lg bg-[#4D44B5] text-white text-sm font-medium hover:bg-[#3d369a] transition-colors"
       >
         Coba Lagi
       </button>
@@ -422,24 +380,24 @@ export default function StudentProfile() {
 
   // ── Render ──
   return (
-    <div className="px-8 py-8 max-w-250 mx-auto flex flex-col gap-6">
+    <div className="p-0 max-w-250 mx-auto flex flex-col gap-6">
 
       {successMsg && (
-        <div className="px-4 py-3 rounded-lg bg-[#D1FAE5] border border-[#6EE7B7] text-[#065F46] text-sm font-medium">
+        <div className="px-4 py-4 rounded-lg bg-[#D1FAE5] border border-[#6EE7B7] text-[#065F46] text-sm font-medium">
           {successMsg}
         </div>
       )}
       {errorMsg && !isError && (
-        <div className="px-4 py-3 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-[#B91C1C] text-sm font-medium">
+        <div className="px-4 py-4 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-[#B91C1C] text-sm font-medium">
           {errorMsg}
         </div>
       )}
 
       {/* ── Data Diri ── */}
-      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-5">
+      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-6">
 
         {/* Avatar */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <div className="w-20 h-20 rounded-2xl border border-gray-200 bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0">
             {photoUrl
               ? <img src={photoUrl} alt="Foto profil" className="w-full h-full object-cover" />
@@ -467,7 +425,7 @@ export default function StudentProfile() {
           )}
         </div>
 
-        <div className="border-b border-[#DBD9E1] pb-1">
+        <div className="border-b border-[#DBD9E1] pb-2">
           <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Data Diri</h2>
         </div>
 
@@ -541,7 +499,7 @@ export default function StudentProfile() {
         </div>
 
       {/* ── Dokumen ── */}
-      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-3">
+      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
         <UploadZone
           accept=".pdf,.doc,.docx"
           file={newCvFile}
@@ -558,7 +516,7 @@ export default function StudentProfile() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4D44B5] text-white font-medium text-base hover:bg-[#3d369a] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-3.5 rounded-lg bg-[#4D44B5] text-white font-medium text-base hover:bg-[#3d369a] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <SaveIcon />
           {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}

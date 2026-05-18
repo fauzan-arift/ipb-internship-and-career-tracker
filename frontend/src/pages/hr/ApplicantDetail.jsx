@@ -52,14 +52,14 @@ function TimelineProgress({ timeline }) {
         }
 
         return (
-          <div key={index} className="relative flex gap-4 pb-8 last:pb-0">
+          <div key={index} className="relative flex gap-4 pb-6 last:pb-0">
             {index < timeline.length - 1 && (
               <div className={`absolute left-[11px] top-5 bottom-0 w-0.5 ${lineColor}`} />
             )}
             <div className={`w-5 h-5 rounded-full ${dotColor} flex-shrink-0 relative z-10 border-2 border-white shadow-sm`} />
-            <div className="flex-1 pt-0.5">
+            <div className="flex-1 pt-2">
               <div className={`font-semibold text-sm ${textColor}`}>{item.stage}</div>
-              <div className="text-xs text-gray-500 mt-0.5">
+              <div className="text-xs text-gray-500 mt-2">
                 {item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
               </div>
             </div>
@@ -125,7 +125,7 @@ export default function ApplicantDetail() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4">
+    <div className="flex flex-col gap-6 p-0">
       <Breadcrumb
         items={[
           { label: 'Daftar Pelamar', href: '/hr/applicants' },
@@ -143,7 +143,7 @@ export default function ApplicantDetail() {
           </div>
         </div>
 
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex gap-4 flex-wrap">
           <Button 
             variant="primary" 
             onClick={openModal}
@@ -213,7 +213,7 @@ export default function ApplicantDetail() {
             </h3>
             <div className="space-y-4">
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   Posisi Dilamar
                 </div>
                 <div className="text-base font-semibold text-gray-900">
@@ -221,7 +221,7 @@ export default function ApplicantDetail() {
                 </div>
               </div>
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   Tanggal Melamar
                 </div>
                 <div className="text-base font-semibold text-gray-900">

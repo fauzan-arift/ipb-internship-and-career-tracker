@@ -143,13 +143,13 @@ function EditInternship() {
   }
 
   if (isFetching) return (
-    <div style={{ textAlign: 'center', padding: '40px', fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+    <div className="text-center p-6" style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
       Memuat data lowongan...
     </div>
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="flex flex-col gap-6 p-0">
       <Breadcrumb
         items={[
           { label: 'Kelola Lowongan', href: '/hr/dashboard' },
@@ -247,7 +247,7 @@ function EditInternship() {
       </FormSectionCard>
 
       {apiError && (
-        <div style={{ padding: '12px 16px', backgroundColor: '#FDECEA', color: '#8B1A1A', borderRadius: '8px', fontSize: '14px', fontFamily: 'Inter, sans-serif' }}>
+        <div className="p-4" style={{ backgroundColor: '#FDECEA', color: '#8B1A1A', borderRadius: '8px', fontSize: '14px', fontFamily: 'Inter, sans-serif' }}>
           {apiError}
         </div>
       )}

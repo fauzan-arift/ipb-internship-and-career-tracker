@@ -72,27 +72,26 @@ const RegisterStudent = () => {
   const sectionTitle = {
     fontSize: '15px', fontWeight: '600', color: '#3D3FA8',
     fontFamily: 'Inter, sans-serif', borderBottom: '1px solid #E5E7EB',
-    paddingBottom: '8px', margin: '8px 0 4px 0',
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <div style={{
+    <div className="p-0" style={{ display: 'flex', justifyContent: 'center' }}>
+      <div className="p-6" style={{
         backgroundColor: '#FFFFFF', borderRadius: '12px',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '40px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
         width: '100%', maxWidth: '520px', boxSizing: 'border-box'
       }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif', margin: '0 0 24px 0', textAlign: 'center' }}>
+        <h1 className="m-0 mb-6" style={{ fontSize: '22px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif', textAlign: 'center' }}>
           Registrasi Mahasiswa
         </h1>
 
         {status.msg && (
-          <div style={{
+          <div className="p-4 mb-4" style={{
             backgroundColor: status.type === 'error' ? '#FEE2E2' : '#D1FAE5',
             border: `1px solid ${status.type === 'error' ? '#FECACA' : '#6EE7B7'}`,
-            borderRadius: '8px', padding: '10px 14px',
+            borderRadius: '8px',
             color: status.type === 'error' ? '#DC2626' : '#065F46',
-            fontSize: '13px', fontFamily: 'Inter, sans-serif', marginBottom: '16px'
+            fontSize: '13px', fontFamily: 'Inter, sans-serif'
           }}>
             {status.msg}
           </div>
@@ -103,7 +102,7 @@ const RegisterStudent = () => {
             style={{ 
               display: 'flex', 
               flexDirection: 'column', 
-              gap: '14px',
+              gap: '16px',
               backgroundColor: 'transparent',
               borderRadius: '0',
               padding: '0',
@@ -112,7 +111,7 @@ const RegisterStudent = () => {
               maxWidth: '100%',
             }}
           >
-          <p style={sectionTitle}>Data Pribadi</p>
+          <p className="mt-2 mb-2 pb-2" style={sectionTitle}>Data Pribadi</p>
 
           <FormField label="Nama Lengkap *">
             <TextInput placeholder="Nama lengkap sesuai KTP"
@@ -144,7 +143,7 @@ const RegisterStudent = () => {
             />
           </FormField>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="gap-4" style={{ display: 'flex' }}>
             <div style={{ flex: 1 }}>
               <FormField label="Tahun Lulus">
                 <TextInput placeholder="2026" type="number"
@@ -166,7 +165,7 @@ const RegisterStudent = () => {
               value={formData.phone_number} onChange={handleChange} name="phone_number" />
           </FormField>
 
-          <p style={sectionTitle}>Akun</p>
+          <p className="mt-2 mb-2 pb-2" style={sectionTitle}>Akun</p>
 
           <FormField label="Email IPB * (@apps.ipb.ac.id)">
             <TextInput type="email" placeholder="nama@apps.ipb.ac.id"
@@ -179,11 +178,11 @@ const RegisterStudent = () => {
               minLength={8} required />
           </FormField>
 
-          <Button type="submit" variant="primary" fullWidth disabled={isLoading} style={{ marginTop: '8px' }}>
+          <Button type="submit" variant="primary" fullWidth disabled={isLoading} className="mt-2">
             {isLoading ? 'Mendaftarkan...' : 'Daftar Mahasiswa'}
           </Button>
 
-          <p style={{ textAlign: 'center', fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif', margin: 0 }}>
+          <p className="m-0" style={{ textAlign: 'center', fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
             Sudah punya akun?{' '}
             <span onClick={() => navigate('/login')} style={{ color: '#3D3FA8', cursor: 'pointer', fontWeight: '500' }}>
               Login di sini

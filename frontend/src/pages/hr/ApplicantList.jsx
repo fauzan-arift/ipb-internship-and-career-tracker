@@ -27,16 +27,16 @@ function ApplicantList() {
   } = useApplicants();
 
   return (
-    <div>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif', marginBottom: '24px' }}>
+    <div className="px-0">
+      <h1 className="mb-6" style={{ fontSize: '24px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}>
         Daftar Pelamar
       </h1>
 
-      <div style={{ marginBottom: '20px' }}>
+      <div className="mb-6">
         <SingleStatCard label="Total Pelamar" value={total} />
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
+      <div className="mb-6">
         <SearchBar
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -44,8 +44,8 @@ function ApplicantList() {
         />
       </div>
 
-      <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #E5E7EB', padding: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+      <div className="p-4" style={{ background: '#fff', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
+        <div className="flex items-center justify-between mb-4">
           <PaginationInfo from={from} to={to} total={total} label="pelamar" />
           
           <FilterButton
@@ -65,11 +65,11 @@ function ApplicantList() {
         </div>
 
         {error ? (
-          <div style={{ textAlign: 'center', padding: '32px 0', color: '#E53E3E' }}>
+          <div className="text-center py-8" style={{ color: '#E53E3E' }}>
             <p>{error}</p>
           </div>
         ) : loading ? (
-          <div style={{ textAlign: 'center', padding: '32px 0', color: '#6B7280' }}>
+          <div className="text-center py-8" style={{ color: '#6B7280' }}>
             <p>Memuat data pelamar...</p>
           </div>
         ) : (
@@ -92,7 +92,7 @@ function ApplicantList() {
         )}
 
         {totalPages > 1 && (
-          <div style={{ marginTop: '16px' }}>
+          <div className="mt-4">
             <Pagination
               currentPage={page}
               totalPages={totalPages}

@@ -109,9 +109,9 @@ function HRDashboard() {
   const totalPages = Math.ceil((total || 0) / ITEMS_PER_PAGE);
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif', margin: 0 }}>
+    <div className="p-0">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="m-0" style={{ fontSize: '24px', fontWeight: '700', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}>
           Kelola Lowongan
         </h1>
         <Button variant="primary" onClick={() => navigate('/hr/dashboard/new')}>
@@ -120,7 +120,7 @@ function HRDashboard() {
         </Button>
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
+      <div className="mb-6">
         <SearchBar
           value={search}
           onChange={onSearchChange}
@@ -162,7 +162,7 @@ function HRDashboard() {
       />
 
       {totalPages > 1 && (
-        <div style={{ marginTop: '16px', padding: '0 8px' }}>
+        <div className="mt-4 px-2">
           <Pagination
             currentPage={page}
             totalPages={totalPages}
@@ -194,7 +194,7 @@ function HRDashboard() {
         }
       >
         {pendingAction.action === 'reopen' && (
-          <div style={{ marginTop: '16px' }}>
+          <div className="mt-4">
             <DatePicker
               label="Tanggal Penutupan Baru"
               value={reopenDate}

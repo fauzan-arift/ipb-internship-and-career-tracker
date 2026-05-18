@@ -5,19 +5,19 @@ const Home = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="text-center py-12">Loading...</div>;
+    return <div className="text-center p-0">Loading...</div>;
   }
 
   if (!isAuthenticated || !user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">Selamat Datang di IPB Internship Portal</h1>
-        <p className="text-lg text-gray-600 mb-8 max-w-md">
+        <p className="text-lg text-gray-600 mb-6 max-w-md">
           Sistem informasi terpadu untuk pelayanan Magang Mahasiswa dan Rekrutmen Perusahaan di IPB University.
         </p>
-        <div className="flex space-x-4">
-          <Link to="/login" className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700">Masuk (Login)</Link>
-          <Link to="/register/student" className="px-6 py-2 bg-white text-blue-600 border border-blue-600 font-semibold rounded-lg shadow-sm hover:bg-gray-50">Daftar Mahasiswa</Link>
+        <div className="flex gap-4">
+          <Link to="/login" className="px-4 py-3.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700">Masuk (Login)</Link>
+          <Link to="/register/student" className="px-4 py-3.5 bg-white text-blue-600 border border-blue-600 font-semibold rounded-lg shadow-sm hover:bg-gray-50">Daftar Mahasiswa</Link>
         </div>
       </div>
     );
