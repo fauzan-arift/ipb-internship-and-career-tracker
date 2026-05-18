@@ -25,6 +25,12 @@ class FileService:
         original_name = file.filename or "file"
         ext = os.path.splitext(original_name)[-1].lower()
 
+        if document_type == "CV" and ext != ".pdf":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="File CV wajib berupa PDF.",
+            )
+
         if ext not in ALLOWED_EXTENSIONS:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

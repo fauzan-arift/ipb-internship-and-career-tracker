@@ -32,6 +32,7 @@ class AdminService:
                     "position": hr.position,
                     "phone_number": hr.phone_number,
                     "company_name": company.company_name if company else None,
+                    "industry": company.industry if company else None,
                     "registered_at": (
                         company.registration_date.isoformat()
                         if company and company.registration_date else None
@@ -54,6 +55,7 @@ class AdminService:
                     "position": hr.position,
                     "phone_number": hr.phone_number,
                     "company_name": company.company_name if company else None,
+                    "industry": company.industry if company else None,
                     "status": hr.status.value if hr else None,
                     "registered_at": (
                         company.registration_date.isoformat()
@@ -101,6 +103,8 @@ class AdminService:
                 "website": company.website if company else None,
                 "description": company.description if company else None,
                 "company_email": company.email if company else None,
+                "registration_date": company.registration_date if company else None,
+                "verified_at": company.verified_at if company else None,
             } if company else None,
             "npwp_document": {
                 "document_id": npwp_doc.id,

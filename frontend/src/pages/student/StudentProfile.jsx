@@ -292,7 +292,14 @@ export default function StudentProfile() {
     e.preventDefault()
     setIsDragging(false)
     const file = e.dataTransfer.files?.[0]
-    if (file) setNewCvFile(file)
+    if (file) {
+      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+        setErrorMsg('Format file CV wajib berupa PDF!')
+        setTimeout(() => setErrorMsg(''), 5000)
+        return
+      }
+      setNewCvFile(file)
+    }
   }
 
   // ── Photo ──
@@ -501,13 +508,20 @@ export default function StudentProfile() {
       {/* ── Dokumen ── */}
       <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
         <UploadZone
-          accept=".pdf,.doc,.docx"
+          accept=".pdf"
           file={newCvFile}
           existingFileUrl={cvUrl}
           existingFileName="CV Tersimpan"
-          hint="PDF/DOC/DOCX"
+          hint="Hanya file PDF (maks. 5 MB)"
           allowRemove={!!newCvFile}  // hanya bisa hapus kalau file baru, bukan file server
-          onChange={(file) => setNewCvFile(file)}
+          onChange={(file) => {
+            if (file && file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+              setErrorMsg('Format file CV wajib berupa PDF!')
+              setTimeout(() => setErrorMsg(''), 5000)
+              return
+            }
+            setNewCvFile(file)
+          }}
         />
       </div>
 

@@ -17,7 +17,15 @@ function Login() {
   const [apiError, setApiError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
+
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === 'ADMIN') navigate('/admin/dashboard');
+      else if (user.role === 'HR') navigate('/hr/dashboard');
+      else if (user.role === 'STUDENT') navigate('/internship');
+    }
+  }, [isAuthenticated, user, navigate]);
 
   function validate() {
     const newErrors = {};

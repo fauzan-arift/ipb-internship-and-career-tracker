@@ -43,6 +43,8 @@ class CompanyInfo(BaseModel):
     website: Optional[str] = None
     description: Optional[str] = None
     company_email: Optional[str] = None
+    registration_date: Optional[datetime] = None
+    verified_at: Optional[datetime] = None
 
 
 class NPWPDocumentInfo(BaseModel):

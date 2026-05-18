@@ -22,7 +22,7 @@ const PendingList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,12 +72,12 @@ const PendingList = () => {
     .map((hr) => ({
       id: hr.hr_profile_id || hr.hr_id,
       name: hr.company_name || 'Tidak ada nama',
-      industry: hr.position || '-',
+      industry: hr.industry || '-',
       status: hr.status ? hr.status.toLowerCase() : 'pending',
       createdAt: hr.registered_at ? new Date(hr.registered_at).toLocaleDateString('id-ID') : (hr.verified_at ? new Date(hr.verified_at).toLocaleDateString('id-ID') : '-'),
     }))
     .filter((hr) => hr.name.toLowerCase().includes(search.toLowerCase()))
-    .filter((hr) => filterStatus === 'all' || hr.status === filterStatus);
+    .filter((hr) => !filterStatus || filterStatus === 'all' || hr.status === filterStatus);
 
   const displayStats = [
     { label: 'TOTAL PERUSAHAAN', value: stats.total, icon: <Building2 size={22} /> },

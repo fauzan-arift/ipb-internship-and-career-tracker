@@ -62,7 +62,7 @@ function AppRoutes() {
       />
 
       {/* ── Home ── */}
-      <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
       {/* ── Admin ── */}
       <Route

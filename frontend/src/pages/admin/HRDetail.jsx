@@ -228,6 +228,28 @@ const HRDetail = () => {
       label: 'Alamat Lengkap',
       value: detail.company?.address,
     },
+    {
+      label: 'Tanggal Registrasi',
+      value: detail.company?.registration_date
+        ? new Date(detail.company.registration_date).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })
+        : '-',
+    },
+    ...(isVerified && detail.company?.verified_at
+      ? [
+          {
+            label: 'Tanggal Verifikasi',
+            value: new Date(detail.company.verified_at).toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            }),
+          },
+        ]
+      : []),
   ];
 
   const documents = detail.npwp_document
@@ -310,6 +332,7 @@ const HRDetail = () => {
   );
 
   const registeredAtRaw =
+    detail.company?.registration_date ??
     detail.npwp_document?.upload_date ??
     detail?.hr?.registered_at ??
     detail?.registered_at ??

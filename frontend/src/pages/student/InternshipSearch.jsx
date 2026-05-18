@@ -24,6 +24,43 @@ function getTagLabel(status) {
   return n;
 }
 
+const InternshipCardSkeleton = () => (
+  <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm animate-pulse flex flex-col gap-4">
+    {/* Tags */}
+    <div className="flex gap-2">
+      <div className="h-6 w-16 bg-gray-200 rounded-full" />
+      <div className="h-6 w-24 bg-gray-200 rounded-full" />
+    </div>
+
+    {/* Avatar & Title */}
+    <div className="flex items-center gap-4 my-2">
+      <div className="h-12 w-12 bg-gray-200 rounded-lg shrink-0" />
+      <div className="flex flex-col gap-2 w-full">
+        <div className="h-4 bg-gray-200 rounded w-3/4" />
+        <div className="h-3 bg-gray-200 rounded w-1/2" />
+      </div>
+    </div>
+
+    {/* Location & Duration */}
+    <div className="space-y-3 my-2">
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 bg-gray-200 rounded-full shrink-0" />
+        <div className="h-3 bg-gray-200 rounded w-2/3" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 bg-gray-200 rounded-full shrink-0" />
+        <div className="h-3 bg-gray-200 rounded w-1/2" />
+      </div>
+    </div>
+
+    {/* Footer */}
+    <div className="flex justify-between items-center border-t pt-4 border-gray-100 mt-2">
+      <div className="h-3 bg-gray-200 rounded w-20" />
+      <div className="h-8 bg-gray-200 rounded-lg w-24" />
+    </div>
+  </div>
+);
+
 function InternshipSearch() {
   const navigate = useNavigate();
   const { internships, searchQuery, setSearchQuery, isLoading, error } = useInternships();
@@ -56,40 +93,44 @@ function InternshipSearch() {
         />
       </div>
 
-      {isLoading && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-600 shadow-sm">
-          Memuat lowongan magang...
-        </div>
-      )}
-
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6 mb-6">
           {error}
         </div>
       )}
 
-      {!isLoading && !error && mappedInternships.length === 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
-          Tidak ada lowongan magang yang sesuai.
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <InternshipCardSkeleton key={idx} />
+          ))}
         </div>
-      )}
+      ) : (
+        <>
+          {!error && mappedInternships.length === 0 && (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
+              Tidak ada lowongan magang yang sesuai.
+            </div>
+          )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {mappedInternships.map((item) => (
-          <InternshipCard
-            key={item.id}
-            tags={item.tags}
-            companyName={item.companyName}
-            companyInitial={item.companyInitial}
-            companyLogoUrl={item.companyLogoUrl}
-            position={item.position}
-            location={item.location}
-            duration={item.duration}
-            deadline={item.deadline}
-            onDetailClick={() => navigate(`/internship/${item.id}`)}
-          />
-        ))}
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {mappedInternships.map((item) => (
+              <InternshipCard
+                key={item.id}
+                tags={item.tags}
+                companyName={item.companyName}
+                companyInitial={item.companyInitial}
+                companyLogoUrl={item.companyLogoUrl}
+                position={item.position}
+                location={item.location}
+                duration={item.duration}
+                deadline={item.deadline}
+                onDetailClick={() => navigate(`/internship/${item.id}`)}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

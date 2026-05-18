@@ -29,7 +29,24 @@ class InternshipService:
     def __init__(self, uow: IUnitOfWork):
         self.uow = uow
 
-    # ==================== Helpers ====================
+    async def _auto_expire_internships(self, uow) -> None:
+        """
+        Self-healing/Lazy-expiration:
+        Finds all active internships whose close_date is in the past and sets is_active = False.
+        """
+        from sqlalchemy import update
+        from app.infrastructure.models.internship import InternshipORM
+        
+        today = date.today()
+        stmt = (
+            update(InternshipORM)
+            .where(
+                InternshipORM.is_active == True,
+                InternshipORM.close_date < today
+            )
+            .values(is_active=False)
+        )
+        await uow._session.execute(stmt)
 
     async def _build_company_summary(self, uow, company_id: UUID) -> Optional[CompanySummary]:
         company = await uow.companies.get_by_id(company_id)
@@ -63,6 +80,8 @@ class InternshipService:
         search: Optional[str],
     ) -> PaginatedInternshipResponse:
         async with self.uow as uow:
+            await self._auto_expire_internships(uow)
+            await uow.commit()
             items, total = await uow.internships.get_active_list(page, limit, search)
             internship_ids = [i.id for i in items]
             accepted_counts = await uow.applications.count_accepted_by_internship_ids(internship_ids)
@@ -88,6 +107,8 @@ class InternshipService:
 
     async def get_internship_detail(self, internship_id: UUID) -> InternshipDetailResponse:
         async with self.uow as uow:
+            await self._auto_expire_internships(uow)
+            await uow.commit()
             internship = await uow.internships.get_by_id(internship_id)
             if not internship:
                 raise HTTPException(
@@ -192,6 +213,8 @@ class InternshipService:
         search: Optional[str],
     ) -> PaginatedInternshipResponse:
         async with self.uow as uow:
+            await self._auto_expire_internships(uow)
+            await uow.commit()
             items, total = await uow.internships.get_by_company(company_id, page, limit, search)
             company_summary = await self._build_company_summary(uow, company_id)
             internship_ids = [i.id for i in items]
