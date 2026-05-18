@@ -27,8 +27,8 @@ function MyApplications() {
 
   if (error && applications.length === 0) {
     return (
-      <div className="h-full">
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 mb-6">
+      <div className="h-full p-0">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6 mb-6">
           {error}
         </div>
       </div>
@@ -36,7 +36,7 @@ function MyApplications() {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full p-0">
       <h1 className="text-2xl font-bold mb-6 text-gray-900">Lamaran Saya</h1>
 
       <div className="grid grid-cols-4 gap-4 mb-6">
@@ -46,13 +46,13 @@ function MyApplications() {
         <StatCard label="Ditolak" value={stats.rejected_count || 0} variant="red" />
       </div>
 
-      <div className="flex gap-6 items-start" style={{ paddingBottom: '24px' }}>
+      <div className="flex gap-6 items-start pb-6">
         <div className="w-7/12 bg-white rounded-xl border border-gray-200 p-4 overflow-y-auto">
           <h3 className="font-semibold text-gray-800 mb-4">Daftar Lamaran Magang</h3>
           {isLoadingList && applications.length === 0 ? (
             <div className="text-center py-8 text-gray-500">Memuat lamaran...</div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {applications.map((app) => {
                 const logo = app.logo || app.internship?.company?.company_name?.[0] || '?';
                 const logoUrl = app.internship?.company?.photo_profile_url;
@@ -80,7 +80,7 @@ function MyApplications() {
 
         <div className="flex-1 overflow-y-auto">
           {isLoadingDetail && !isUsingDummy ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500">
               Memuat detail...
             </div>
           ) : (

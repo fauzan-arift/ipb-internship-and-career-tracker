@@ -109,8 +109,8 @@ const AlertCircleIcon = () => (
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 const HeroSkeleton = () => (
-  <div className="flex items-center justify-between bg-white rounded-xl border border-[#DBD9E1] px-8 py-8 gap-4 animate-pulse">
-    <div className="flex flex-col gap-3 w-full max-w-sm">
+  <div className="flex items-center justify-between bg-white rounded-xl border border-[#DBD9E1] p-6 gap-4 animate-pulse">
+    <div className="flex flex-col gap-4 w-full max-w-sm">
       <div className="h-8 bg-gray-200 rounded w-3/4" />
       <div className="h-4 bg-gray-200 rounded w-1/2" />
       <div className="h-4 bg-gray-200 rounded w-1/3" />
@@ -142,9 +142,9 @@ const SectionHeader = ({ icon, title }) => (
 )
 
 const InfoRow = ({ icon, label, value }) => (
-  <div className="flex items-center gap-3">
+  <div className="flex items-center gap-2">
     {icon}
-    <div className="flex flex-col gap-0.5">
+    <div className="flex flex-col gap-2">
       <span className="text-[#767682] text-xs font-normal leading-4">{label}</span>
       <span className="text-[#1B1B21] text-base font-medium leading-6">{value}</span>
     </div>
@@ -155,7 +155,7 @@ const TextBlock = ({ text }) => {
   if (!text) return null
   const lines = text.split('\n').filter(Boolean)
   return lines.length > 1 ? (
-    <ul className="list-disc list-inside flex flex-col gap-1 text-[#454651] text-base font-normal leading-6">
+    <ul className="list-disc list-inside flex flex-col gap-2 text-[#454651] text-base font-normal leading-6">
       {lines.map((line, i) => <li key={i}>{line}</li>)}
     </ul>
   ) : (
@@ -187,7 +187,7 @@ const Toast = ({ message, type, onClose }) => {
   }
 
   return (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg text-sm font-medium max-w-sm ${styles[type]}`}>
+    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-4 px-4 py-4 rounded-lg border shadow-lg text-sm font-medium max-w-sm ${styles[type]}`}>
       <span className="flex-1">{message}</span>
       <button onClick={onClose} className="opacity-60 hover:opacity-100 text-lg leading-none shrink-0">&times;</button>
     </div>
@@ -324,7 +324,7 @@ export default function InternshipDetail() {
   const paymentBadge = internship ? getPaymentStatusBadge(internship.payment_status) : null
 
   return (
-    <div className="px-8 py-8 max-w-275 mx-auto flex flex-col gap-6">
+    <div className="p-0 flex flex-col gap-6">
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
@@ -345,7 +345,7 @@ export default function InternshipDetail() {
           </p>
           <button
             onClick={() => navigate('/lowongan')}
-            className="px-5 py-2 rounded-lg bg-[#4D44B5] text-white text-sm font-medium hover:bg-[#3d369a] transition-colors"
+            className="px-4 py-3.5 rounded-lg bg-[#4D44B5] text-white text-sm font-medium hover:bg-[#3d369a] transition-colors"
           >
             Kembali ke Daftar Lowongan
           </button>
@@ -354,8 +354,8 @@ export default function InternshipDetail() {
 
       {/* Hero Header Card */}
       {isLoading ? <HeroSkeleton /> : internship && (
-        <div className="flex items-center justify-between bg-white rounded-xl border border-[#DBD9E1] px-8 py-8 gap-4 flex-wrap">
-          <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between bg-white rounded-xl border border-[#DBD9E1] p-6 gap-4 flex-wrap">
+          <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <h1 className="text-[#1B1B21] text-3xl font-bold leading-tight tracking-tight">
                 {internship.title}
@@ -383,7 +383,7 @@ export default function InternshipDetail() {
             <button
               onClick={btnDisabled ? undefined : handleApply}
               disabled={btnDisabled}
-              className={`flex items-center justify-center px-5 py-2 rounded-lg text-base font-medium leading-6 tracking-wide transition-colors whitespace-nowrap disabled:cursor-not-allowed ${btnClassName}`}
+              className={`flex items-center justify-center px-4 py-3.5 rounded-lg text-base font-medium leading-6 tracking-wide transition-colors whitespace-nowrap disabled:cursor-not-allowed ${btnClassName}`}
             >
               {btnLabel}
             </button>
@@ -418,7 +418,7 @@ export default function InternshipDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
         {/* Left Column — description, requirements, benefits */}
-        <div className="lg:col-span-2 flex flex-col gap-5">
+        <div className="lg:col-span-2 flex flex-col gap-6">
           {isLoading ? <CardSkeleton /> : internship && (
             <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
               <SectionHeader icon={<FileTextIcon />} title="Deskripsi Pekerjaan" />
@@ -443,7 +443,7 @@ export default function InternshipDetail() {
           {/* Informasi Magang */}
           {isLoading ? <CardSkeleton /> : internship && (
             <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
-              <div className="pb-3 border-b border-[#DBD9E1]">
+              <div className="pb-4 border-b border-[#DBD9E1]">
                 <h2 className="text-[#1B1B21] text-xl font-semibold leading-7">Informasi Magang</h2>
               </div>
               <div className="flex flex-col gap-4">
@@ -457,14 +457,14 @@ export default function InternshipDetail() {
           {/* Tentang Perusahaan */}
           {isLoading ? <CardSkeleton /> : internship && (
             <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-4">
-              <div className="pb-3 border-b border-[#DBD9E1]">
+              <div className="pb-4 border-b border-[#DBD9E1]">
                 <h2 className="text-[#1B1B21] text-xl font-semibold leading-7">Tentang Perusahaan</h2>
               </div>
 
               {/* Logo + name row */}
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex items-center gap-4 pt-2">
                 <CompanyLogo company={internship.company} />
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-2">
                   <p className="text-[#1B1B21] text-sm font-semibold leading-tight">
                     {internship.company.company_name}
                   </p>

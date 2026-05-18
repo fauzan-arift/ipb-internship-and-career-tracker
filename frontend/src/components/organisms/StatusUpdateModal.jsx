@@ -107,6 +107,7 @@ export default function StatusUpdateModal({
               type="button"
               onClick={onSave}
               disabled={!selectedStatus || selectedStatus === currentStatus || isSaving}
+              size="lg"
             >
               {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
             </Button>

@@ -112,14 +112,14 @@ function CreateInternship() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="flex flex-col gap-6 p-0">
 
-        <Breadcrumb
-          items={[
-            { label: 'Kelola Lowongan', href: '/hr/dashboard' },
-            { label: 'Buat Lowongan Baru' },
-          ]}
-        />
+      <Breadcrumb
+        items={[
+          { label: 'Kelola Lowongan', href: '/hr/dashboard' },
+          { label: 'Buat Lowongan Baru' },
+        ]}
+      />
 
       <FormSectionCard title="Informasi Umum" icon={<FileText size={18} />}>
         <FormField label="Posisi yang Ditawarkan" error={errors.posisi}>

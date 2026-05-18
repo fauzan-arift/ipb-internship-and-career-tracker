@@ -65,11 +65,11 @@ function Login() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#EEF0F8', display: 'flex', flexDirection: 'column' }}>
       <Navbar variant="auth" />
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '40px', width: '100%', maxWidth: '440px', boxSizing: 'border-box' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px', gap: '12px' }}>
+      <div className="p-0" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="p-6" style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', width: '100%', maxWidth: '440px', boxSizing: 'border-box' }}>
+          <div className="mb-6 gap-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <img src={logoIPB} alt="IPB Logo" style={{ height: '64px', width: 'auto' }} />
-            <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif', margin: 0 }}>
+            <h1 className="m-0" style={{ fontSize: '22px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif' }}>
               IPB Internship Portal
             </h1>
           </div>
@@ -106,7 +106,7 @@ function Login() {
             </FormField>
 
             {apiError && (
-              <div style={{ backgroundColor: '#FEE2E2', border: '1px solid #FECACA', borderRadius: '8px', padding: '10px 14px', color: '#DC2626', fontSize: '13px', fontFamily: 'Inter, sans-serif' }}>
+              <div className="p-4" style={{ backgroundColor: '#FEE2E2', border: '1px solid #FECACA', borderRadius: '8px', color: '#DC2626', fontSize: '13px', fontFamily: 'Inter, sans-serif' }}>
                 {apiError}
               </div>
             )}
@@ -116,13 +116,13 @@ function Login() {
             </Button>
           </form>
 
-          <div style={{ margin: '24px 0', borderTop: '1px solid #CBD0E0' }} />
+          <div className="my-6" style={{ borderTop: '1px solid #CBD0E0' }} />
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          <div className="gap-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <span style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
               Belum punya akun? Daftar sebagai
             </span>
-            <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
+            <div className="gap-4" style={{ display: 'flex', width: '100%' }}>
               <Button variant="primary" fullWidth onClick={() => navigate('/register/student')}>
                 Mahasiswa
               </Button>

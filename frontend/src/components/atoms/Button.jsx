@@ -19,6 +19,7 @@ function Button({ children, variant = 'primary', size = 'default', fullWidth = f
   const sizes = {
     default: { padding: '10px 20px', fontSize: '14px' },
     sm: { padding: '6px 14px', fontSize: '13px' },
+    lg: { padding: '14px 16px', fontSize: '16px' },
   };
 
   const variants = {

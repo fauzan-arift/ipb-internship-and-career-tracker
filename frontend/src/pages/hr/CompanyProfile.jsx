@@ -41,14 +41,14 @@ const VerificationBadge = ({ status }) => {
   }
   const badge = map[status] ?? { label: status, className: 'bg-gray-100 text-gray-600' }
   return (
-    <span className={`w-fit px-2.5 py-1 rounded-full text-xs font-medium ${badge.className}`}>
+    <span className={`w-fit px-2 py-2 rounded-full text-xs font-medium ${badge.className}`}>
       {badge.label}
     </span>
   )
 }
 
 const InfoRow = ({ label, value, children }) => (
-  <div className="flex flex-col gap-1">
+  <div className="flex flex-col gap-2">
     <span className="text-[#787584] text-xs font-semibold uppercase tracking-widest">{label}</span>
     {children ?? <span className="text-[#1B1B21] text-sm font-medium">{value ?? '-'}</span>}
   </div>
@@ -183,19 +183,19 @@ export default function CompanyProfile() {
 
   // ── Loading ──
   if (isLoading) return (
-    <div className="px-8 py-8 max-w-[860px] mx-auto">
+    <div className="p-0 max-w-[860px] mx-auto">
       <ProfileSkeleton />
     </div>
   )
 
   // ── Error ──
   if (isError) return (
-    <div className="px-8 py-8 max-w-[860px] mx-auto flex flex-col items-center gap-4 mt-16">
+    <div className="p-0 max-w-[860px] mx-auto flex flex-col items-center gap-4 mt-16">
       <p className="text-[#1B1B21] text-lg font-semibold">Gagal memuat profil perusahaan</p>
       <p className="text-[#454651] text-sm">{errorMsg}</p>
       <button
         onClick={() => window.location.reload()}
-        className="px-5 py-2 rounded-lg bg-[#4D44B5] text-white text-sm font-medium hover:bg-[#3d369a] transition-colors"
+        className="px-4 py-3.5 rounded-lg bg-[#4D44B5] text-white text-sm font-medium hover:bg-[#3d369a] transition-colors"
       >
         Coba Lagi
       </button>
@@ -203,25 +203,25 @@ export default function CompanyProfile() {
   )
 
   return (
-    <div className="px-8 py-8 max-w-[860px] mx-auto flex flex-col gap-6">
+    <div className="p-0 max-w-250 mx-auto flex flex-col gap-6">
 
       {/* Toast messages */}
       {successMsg && (
-        <div className="px-4 py-3 rounded-lg bg-[#D1FAE5] border border-[#6EE7B7] text-[#065F46] text-sm font-medium">
+        <div className="p-4 rounded-lg bg-[#D1FAE5] border border-[#6EE7B7] text-[#065F46] text-sm font-medium">
           {successMsg}
         </div>
       )}
       {errorMsg && !isError && (
-        <div className="px-4 py-3 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-[#B91C1C] text-sm font-medium">
+        <div className="p-4 rounded-lg bg-[#FEF2F2] border border-[#FECACA] text-[#B91C1C] text-sm font-medium">
           {errorMsg}
         </div>
       )}
 
       {/* ── Card 1: Informasi Perusahaan ── */}
-      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-5">
+      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-6">
 
         {/* Logo row */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
         <div className="w-20 h-20 rounded-2xl border border-gray-200 bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0">
             {photoUrl
             ? <img src={photoUrl} alt="Logo perusahaan" className="w-full h-full object-cover" />
@@ -252,7 +252,7 @@ export default function CompanyProfile() {
           onChange={(e) => handlePhotoFile(e.target.files?.[0])}
         />
 
-        <div className="border-b border-[#DBD9E1] pb-1">
+        <div className="border-b border-[#DBD9E1] pb-2">
           <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Informasi Perusahaan</h2>
         </div>
 
@@ -329,8 +329,8 @@ export default function CompanyProfile() {
       </div>
 
       {/* ── Card 2: Informasi Pribadi HR ── */}
-      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-5">
-        <div className="border-b border-[#DBD9E1] pb-1">
+      <div className="bg-white rounded-xl border border-[#DBD9E1] p-6 flex flex-col gap-6">
+        <div className="border-b border-[#DBD9E1] pb-2">
           <h2 className="text-[#1B1B21] font-semibold text-xl leading-7">Informasi Pribadi HR</h2>
         </div>
 
@@ -367,7 +367,7 @@ export default function CompanyProfile() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4D44B5] text-white font-medium text-base hover:bg-[#3d369a] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-3.5 rounded-lg bg-[#4D44B5] text-white font-medium text-base hover:bg-[#3d369a] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <Save size={18} />
           {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}

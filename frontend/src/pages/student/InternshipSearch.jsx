@@ -43,7 +43,7 @@ function InternshipSearch() {
   }));
 
   return (
-    <div>
+    <div className="p-0">
       <h1 className="text-2xl font-bold mb-4 text-gray-900">
         Cari Lowongan Magang
       </h1>
@@ -63,7 +63,7 @@ function InternshipSearch() {
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 mb-6">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6 mb-6">
           {error}
         </div>
       )}
