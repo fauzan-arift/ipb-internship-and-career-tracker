@@ -4,6 +4,108 @@ import ApplicationListItem from '@/components/molecules/ApplicationListItem';
 import ApplicationDetailPanel from '@/components/organisms/ApplicationDetailPanel';
 import { useApplications } from '@/hooks/useApplications';
 
+// ---------------------------------------------------------------------------
+// Skeleton primitives
+// ---------------------------------------------------------------------------
+
+const Shimmer = ({ className = '', style = {} }) => (
+  <div
+    className={`relative overflow-hidden bg-gray-100 rounded ${className}`}
+    style={{ isolation: 'isolate', ...style }}
+  >
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background:
+          'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%)',
+        animation: 'shimmer 1.6s infinite',
+      }}
+    />
+    <style>{`@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}`}</style>
+  </div>
+);
+
+const StatCardSkeleton = () => (
+  <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+    <Shimmer className="h-3 w-24 rounded-full" />
+    <Shimmer className="h-8 w-12 rounded-md" />
+  </div>
+);
+
+const ApplicationListItemSkeleton = () => (
+  <div className="flex items-center gap-4 p-3 rounded-xl border border-gray-100">
+    <Shimmer className="w-11 h-11 rounded-lg flex-shrink-0" />
+    <div className="flex-1 flex flex-col gap-2 min-w-0">
+      <Shimmer className="h-3.5 w-40 rounded-full" />
+      <Shimmer className="h-3 w-28 rounded-full" />
+    </div>
+    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+      <Shimmer className="h-3 w-20 rounded-full" />
+      <Shimmer className="h-5 w-16 rounded-full" />
+    </div>
+  </div>
+);
+
+const ApplicationDetailPanelSkeleton = () => (
+  <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col gap-6">
+    <div className="flex items-center gap-4">
+      <Shimmer className="w-14 h-14 rounded-xl flex-shrink-0" />
+      <div className="flex flex-col gap-2 flex-1">
+        <Shimmer className="h-4 w-48 rounded-full" />
+        <Shimmer className="h-3 w-32 rounded-full" />
+      </div>
+      <Shimmer className="h-7 w-24 rounded-full flex-shrink-0" />
+    </div>
+
+    <div className="border-t border-gray-100" />
+
+    {[100, 80, 90].map((w, i) => (
+      <div key={i} className="flex flex-col gap-1.5">
+        <Shimmer className="h-3 w-20 rounded-full" />
+        <Shimmer className="h-3.5 rounded-full" style={{ width: `${w}%` }} />
+      </div>
+    ))}
+
+    <div className="border-t border-gray-100" />
+
+    <div className="flex flex-col gap-2">
+      <Shimmer className="h-3 w-28 rounded-full" />
+      <div className="flex flex-col gap-1.5 mt-1">
+        {['100%', '91.67%', '80%', '100%', '75%'].map((w, i) => (
+          <Shimmer key={i} className="h-3 rounded-full" style={{ width: w }} />
+        ))}
+      </div>
+    </div>
+
+    <Shimmer className="h-10 w-full rounded-lg mt-2" />
+  </div>
+);
+
+const MyApplicationsSkeleton = () => (
+  <div className="h-full p-0">
+    <Shimmer className="h-7 w-48 rounded-full mb-6" />
+    <div className="grid grid-cols-4 gap-4 mb-6">
+      {Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)}
+    </div>
+    <div className="flex gap-6 items-start pb-6">
+      <div className="w-7/12 bg-white rounded-xl border border-gray-200 p-4">
+        <Shimmer className="h-4 w-44 rounded-full mb-4" />
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => <ApplicationListItemSkeleton key={i} />)}
+        </div>
+      </div>
+      <div className="flex-1">
+        <ApplicationDetailPanelSkeleton />
+      </div>
+    </div>
+  </div>
+);
+
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+
 function MyApplications() {
   const {
     applications,
@@ -18,11 +120,7 @@ function MyApplications() {
   } = useApplications();
 
   if (isLoadingList && applications.length === 0) {
-    return (
-      <div className="h-full flex items-center justify-center text-gray-500">
-        Memuat lamaran...
-      </div>
-    );
+    return <MyApplicationsSkeleton />;
   }
 
   if (error && applications.length === 0) {

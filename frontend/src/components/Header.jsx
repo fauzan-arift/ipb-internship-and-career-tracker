@@ -14,9 +14,14 @@ function Navbar({ variant = 'app', user, onLogout }) {
           justifyContent: 'center',
         }}
       >
-        <span style={{ fontSize: '18px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif' }}>
-          IPB Internship Portal
-        </span>
+        <img
+          src="/Logo IPB Internship Portal - internship.svg"
+          alt="IPB Internship Portal"
+          style={{
+            height: '32px',
+            width: 'auto',
+          }}
+        />
       </nav>
     );
   }
@@ -32,9 +37,14 @@ function Navbar({ variant = 'app', user, onLogout }) {
         justifyContent: 'space-between',
       }}
     >
-      <span style={{ fontSize: '18px', fontWeight: '700', color: '#3D3FA8', fontFamily: 'Inter, sans-serif' }}>
-        IPB Internship Portal
-      </span>
+        <img
+          src="/Logo IPB Internship Portal - internship.svg"
+          alt="IPB Internship Portal"
+          style={{
+            height: '32px',
+            width: 'auto',
+          }}
+        />
       {user && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span style={{ fontSize: '14px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>

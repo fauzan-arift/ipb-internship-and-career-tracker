@@ -3,6 +3,87 @@ import OfferCard from '@/components/organisms/OfferCard';
 import ConfirmationDialog from '@/components/organisms/ConfirmationDialog';
 import { useOffers } from '@/hooks/useOffers';
 
+// ---------------------------------------------------------------------------
+// Skeleton primitives
+// ---------------------------------------------------------------------------
+
+const Shimmer = ({ className = '', style = {} }) => (
+  <div
+    className={`relative overflow-hidden bg-gray-100 rounded ${className}`}
+    style={{ isolation: 'isolate', ...style }}
+  >
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background:
+          'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%)',
+        animation: 'shimmer 1.6s infinite',
+      }}
+    />
+    <style>{`@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}`}</style>
+  </div>
+);
+
+const OfferCardSkeleton = () => (
+  <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col gap-5">
+    {/* Company header */}
+    <div className="flex items-center gap-4">
+      <Shimmer className="w-14 h-14 rounded-xl flex-shrink-0" />
+      <div className="flex flex-col gap-2 flex-1">
+        <Shimmer className="h-4 w-52 rounded-full" />
+        <Shimmer className="h-3 w-36 rounded-full" />
+      </div>
+      <Shimmer className="h-7 w-24 rounded-full flex-shrink-0" />
+    </div>
+
+    <div className="border-t border-gray-100" />
+
+    {/* Info grid */}
+    <div className="grid grid-cols-2 gap-4">
+      {[['w-16', 'w-32'], ['w-20', 'w-28'], ['w-14', 'w-36'], ['w-18', 'w-24']].map(([lw, vw], i) => (
+        <div key={i} className="flex flex-col gap-1.5">
+          <Shimmer className={`h-3 ${lw} rounded-full`} />
+          <Shimmer className={`h-3.5 ${vw} rounded-full`} />
+        </div>
+      ))}
+    </div>
+
+    <div className="border-t border-gray-100" />
+
+    {/* Description lines */}
+    <div className="flex flex-col gap-2">
+      <Shimmer className="h-3 w-28 rounded-full" />
+      <div className="flex flex-col gap-1.5 mt-1">
+        {['100%', '91.67%', '83.33%', '100%', '66.67%'].map((w, i) => (
+          <Shimmer key={i} className="h-3 rounded-full" style={{ width: w }} />
+        ))}
+      </div>
+    </div>
+
+    {/* Action buttons */}
+    <div className="flex gap-3 pt-1">
+      <Shimmer className="h-10 flex-1 rounded-lg" />
+      <Shimmer className="h-10 flex-1 rounded-lg" />
+    </div>
+  </div>
+);
+
+const OffersPageSkeleton = () => (
+  <div className="h-full p-0">
+    <Shimmer className="h-7 w-44 rounded-full mb-6" />
+    <div className="space-y-6">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <OfferCardSkeleton key={i} />
+      ))}
+    </div>
+  </div>
+);
+
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+
 function OffersPage() {
   const { offers, isLoading, error, acceptOffer, rejectOffer, refetch } = useOffers();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,11 +106,7 @@ function OffersPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="h-full flex items-center justify-center text-gray-500">
-        Memuat tawaran lowongan...
-      </div>
-    );
+    return <OffersPageSkeleton />;
   }
 
   if (error && offers.length === 0) {
