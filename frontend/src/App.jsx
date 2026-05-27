@@ -20,6 +20,7 @@ import InternshipSearch from '@/pages/student/InternshipSearch';
 import StudentProfile from '@/pages/student/StudentProfile';
 import MyApplications from '@/pages/student/MyApplications';
 import OffersPage from '@/pages/student/OffersPage';
+import CareerMapping from '@/pages/student/CareerMapping';
 
 import HRDashboard from '@/pages/hr/HRDashboard';
 import CreateInternship from '@/pages/hr/CreateInternship';
@@ -133,6 +134,16 @@ function AppRoutes() {
           <ProtectedRoute allowedRoles={['STUDENT']}>
             <DashboardLayout role="student">
               <OffersPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/career"
+        element={(
+          <ProtectedRoute allowedRoles={['STUDENT']}>
+            <DashboardLayout role="student">
+              <CareerMapping />
             </DashboardLayout>
           </ProtectedRoute>
         )}
