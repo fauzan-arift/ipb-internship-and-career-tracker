@@ -334,13 +334,15 @@ export default function StudentProfile() {
         setNewPhotoFile(null)
       }
 
+      const normalizedGpa = gpa ? parseFloat(String(gpa).replace(',', '.')) : 0;
+
       const payload = {
         full_name:       fullName,
         email:           email,
         nim:             nim,
         faculty:         faculty,
         major:           major,
-        gpa:             parseFloat(gpa) || 0,
+        gpa:             isNaN(normalizedGpa) ? 0 : normalizedGpa,
         graduation_year: parseInt(graduationYear, 10) || 0,
         phone_number:    phoneNumber,
         skills:          skills,

@@ -9,6 +9,7 @@ from app.infrastructure.repositories.internship_repository import SQLAlchemyInte
 from app.infrastructure.repositories.application_repository import SQLAlchemyApplicationRepository
 from app.infrastructure.repositories.skill_repository import SQLAlchemySkillRepository
 from app.infrastructure.repositories.offer_repository import SQLAlchemyOfferRepository
+from app.infrastructure.repositories.career_mapping_repository import SQLAlchemyCareerMappingRepository
 
 
 class SQLAlchemyUnitOfWork(IUnitOfWork):
@@ -26,6 +27,7 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self.applications = SQLAlchemyApplicationRepository(self._session)
         self.skills = SQLAlchemySkillRepository(self._session)
         self.offers = SQLAlchemyOfferRepository(self._session)
+        self.career_mappings = SQLAlchemyCareerMappingRepository(self._session)
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:

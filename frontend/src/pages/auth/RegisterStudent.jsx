@@ -46,7 +46,7 @@ const RegisterStudent = () => {
         ...formData,
         email: normalizedEmail,
         graduation_year: formData.graduation_year ? parseInt(formData.graduation_year) : null,
-        gpa: formData.gpa ? parseFloat(formData.gpa) : null,
+        gpa: formData.gpa ? parseFloat(String(formData.gpa).replace(',', '.')) : null,
         faculty: formData.faculty || null,
         phone_number: formData.phone_number || null,
       };

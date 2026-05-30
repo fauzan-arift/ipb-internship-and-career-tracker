@@ -59,4 +59,14 @@ export const studentService = {
     });
     return response.data;
   },
+
+  /**
+   * GET /api/v1/students/career-mapping
+   * Returns career mapping distribution for the logged-in student's major.
+   * Response: { faculty, major, grand_total_students, last_updated, company_distributions[] }
+   */
+  async getCareerMapping() {
+    const response = await api.get('/students/career-mapping');
+    return response.data;
+  },
 };
