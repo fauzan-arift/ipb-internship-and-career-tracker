@@ -9,11 +9,16 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
+from sqlalchemy import select as _sa_select
 
 from app.domain.entities.offer import Offer
 from app.domain.entities.application import ApplicationStatusHistory
 from app.domain.entities.enums import ApplicationStatus, OfferStatus
 from app.domain.unit_of_work import IUnitOfWork
+from app.infrastructure.models.student import StudentORM as _StudentORM
+from app.infrastructure.models.application import ApplicationORM as _AppORM
+from app.infrastructure.models.offer import OfferORM as _OfferORM
+from app.infrastructure.models.internship import InternshipORM as _InternshipORM
 from app.presentation.schemas.offer import (
     OfferCreateRequest,
     OfferResponse,
@@ -303,6 +308,69 @@ class OfferService:
                 new_status=new_app_status.value,
             )
             await uow.applications.save_status_history(history)
+
+            # D. If student ACCEPTED — increment CareerMapping counter (same transaction)
+            if new_offer_status == OfferStatus.ACCEPTED.value:
+                try:
+                    # Fetch the student ORM (need faculty + major)
+                    _student_r = await uow._session.execute(
+                        _sa_select(_StudentORM).where(_StudentORM.id == app.student_id)
+                    )
+                    student_orm = _student_r.scalars().first()
+
+                    # Fetch the internship to get company_id
+                    internship = await uow.internships.get_by_id(app.internship_id)
+
+                    if student_orm and internship and student_orm.faculty and student_orm.major:
+                        company_id = internship.company_id
+
+                        # ── Deduplication guard ──────────────────────────────────
+                        # Check whether this student already has ANOTHER accepted
+                        # offer at the SAME company (excluding the current application).
+                        # If yes → they are already counted as 1 alumnus → skip.
+                        prior_accepted_r = await uow._session.execute(
+                            _sa_select(_AppORM.id)
+                            .join(_OfferORM, _OfferORM.application_id == _AppORM.id)
+                            .join(_InternshipORM, _InternshipORM.id == _AppORM.internship_id)
+                            .where(
+                                _AppORM.student_id == app.student_id,
+                                _InternshipORM.company_id == company_id,
+                                _OfferORM.status == OfferStatus.ACCEPTED.value,
+                                _AppORM.id != app.id,
+                            )
+                            .limit(1)
+                        )
+                        already_counted = prior_accepted_r.scalars().first() is not None
+
+                        if already_counted:
+                            logger.info(
+                                "CareerMapping skipped (student already counted): "
+                                "student_id=%s company_id=%s",
+                                app.student_id,
+                                company_id,
+                            )
+                        else:
+                            await uow.career_mappings.upsert_increment(
+                                faculty=student_orm.faculty,
+                                major=student_orm.major,
+                                company_id=company_id,
+                            )
+                            logger.info(
+                                "CareerMapping incremented: faculty=%s major=%s company_id=%s",
+                                student_orm.faculty,
+                                student_orm.major,
+                                company_id,
+                            )
+                    else:
+                        logger.warning(
+                            "CareerMapping skipped: missing student faculty/major or internship "
+                            "(student_id=%s, internship_id=%s)",
+                            app.student_id,
+                            app.internship_id,
+                        )
+                except Exception as cm_err:
+                    logger.error("CareerMapping upsert failed: %s", cm_err, exc_info=True)
+                    raise
 
             # Resolve file URL BEFORE commit so all reads stay in one phase.
             # Doing it after commit (but still inside the `async with` block) risks

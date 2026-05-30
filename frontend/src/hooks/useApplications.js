@@ -67,18 +67,16 @@ export function useApplications() {
       const apiStats = data.stats || {};
 
       if (apiApps.length === 0) {
-        console.info('📦 Data API kosong. Menggunakan dummy applications sebagai fallback.');
-        setApplications(dummyApplications);
+        console.info('📦 Data API kosong.');
+        setApplications([]);
         setStats({
-          total_applications: dummyApplications.length,
-          processing_count: dummyApplications.filter((a) => a.status === 'Diproses').length,
-          accepted_count: dummyApplications.filter((a) => a.status === 'Diterima').length,
-          rejected_count: dummyApplications.filter((a) => a.status === 'Ditolak').length,
+          total_applications: 0,
+          processing_count: 0,
+          accepted_count: 0,
+          rejected_count: 0,
         });
-        setUseDummy(true);
-        if (!selectedId && dummyApplications.length > 0) {
-          setSelectedId(dummyApplications[0].id);
-        }
+        setUseDummy(false);
+        setSelectedId(null);
       } else {
         setApplications(apiApps);
         setStats(apiStats);
@@ -90,18 +88,15 @@ export function useApplications() {
     } catch (err) {
       console.error('❌ Failed to fetch applications:', err);
       setError(err.message || 'Gagal memuat daftar lamaran.');
-      console.info('⚠️ API error. Menggunakan dummy applications sebagai fallback.');
-      setApplications(dummyApplications);
+      setApplications([]);
       setStats({
-        total_applications: dummyApplications.length,
-        processing_count: dummyApplications.filter((a) => a.status === 'Diproses').length,
-        accepted_count: dummyApplications.filter((a) => a.status === 'Diterima').length,
-        rejected_count: dummyApplications.filter((a) => a.status === 'Ditolak').length,
+        total_applications: 0,
+        processing_count: 0,
+        accepted_count: 0,
+        rejected_count: 0,
       });
-      setUseDummy(true);
-      if (!selectedId && dummyApplications.length > 0) {
-        setSelectedId(dummyApplications[0].id);
-      }
+      setUseDummy(false);
+      setSelectedId(null);
     } finally {
       setIsLoadingList(false);
     }

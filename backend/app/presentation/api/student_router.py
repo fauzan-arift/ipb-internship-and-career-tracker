@@ -25,6 +25,8 @@ from app.presentation.schemas.offer import (
     OfferRespondRequest,
     OfferResponse,
 )
+from app.application.services.career_mapping_service import CareerMappingService
+from app.presentation.schemas.career_mapping import CareerMappingResponse
 
 router = APIRouter()
 
@@ -45,6 +47,12 @@ def get_offer_service(
     uow: SQLAlchemyUnitOfWork = Depends(get_uow),
 ) -> OfferService:
     return OfferService(uow=uow)
+
+
+def get_career_mapping_service(
+    uow: SQLAlchemyUnitOfWork = Depends(get_uow),
+) -> CareerMappingService:
+    return CareerMappingService(uow=uow)
 
 
 @router.get(
@@ -192,3 +200,27 @@ async def respond_to_offer(
         offer_id=offer_id,
         payload=body,
     )
+
+
+# ─────────────────────────────────────────────────────────────
+# Career Mapping endpoint
+# ─────────────────────────────────────────────────────────────
+
+@router.get(
+    "/career-mapping",
+    summary="Peta karir alumni dari jurusan saya",
+    response_model=CareerMappingResponse,
+    tags=["Students"],
+)
+async def get_career_mapping(
+    current_user=Depends(require_role("STUDENT")),
+    svc: CareerMappingService = Depends(get_career_mapping_service),
+):
+    """
+    Mengembalikan distribusi alumni magang dari jurusan yang sama dengan
+    mahasiswa yang sedang login, dikelompokkan per perusahaan.
+
+    **Catatan:** Jumlah alumni hanya bertambah ketika mahasiswa
+    *menerima* (Accept) penawaran magang secara resmi.
+    """
+    return await svc.get_career_mapping(student_user_id=current_user.id)

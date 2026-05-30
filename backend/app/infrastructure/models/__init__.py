@@ -13,10 +13,11 @@ from app.infrastructure.models.internship import InternshipORM
 from app.infrastructure.models.application import ApplicationORM, ApplicationStatusHistoryORM
 from app.infrastructure.models.skill import SkillORM
 from app.infrastructure.models.offer import OfferORM
+from app.infrastructure.models.career_mapping import CareerMappingORM
 
 __all__ = [
     "UserORM", "StudentORM", "HrORM", "AdminORM",
     "CompanyORM", "DocumentORM", "EmailNotificationORM", "VerificationTokenORM",
     "InternshipORM", "ApplicationORM", "ApplicationStatusHistoryORM", "SkillORM",
-    "OfferORM",
+    "OfferORM", "CareerMappingORM",
 ]
