@@ -40,13 +40,33 @@ const RegisterStudent = () => {
       return;
     }
 
+    let normalizedGpa = null;
+    if (formData.gpa !== '' && formData.gpa !== null && formData.gpa !== undefined) {
+      const parsed = parseFloat(String(formData.gpa).replace(',', '.'));
+      if (isNaN(parsed) || parsed < 0.0 || parsed > 4.0) {
+        setStatus({ type: 'error', msg: 'IPK harus berupa angka desimal antara 0.00 dan 4.00' });
+        return;
+      }
+      normalizedGpa = parsed;
+    }
+
+    let normalizedGradYear = null;
+    if (formData.graduation_year !== '' && formData.graduation_year !== null && formData.graduation_year !== undefined) {
+      const parsed = parseInt(formData.graduation_year, 10);
+      if (isNaN(parsed) || parsed < 2000 || parsed > 2100) {
+        setStatus({ type: 'error', msg: 'Tahun Lulus harus berupa angka tahun antara 2000 dan 2100' });
+        return;
+      }
+      normalizedGradYear = parsed;
+    }
+
     setIsLoading(true);
     try {
       const payload = {
         ...formData,
         email: normalizedEmail,
-        graduation_year: formData.graduation_year ? parseInt(formData.graduation_year) : null,
-        gpa: formData.gpa ? parseFloat(String(formData.gpa).replace(',', '.')) : null,
+        graduation_year: normalizedGradYear,
+        gpa: normalizedGpa,
         faculty: formData.faculty || null,
         phone_number: formData.phone_number || null,
       };

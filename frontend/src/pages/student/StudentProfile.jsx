@@ -334,7 +334,27 @@ export default function StudentProfile() {
         setNewPhotoFile(null)
       }
 
-      const normalizedGpa = gpa ? parseFloat(String(gpa).replace(',', '.')) : 0;
+      let normalizedGpa = null;
+      if (gpa !== '' && gpa !== null && gpa !== undefined) {
+        const parsed = parseFloat(String(gpa).replace(',', '.'));
+        if (isNaN(parsed) || parsed < 0.0 || parsed > 4.0) {
+          setErrorMsg('IPK harus berupa angka desimal antara 0.00 dan 4.00');
+          setIsSaving(false);
+          return;
+        }
+        normalizedGpa = parsed;
+      }
+
+      let normalizedGradYear = null;
+      if (graduationYear !== '' && graduationYear !== null && graduationYear !== undefined) {
+        const parsed = parseInt(graduationYear, 10);
+        if (isNaN(parsed) || parsed < 2000 || parsed > 2100) {
+          setErrorMsg('Tahun Lulus harus berupa angka tahun antara 2000 dan 2100');
+          setIsSaving(false);
+          return;
+        }
+        normalizedGradYear = parsed;
+      }
 
       const payload = {
         full_name:       fullName,
@@ -342,8 +362,8 @@ export default function StudentProfile() {
         nim:             nim,
         faculty:         faculty,
         major:           major,
-        gpa:             isNaN(normalizedGpa) ? 0 : normalizedGpa,
-        graduation_year: parseInt(graduationYear, 10) || 0,
+        gpa:             normalizedGpa,
+        graduation_year: normalizedGradYear,
         phone_number:    phoneNumber,
         skills:          skills,
         ...(cvId    && { cv_id: cvId }),

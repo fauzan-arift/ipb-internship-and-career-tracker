@@ -59,25 +59,44 @@ class SQLAlchemyInternshipRepository(IInternshipRepository):
             ),
         ]
         if search:
+            from app.infrastructure.models.company import CompanyORM
             pattern = f"%{search}%"
             base_where.append(
                 or_(
                     InternshipORM.title.ilike(pattern),
                     InternshipORM.description.ilike(pattern),
+                    InternshipORM.location.ilike(pattern),
+                    CompanyORM.company_name.ilike(pattern),
                 )
             )
 
-        total_stmt = select(func.count()).select_from(InternshipORM).where(*base_where)
+            total_stmt = (
+                select(func.count())
+                .select_from(InternshipORM)
+                .join(CompanyORM, InternshipORM.company_id == CompanyORM.id)
+                .where(*base_where)
+            )
+            stmt = (
+                select(InternshipORM)
+                .join(CompanyORM, InternshipORM.company_id == CompanyORM.id)
+                .where(*base_where)
+                .order_by(InternshipORM.open_date.desc())
+                .offset((page - 1) * limit)
+                .limit(limit)
+            )
+        else:
+            total_stmt = select(func.count()).select_from(InternshipORM).where(*base_where)
+            stmt = (
+                select(InternshipORM)
+                .where(*base_where)
+                .order_by(InternshipORM.open_date.desc())
+                .offset((page - 1) * limit)
+                .limit(limit)
+            )
+
         total_result = await self._session.execute(total_stmt)
         total = total_result.scalar_one()
 
-        stmt = (
-            select(InternshipORM)
-            .where(*base_where)
-            .order_by(InternshipORM.open_date.desc())
-            .offset((page - 1) * limit)
-            .limit(limit)
-        )
         result = await self._session.execute(stmt)
         rows = result.scalars().all()
         return [self._to_domain(r) for r in rows], total
