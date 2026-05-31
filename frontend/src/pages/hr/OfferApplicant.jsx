@@ -9,11 +9,14 @@ import OfferFormInput from '@/components/molecules/OfferFormInput';
 import UploadZone from '@/components/atoms/UploadZone';
 import { useHrApplication } from '@/hooks/useHrApplication';
 import { format } from 'date-fns';
+import useToast from '@/hooks/useToast';
+import Toast from '@/components/atoms/Toast';
 
 export default function OfferApplicant() {
   const { application_id } = useParams();
   const navigate = useNavigate();
   const { application, loading, submitting, usingDummy, createOffer, uploadFile } = useHrApplication(application_id);
+  const { toast, showToast, hideToast } = useToast();
 
   const [formData, setFormData] = useState({
     offerDate: new Date(),
@@ -62,7 +65,7 @@ export default function OfferApplicant() {
     if (!formData.file) errors.push('Dokumen');
 
     if (errors.length > 0) {
-      alert(`Harap isi semua field berikut:\n\n- ${errors.join('\n- ')}`);
+      showToast(`Harap isi semua field berikut: ${errors.join(', ')}`, 'error');
       return false;
     }
     return true;
@@ -95,11 +98,13 @@ export default function OfferApplicant() {
       };
 
       await createOffer(payload);
-      alert('Penawaran magang berhasil dikirim!');
-      navigate('/hr/applicants');
+      showToast('Penawaran magang berhasil dikirim!', 'success');
+      setTimeout(() => {
+        navigate('/hr/applicants');
+      }, 1500);
     } catch (err) {
       console.error('Failed to send offer:', err);
-      alert('Gagal mengirim penawaran: ' + (err.response?.data?.detail || err.message));
+      showToast('Gagal mengirim penawaran: ' + (err.response?.data?.detail || err.message), 'error');
     } finally {
       setIsFormSubmitting(false);
     }
@@ -207,6 +212,13 @@ export default function OfferApplicant() {
           </div>
         </form>
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={hideToast}
+        />
+      )}
     </div>
   );
 }
