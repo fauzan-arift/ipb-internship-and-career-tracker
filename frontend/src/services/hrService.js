@@ -3,7 +3,7 @@ import api from '@/api/axios';
 const BASE_PATH = '/hr/internships';
 
 const hrService = {
-  // ── yang sudah ada, jangan diubah ──
+
   listHRInternships: async ({ page = 1, limit = 20, search = '' } = {}) => {
     const params = { page, limit };
     if (search) params.search = search;
@@ -35,7 +35,8 @@ const hrService = {
     return response.data;
   },
 
-  // ── tambahan baru: company profile ──
+
+
   getProfile: async () => {
     const response = await api.get('/hr/company-profile');
     return response.data;

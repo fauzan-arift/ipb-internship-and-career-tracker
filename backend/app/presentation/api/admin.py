@@ -18,15 +18,6 @@ _admin_dep = [Depends(require_role("ADMIN"))]
     tags=["Admin"],
 )
 async def list_pending_hr(svc: AdminService = Depends(get_admin_service)):
-    """
-    Mengembalikan daftar semua akun HR yang sedang menunggu persetujuan Admin.
-
-    Setiap item berisi informasi pribadi HR dan nama perusahaan yang didaftarkan.
-    Gunakan `hr_profile_id` untuk memanggil endpoint approve/reject.
-
-    **Response fields per item:** `hr_profile_id`, `full_name`, `email`, `position`,
-    `phone_number`, `company_name`, `registered_at`
-    """
     items = await svc.get_pending_registrations()
     return {"success": True, "message": "OK", "data": items}
 
@@ -38,14 +29,6 @@ async def list_pending_hr(svc: AdminService = Depends(get_admin_service)):
     tags=["Admin"],
 )
 async def list_processed_hr(svc: AdminService = Depends(get_admin_service)):
-    """
-    Mengembalikan daftar semua akun HR yang sudah diproses (disetujui atau ditolak).
-
-    Field `status` menunjukkan status akhir: `VERIFIED` atau `REJECTED`.
-    Field `verified_at` berisi tanggal approval (null jika ditolak).
-
-    **Response fields per item:** semua field `pending-registrations` + `status` + `verified_at`
-    """
     items = await svc.get_processed_registrations()
     return {"success": True, "message": "OK", "data": items}
 
@@ -58,14 +41,6 @@ async def list_processed_hr(svc: AdminService = Depends(get_admin_service)):
     tags=["Admin"],
 )
 async def get_hr_detail(hr_profile_id: UUID, svc: AdminService = Depends(get_admin_service)):
-    """
-    Mengembalikan detail lengkap satu HR meliputi:
-    - **Profil pribadi** (`hr`): nama, email, posisi, nomor telepon, status.
-    - **Profil perusahaan** (`company`): nama, alamat, industri, website.
-    - **Dokumen NPWP** (`npwp_document`): nama file, format, dan URL download.
-
-    `hr_profile_id` adalah `id` dari tabel `hrs` (bukan `users.id`).
-    """
     detail = await svc.get_hr_detail(hr_profile_id)
     return detail
 
@@ -118,9 +93,5 @@ async def reject_hr(
     status_code=status.HTTP_302_FOUND,
 )
 async def get_document(document_id: UUID, svc: AdminService = Depends(get_admin_service)):
-    """
-    Redirect ke URL Cloudinary dari dokumen (misalnya file NPWP).
-    Gunakan `document_id` dari field `npwp_document.document_id` di endpoint detail HR.
-    """
     url = await svc.get_document_url(document_id)
     return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)

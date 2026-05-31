@@ -49,10 +49,10 @@ export const dummyHrApplications = {
   },
 };
 
-// Helper untuk mendapatkan dummy data berdasarkan ID
+
 export function getDummyHrApplication(id) {
   return dummyHrApplications[id] || null;
 }
 
-// Helper untuk mendapatkan dummy list (untuk applicant list)
+
 export const dummyHrApplicationList = Object.values(dummyHrApplications);

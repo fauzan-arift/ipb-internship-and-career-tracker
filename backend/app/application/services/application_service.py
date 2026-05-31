@@ -1,7 +1,3 @@
-"""
-Application Service — Phase 3
-Handles student and HR views of applications, status updates (with history), and offer creation.
-"""
 import logging
 import math
 from datetime import datetime, timezone
@@ -34,7 +30,6 @@ from app.presentation.schemas.application import (
 
 logger = logging.getLogger(__name__)
 
-# Statuses that count as "in processing" (everything that is not final)
 _ACCEPTED_STATUSES = {ApplicationStatus.ACCEPTED.value, ApplicationStatus.DITERIMA.value}
 _REJECTED_STATUSES = {ApplicationStatus.REJECTED.value, ApplicationStatus.DITOLAK.value}
 
@@ -45,9 +40,7 @@ class ApplicationService:
         self.uow = uow
         self.email_service = email_service
 
-    # ─────────────────────────────────────────────────────────────
-    # Helpers
-    # ─────────────────────────────────────────────────────────────
+
 
     async def _resolve_student_profile(self, uow, user_id: UUID):
         student = await uow.users.get_student_profile_by_user_id(user_id)
@@ -93,18 +86,18 @@ class ApplicationService:
         any_expired = False
         for offer in pending_offers:
             if date.today() > offer.expiry_date:
-                # Update offer status to Rejected
+
                 updated_offer = offer.model_copy(update={"status": "Rejected"})
                 await uow.offers.save(updated_offer)
 
-                # Update application status to Ditolak
+
                 app = await uow.applications.get_by_id(offer.application_id)
                 if app:
                     old_status = app.status.value
                     updated_app = app.model_copy(update={"status": ApplicationStatus.DITOLAK})
                     await uow.applications.save(updated_app)
 
-                    # Write history
+
                     history = ApplicationStatusHistory(
                         application_id=app.id,
                         previous_status=old_status,
@@ -116,9 +109,7 @@ class ApplicationService:
         if any_expired:
             await uow.commit()
 
-    # ─────────────────────────────────────────────────────────────
-    # Student-facing
-    # ─────────────────────────────────────────────────────────────
+
 
     async def get_student_applications(
         self, student_user_id: UUID
@@ -126,7 +117,7 @@ class ApplicationService:
         async with self.uow as uow:
             student = await self._resolve_student_profile(uow, student_user_id)
             await self._auto_expire_pending_offers(uow, student.profile_id)
-            # student.profile_id = students table PK, used as FK in applications
+
             apps = await uow.applications.list_by_student(student.profile_id)
             
             total = len(apps)
@@ -206,9 +197,7 @@ class ApplicationService:
             offer=offer_brief,
         )
 
-    # ─────────────────────────────────────────────────────────────
-    # HR-facing
-    # ─────────────────────────────────────────────────────────────
+
 
     async def list_hr_applicants(
         self,
@@ -221,7 +210,7 @@ class ApplicationService:
         async with self.uow as uow:
             company = await self._resolve_hr_company(uow, hr_user_id)
 
-            # Ownership check
+
             internship = await uow.internships.get_by_id(internship_id)
             if not internship or internship.company_id != company.id:
                 raise HTTPException(
@@ -241,7 +230,7 @@ class ApplicationService:
                 student_profile = await uow.users.get_student_profile_by_id(app.student_id)
                 user_orm = None
                 if student_profile:
-                    # student_profile.id == user_orm.id (set by _student_to_domain mapper)
+
                     user_orm = await uow.users.get_by_id(student_profile.id)
 
                 full_name = user_orm.full_name if user_orm else "Unknown"
@@ -284,7 +273,7 @@ class ApplicationService:
             if not app:
                 raise HTTPException(status_code=404, detail="Lamaran tidak ditemukan.")
 
-            # Ownership: verify internship belongs to company
+
             internship = await uow.internships.get_by_id(app.internship_id)
             if not internship or internship.company_id != company.id:
                 raise HTTPException(
@@ -292,11 +281,11 @@ class ApplicationService:
                     detail="Anda tidak memiliki akses ke lamaran ini.",
                 )
 
-            # Build student detail
+
             student_profile = await uow.users.get_student_profile_by_id(app.student_id)
             if not student_profile:
                 raise HTTPException(status_code=404, detail="Profil mahasiswa tidak ditemukan.")
-            # student_profile.id == user_orm.id (set by _student_to_domain mapper)
+
             user_orm = await uow.users.get_by_id(student_profile.id)
 
             cv_url = None
@@ -311,7 +300,7 @@ class ApplicationService:
                 if doc:
                     photo_profile_url = doc.file_url
 
-            # student_profile.skills is already List[str] from the domain mapper
+
             skill_names = student_profile.skills if student_profile.skills else []
 
             history_list = await uow.applications.get_status_history(application_id)
@@ -352,7 +341,7 @@ class ApplicationService:
         application_id: UUID,
         new_status: str,
     ) -> None:
-        # ── gather everything we need for email BEFORE closing the UoW ──
+
         student_user = None
         internship_title = ""
         company_name = ""
@@ -373,7 +362,7 @@ class ApplicationService:
 
             old_status = app.status.value
 
-            # Validate new status value (Case-Insensitive)
+
             try:
                 target = new_status.strip().lower()
                 updated_status = next(
@@ -391,7 +380,7 @@ class ApplicationService:
             updated_app = app.model_copy(update={"status": updated_status})
             await uow.applications.save(updated_app)
 
-            # CRITICAL: Record status history
+
             history = ApplicationStatusHistory(
                 application_id=app.id,
                 previous_status=old_status,
@@ -400,15 +389,15 @@ class ApplicationService:
             await uow.applications.save_status_history(history)
             await uow.commit()
 
-            # Collect email data while session is still open
+
             internship_title = internship.title
             company_name = company.company_name
             student_profile = await uow.users.get_student_profile_by_id(app.student_id)
             if student_profile:
-                # student_profile.id == user_orm.id (set by _student_to_domain mapper)
+
                 student_user = await uow.users.get_by_id(student_profile.id)
 
-        # ── send email AFTER commit (non-blocking, never fails the request) ──
+
         if self.email_service and student_user:
             try:
                 await self.email_service.send_application_status_update(
@@ -455,7 +444,7 @@ class ApplicationService:
                 search=None,
             )
 
-            # Collect raw applications enriched with internship title
+
             raw: list[tuple] = []  # (application, internship_title)
             for internship in all_internships:
                 apps, _ = await uow.applications.list_by_internship(
@@ -467,7 +456,7 @@ class ApplicationService:
                 for app in apps:
                     raw.append((app, internship.title, internship.id))
 
-            # Sort by application_time descending (newest first)
+
             _epoch = datetime(1970, 1, 1, tzinfo=timezone.utc)
             raw.sort(
                 key=lambda t: t[0].application_time or _epoch,
@@ -477,7 +466,7 @@ class ApplicationService:
             total = len(raw)
             total_pages = math.ceil(total / limit) if limit else 0
 
-            # Paginate in Python
+
             start = (page - 1) * limit
             page_slice = raw[start: start + limit]
 

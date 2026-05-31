@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, model_validator
 from app.domain.entities.enums import WorkStatus, PaymentStatus
 
 
-# ===================== Nested Company Info =====================
+
 
 class CompanySummary(BaseModel):
     id: UUID
@@ -25,7 +25,7 @@ class CompanySummary(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ===================== Request Schemas =====================
+
 
 class InternshipCreateRequest(BaseModel):
     title: str = Field(..., min_length=3, max_length=255)
@@ -88,7 +88,7 @@ class InternshipReopenRequest(BaseModel):
         return self
 
 
-# ===================== Response Schemas =====================
+
 
 class InternshipListItem(BaseModel):
     id: UUID

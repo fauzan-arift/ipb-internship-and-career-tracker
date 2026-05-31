@@ -14,8 +14,6 @@ import FormField from '@/components/molecules/FormField';
 import DateRangePicker from '@/components/atoms/DateRangePicker';
 import DatePicker from '@/components/atoms/DatePicker';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-
 const STATUS_GAJI_OPTIONS = [
   { value: 'Paid', label: 'Paid Internship' },
   { value: 'Unpaid', label: 'Unpaid Internship' },
@@ -26,8 +24,6 @@ const STATUS_PELAKSANAAN_OPTIONS = [
   { value: 'WFO', label: 'WFO (Work From Office)' },
   { value: 'WFA', label: 'WFA (Work From Anywhere)' },
 ];
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 function CreateInternship() {
   const navigate = useNavigate();

@@ -1,6 +1,3 @@
-"""
-HrService — handles HR/Company-facing profile operations.
-"""
 import logging
 from typing import Optional
 from uuid import UUID
@@ -64,7 +61,7 @@ class HrService:
                     detail="Profil perusahaan tidak ditemukan.",
                 )
 
-            # Validate photo_profile_id if provided
+
             if "photo_profile_id" in payload and payload["photo_profile_id"] is not None:
                 doc = await uow.documents.get_by_id(payload["photo_profile_id"])
                 if not doc:
@@ -73,7 +70,7 @@ class HrService:
                         detail="Dokumen foto profil tidak ditemukan. Upload terlebih dahulu.",
                     )
 
-            # Apply partial updates to the company domain entity
+
             updated_company = company.model_copy(update=payload)
             saved = await uow.companies.save(updated_company)
             await uow.commit()

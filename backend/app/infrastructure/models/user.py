@@ -21,7 +21,6 @@ class UserORM(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    # Relationships
     student = relationship("StudentORM", back_populates="user", uselist=False, cascade="all, delete-orphan")
     hr = relationship("HrORM", back_populates="user", uselist=False, cascade="all, delete-orphan")
     admin = relationship("AdminORM", back_populates="user", uselist=False, cascade="all, delete-orphan")

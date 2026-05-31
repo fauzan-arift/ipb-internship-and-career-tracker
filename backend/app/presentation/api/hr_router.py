@@ -1,12 +1,3 @@
-"""
-HR Router
-GET  /api/v1/hr/company-profile                                   — get own company profile
-PUT  /api/v1/hr/company-profile                                   — update own company profile
-GET  /api/v1/hr/internships/{internship_id}/applications          — list applicants for internship
-GET  /api/v1/hr/applications/{application_id}                     — detail view of an applicant
-PATCH /api/v1/hr/applications/{application_id}/status             — update application status
-POST  /api/v1/hr/applications/{application_id}/offers             — create a job offer
-"""
 from typing import Optional
 from uuid import UUID
 
@@ -54,8 +45,6 @@ def get_offer_service(
     return OfferService(uow=uow)
 
 
-# ─── HR Personal Profile ──────────────────────────────────────────────────────
-
 @router.get(
     "/profile",
     summary="Lihat profil pribadi HR saya",
@@ -66,7 +55,6 @@ async def get_my_hr_profile(
     current_user=Depends(require_role("HR")),
     svc: HrService = Depends(get_hr_service),
 ):
-    """Mengembalikan data pribadi HR yang sedang login (nama, posisi, nomor telepon)."""
     hr = await svc.get_hr_profile(hr_user_id=current_user.id)
     return HRProfileResponse(
         id=hr.id,
@@ -88,10 +76,6 @@ async def update_my_hr_profile(
     current_user=Depends(require_role("HR")),
     svc: HrService = Depends(get_hr_service),
 ):
-    """
-    Update parsial profil pribadi HR (nama lengkap, posisi, nomor telepon).
-    Hanya field yang dikirim yang akan diubah.
-    """
     data = body.model_dump(exclude_unset=True)
     hr = await svc.update_hr_profile(hr_user_id=current_user.id, payload=data)
     return HRProfileResponse(
@@ -103,8 +87,6 @@ async def update_my_hr_profile(
     )
 
 
-# ─── Company Profile ──────────────────────────────────────────────────────────
-
 @router.get(
     "/company-profile",
     summary="Lihat profil perusahaan saya",
@@ -115,7 +97,6 @@ async def get_my_company_profile(
     current_user=Depends(require_role("HR")),
     svc: HrService = Depends(get_hr_service),
 ):
-    """Mengembalikan profil perusahaan yang terhubung dengan akun HR yang sedang login."""
     company, photo_url = await svc.get_company_profile(hr_user_id=current_user.id)
     return CompanyProfileResponse(
         **company.model_dump(),
@@ -134,11 +115,6 @@ async def update_my_company_profile(
     current_user=Depends(require_role("HR")),
     svc: HrService = Depends(get_hr_service),
 ):
-    """
-    Update parsial profil perusahaan.
-    Hanya field yang dikirim yang akan diubah.
-    Gunakan `photo_profile_id` dari hasil endpoint `/documents/upload`.
-    """
     data = body.model_dump(exclude_unset=True)
     updated, photo_url = await svc.update_company_profile(hr_user_id=current_user.id, payload=data)
     return CompanyProfileResponse(
@@ -146,8 +122,6 @@ async def update_my_company_profile(
         photo_profile_url=photo_url,
     )
 
-
-# ─── Applicant Management ─────────────────────────────────────────────────────
 
 @router.get(
     "/internships/{internship_id}/applications",
@@ -163,10 +137,6 @@ async def list_applicants(
     current_user=Depends(require_role("HR")),
     svc: ApplicationService = Depends(get_application_service),
 ):
-    """
-    Mengembalikan daftar pelamar untuk lowongan yang dimiliki perusahaan HR.
-    Mendukung filter status dan paginasi.
-    """
     return await svc.list_hr_applicants(
         hr_user_id=current_user.id,
         internship_id=internship_id,
@@ -189,11 +159,6 @@ async def list_all_applicants(
     current_user=Depends(require_role("HR")),
     svc: ApplicationService = Depends(get_application_service),
 ):
-    """
-    Mengembalikan semua pelamar dari **seluruh** lowongan yang diposting oleh perusahaan HR.
-    Response menyertakan `internship_id` dan `internship_title` pada setiap item.
-    Mendukung filter status dan paginasi.
-    """
     return await svc.list_all_hr_applicants(
         hr_user_id=current_user.id,
         status_filter=status_filter,
@@ -213,9 +178,6 @@ async def get_applicant_detail(
     current_user=Depends(require_role("HR")),
     svc: ApplicationService = Depends(get_application_service),
 ):
-    """
-    Mengembalikan profil lengkap mahasiswa pelamar beserta riwayat status lamaran.
-    """
     return await svc.get_hr_applicant_detail(
         hr_user_id=current_user.id,
         application_id=application_id,
@@ -245,7 +207,8 @@ async def update_application_status(
     )
 
 
-# ─── Offer ────────────────────────────────────────────────────────────────────
+
+
 
 @router.post(
     "/applications/{application_id}/offers",

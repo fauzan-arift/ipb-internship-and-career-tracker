@@ -30,22 +30,6 @@ app = FastAPI(
 ## IPB Internship & Career Tracker API
 
 API backend untuk portal magang IPB. Mendukung tiga role pengguna:
-
-| Role | Akses |
-|------|-------|
-| **Student** | Lihat lowongan, lamar, lihat status & penawaran |
-| **HR** | Kelola lowongan, review pelamar, kirim penawaran |
-| **Admin** | Approve/reject akun HR |
-
-### Autentikasi
-Semua endpoint yang membutuhkan login menggunakan **Bearer Token** (JWT).
-Dapatkan token via `POST /api/v1/auth/login`, lalu klik tombol **Authorize** di atas dan masukkan:
-```
-Bearer <token>
-```
-
-### Status Lamaran
-`Pending` → `Diproses` → `Review HR` → `Interview` → `Diterima` → `Ditawarkan` → `Diterima/Ditolak`
     """,
     lifespan=lifespan,
     contact={"name": "IPB Internship Portal"},

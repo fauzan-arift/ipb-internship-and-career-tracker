@@ -1,8 +1,3 @@
-"""
-Offer Service — Phase 3 & 4
-Handles creating job offers for accepted applicants,
-and the student's respond (accept / reject) flow.
-"""
 import logging
 from datetime import date
 from typing import Optional
@@ -43,7 +38,7 @@ class OfferService:
         payload: OfferCreateRequest,
     ) -> OfferResponse:
         async with self.uow as uow:
-            # Resolve HR's company
+
             hr = await uow.users.get_hr_by_user_id(hr_user_id)
             if not hr:
                 raise HTTPException(status_code=404, detail="Profil HR tidak ditemukan.")
@@ -51,12 +46,12 @@ class OfferService:
             if not company:
                 raise HTTPException(status_code=404, detail="Perusahaan HR tidak ditemukan.")
 
-            # Validate application exists
+
             app = await uow.applications.get_by_id(application_id)
             if not app:
                 raise HTTPException(status_code=404, detail="Lamaran tidak ditemukan.")
 
-            # Validate ownership
+
             internship = await uow.internships.get_by_id(app.internship_id)
             if not internship or internship.company_id != company.id:
                 raise HTTPException(
@@ -64,7 +59,7 @@ class OfferService:
                     detail="Anda tidak memiliki akses ke lamaran ini.",
                 )
 
-            # Prevent duplicate offers
+
             existing_offer = await uow.offers.get_by_application_id(application_id)
             if existing_offer:
                 raise HTTPException(
@@ -72,7 +67,7 @@ class OfferService:
                     detail="Penawaran untuk lamaran ini sudah ada.",
                 )
 
-            # Check if quota is full
+
             accepted_count = await uow.applications.count_accepted_by_internship(internship.id)
             if accepted_count >= internship.quota:
                 raise HTTPException(
@@ -80,7 +75,7 @@ class OfferService:
                     detail="Kuota magang sudah terpenuhi, tidak bisa memberikan penawaran lagi."
                 )
 
-            # Validate offering file document exists
+
             doc = await uow.documents.get_by_id(payload.offering_file_id)
             if not doc:
                 raise HTTPException(
@@ -88,7 +83,7 @@ class OfferService:
                     detail="Dokumen penawaran tidak ditemukan.",
                 )
 
-            # Create the offer
+
             offer = Offer(
                 application_id=application_id,
                 offer_date=payload.offer_date,
@@ -101,14 +96,14 @@ class OfferService:
             )
             saved_offer = await uow.offers.save(offer)
 
-            # Side effect 1: Update application status to "Ditawarkan"
+
             old_status = app.status.value
             updated_app = app.model_copy(
                 update={"status": ApplicationStatus.DITAWARKAN}
             )
             await uow.applications.save(updated_app)
 
-            # Side effect 2: Record status history
+
             history = ApplicationStatusHistory(
                 application_id=application_id,
                 previous_status=old_status,
@@ -131,9 +126,7 @@ class OfferService:
             offering_file_url=doc.file_url,
         )
 
-    # ─────────────────────────────────────────────────────────────
-    # Student-facing
-    # ─────────────────────────────────────────────────────────────
+
 
     async def get_student_offers(
         self,
@@ -146,12 +139,12 @@ class OfferService:
         the offering-letter file URL, and internship/company info.
         """
         async with self.uow as uow:
-            # Resolve student profile (students.id = FK in applications)
+
             student = await uow.users.get_student_profile_by_user_id(student_user_id)
             if not student:
                 raise HTTPException(status_code=404, detail="Profil mahasiswa tidak ditemukan.")
 
-            # Auto-expire pending offers
+
             pending_offers = await uow.offers.list_by_student_id(
                 student_id=student.profile_id,
                 status_filter="Pending",
@@ -159,18 +152,18 @@ class OfferService:
             any_expired = False
             for offer in pending_offers:
                 if date.today() > offer.expiry_date:
-                    # Update offer status to Rejected
+
                     updated_offer = offer.model_copy(update={"status": "Rejected"})
                     await uow.offers.save(updated_offer)
 
-                    # Update application status to Ditolak
+
                     app = await uow.applications.get_by_id(offer.application_id)
                     if app:
                         old_status = app.status.value
                         updated_app = app.model_copy(update={"status": ApplicationStatus.DITOLAK})
                         await uow.applications.save(updated_app)
 
-                        # Write history
+
                         history = ApplicationStatusHistory(
                             application_id=app.id,
                             previous_status=old_status,
@@ -189,13 +182,13 @@ class OfferService:
 
             items = []
             for offer in offers:
-                # Resolve the offering letter URL
+
                 file_url = None
                 doc = await uow.documents.get_by_id(offer.offering_file_id)
                 if doc:
                     file_url = doc.file_url
 
-                # Resolve internship + company info
+
                 app = await uow.applications.get_by_id(offer.application_id)
                 internship_title = "Unknown"
                 company_name = "Unknown"
@@ -256,12 +249,12 @@ class OfferService:
           C. Insert ApplicationStatusHistory record
         """
         async with self.uow as uow:
-            # 1. Fetch the offer
+
             offer = await uow.offers.get_by_id(offer_id)
             if not offer:
                 raise HTTPException(status_code=404, detail="Penawaran tidak ditemukan.")
 
-            # 2. Ownership check
+
             student = await uow.users.get_student_profile_by_user_id(student_user_id)
             if not student:
                 raise HTTPException(status_code=404, detail="Profil mahasiswa tidak ditemukan.")
@@ -273,25 +266,23 @@ class OfferService:
                     detail="Anda tidak memiliki akses ke penawaran ini.",
                 )
 
-            # 3. Expiry check
+
             if date.today() > offer.expiry_date:
                 raise HTTPException(status_code=400, detail="Penawaran telah kedaluwarsa.")
 
-            # 4. State guard — only Pending offers can be responded to
+
             if offer.status != OfferStatus.PENDING.value:
                 raise HTTPException(
                     status_code=409,
                     detail=f"Penawaran sudah dalam status '{offer.status}' dan tidak dapat diubah.",
                 )
 
-            # ── Atomic side-effects ──────────────────────────────
 
-            # A. Update offer status
-            new_offer_status = payload.response_status  # "Accepted" or "Rejected"
+            new_offer_status = payload.response_status
             updated_offer = offer.model_copy(update={"status": new_offer_status})
             saved_offer = await uow.offers.save(updated_offer)
 
-            # B. Update application status to match the decision
+
             old_app_status = app.status.value
             new_app_status = (
                 ApplicationStatus.DITERIMA
@@ -301,7 +292,7 @@ class OfferService:
             updated_app = app.model_copy(update={"status": new_app_status})
             await uow.applications.save(updated_app)
 
-            # C. Record the status change in history
+
             history = ApplicationStatusHistory(
                 application_id=app.id,
                 previous_status=old_app_status,
@@ -312,13 +303,13 @@ class OfferService:
             # D. If student ACCEPTED — increment CareerMapping counter (same transaction)
             if new_offer_status == OfferStatus.ACCEPTED.value:
                 try:
-                    # Fetch the student ORM (need faculty + major)
+
                     _student_r = await uow._session.execute(
                         _sa_select(_StudentORM).where(_StudentORM.id == app.student_id)
                     )
                     student_orm = _student_r.scalars().first()
 
-                    # Fetch the internship to get company_id
+
                     internship = await uow.internships.get_by_id(app.internship_id)
 
                     if student_orm and internship and student_orm.faculty and student_orm.major:
@@ -381,7 +372,7 @@ class OfferService:
             if doc:
                 file_url = doc.file_url
 
-            # Single commit — if any step above raised, the transaction rolls back
+
             await uow.commit()
 
         return OfferResponse(

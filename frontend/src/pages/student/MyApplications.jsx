@@ -4,9 +4,8 @@ import ApplicationListItem from '@/components/molecules/ApplicationListItem';
 import ApplicationDetailPanel from '@/components/organisms/ApplicationDetailPanel';
 import { useApplications } from '@/hooks/useApplications';
 
-// ---------------------------------------------------------------------------
-// Skeleton primitives
-// ---------------------------------------------------------------------------
+
+
 
 const Shimmer = ({ className = '', style = {} }) => (
   <div
@@ -102,9 +101,8 @@ const MyApplicationsSkeleton = () => (
   </div>
 );
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
+
+
 
 function MyApplications() {
   const {

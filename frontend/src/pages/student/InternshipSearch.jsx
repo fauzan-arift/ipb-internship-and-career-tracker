@@ -26,13 +26,13 @@ function getTagLabel(status) {
 
 const InternshipCardSkeleton = () => (
   <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm animate-pulse flex flex-col gap-4">
-    {/* Tags */}
+
     <div className="flex gap-2">
       <div className="h-6 w-16 bg-gray-200 rounded-full" />
       <div className="h-6 w-24 bg-gray-200 rounded-full" />
     </div>
 
-    {/* Avatar & Title */}
+
     <div className="flex items-center gap-4 my-2">
       <div className="h-12 w-12 bg-gray-200 rounded-lg shrink-0" />
       <div className="flex flex-col gap-2 w-full">
@@ -41,7 +41,7 @@ const InternshipCardSkeleton = () => (
       </div>
     </div>
 
-    {/* Location & Duration */}
+
     <div className="space-y-3 my-2">
       <div className="flex items-center gap-2">
         <div className="h-3 w-3 bg-gray-200 rounded-full shrink-0" />
@@ -53,7 +53,7 @@ const InternshipCardSkeleton = () => (
       </div>
     </div>
 
-    {/* Footer */}
+
     <div className="flex justify-between items-center border-t pt-4 border-gray-100 mt-2">
       <div className="h-3 bg-gray-200 rounded w-20" />
       <div className="h-8 bg-gray-200 rounded-lg w-24" />

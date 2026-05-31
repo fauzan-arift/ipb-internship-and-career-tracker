@@ -1,8 +1,3 @@
-"""
-Infrastructure Model — CareerMapping
-Tracks how many alumni (students who accepted an offer) from a specific
-faculty+major have been accepted into each company.
-"""
 import uuid
 
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, UniqueConstraint
@@ -40,5 +35,4 @@ class CareerMappingORM(Base):
         UniqueConstraint("faculty", "major", "company_id", name="uq_career_mapping_faculty_major_company"),
     )
 
-    # Relationships
     company = relationship("CompanyORM", foreign_keys=[company_id])

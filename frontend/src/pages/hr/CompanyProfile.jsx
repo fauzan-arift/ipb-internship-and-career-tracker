@@ -4,16 +4,12 @@ import hrService from '@/services/hrService'
 import TextInput from '@/components/atoms/TextInput'
 import FormField from '@/components/molecules/FormField'
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
   return new Date(dateStr).toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric',
   })
 }
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
 
 const ProfileSkeleton = () => (
   <div className="flex flex-col gap-6 animate-pulse">
@@ -54,8 +50,6 @@ const InfoRow = ({ label, value, children }) => (
   </div>
 )
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
 /**
  * CompanyProfile page
  *
@@ -63,7 +57,7 @@ const InfoRow = ({ label, value, children }) => (
  * Layout : DashboardLayout role="hr" wraps this in App.jsx
  */
 export default function CompanyProfile() {
-  // ── Server state ──
+
   const [profile, setProfile]       = useState(null)
   const [isLoading, setIsLoading]   = useState(true)
   const [isSaving, setIsSaving]     = useState(false)
@@ -71,7 +65,7 @@ export default function CompanyProfile() {
   const [errorMsg, setErrorMsg]     = useState('')
   const [successMsg, setSuccessMsg] = useState('')
 
-  // ── Editable fields ──
+
   const [companyName, setCompanyName] = useState('')
   const [address, setAddress]         = useState('')
   const [industry, setIndustry]       = useState('')
@@ -79,18 +73,18 @@ export default function CompanyProfile() {
   const [description, setDescription] = useState('')
   const [companyEmail, setCompanyEmail] = useState('')
 
-  // ── Editable personal fields ──
+
   const [fullName, setFullName]       = useState('')
   const [position, setPosition]       = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [hrEmail, setHrEmail]         = useState('')
 
-  // ── Photo state ──
+
   const [photoUrl, setPhotoUrl]         = useState(null)
   const [newPhotoFile, setNewPhotoFile] = useState(null)
   const photoInputRef = useRef(null)
 
-  // ── Fetch on mount ──
+
   useEffect(() => {
     const fetchProfile = async () => {
       setIsLoading(true)
@@ -106,7 +100,7 @@ export default function CompanyProfile() {
         setCompanyEmail(data.email ?? '')
         setPhotoUrl(data.photo_profile_url ?? null)
 
-        // Fetch personal info
+
         const personal = await hrService.getPersonalProfile()
         setFullName(personal.full_name ?? '')
         setPosition(personal.position ?? '')
@@ -122,7 +116,7 @@ export default function CompanyProfile() {
     fetchProfile()
   }, [])
 
-  // ── Photo ──
+
   const handlePhotoFile = (file) => {
     if (!file) return
     setNewPhotoFile(file)
@@ -131,7 +125,7 @@ export default function CompanyProfile() {
     reader.readAsDataURL(file)
   }
 
-  // ── Save ──
+
   const handleSave = async () => {
     setIsSaving(true)
     setErrorMsg('')
@@ -157,7 +151,7 @@ export default function CompanyProfile() {
 
       const updated = await hrService.updateProfile(payload)
       
-      // Save personal info
+
       const personalPayload = {
         full_name:    fullName,
         position:     position,
@@ -181,14 +175,14 @@ export default function CompanyProfile() {
     }
   }
 
-  // ── Loading ──
+
   if (isLoading) return (
     <div className="p-0 max-w-[860px] mx-auto">
       <ProfileSkeleton />
     </div>
   )
 
-  // ── Error ──
+
   if (isError) return (
     <div className="p-0 max-w-[860px] mx-auto flex flex-col items-center gap-4 mt-16">
       <p className="text-[#1B1B21] text-lg font-semibold">Gagal memuat profil perusahaan</p>

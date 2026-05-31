@@ -71,7 +71,7 @@ class InternshipService:
             photo_profile_url=photo_url,
         )
 
-    # ==================== Student-facing ====================
+
 
     async def list_active_internships(
         self,
@@ -150,7 +150,7 @@ class InternshipService:
                     detail="Mohon maaf, kuota penerimaan untuk lowongan magang ini sudah penuh.",
                 )
 
-            # Critical business rule: student MUST have uploaded a CV to their profile
+
             student = await uow.users.get_student_profile_by_user_id(student_user_id)
             if not student or not student.cv_id:
                 raise HTTPException(
@@ -158,7 +158,7 @@ class InternshipService:
                     detail="Kamu harus mengupload CV di profil sebelum melamar lowongan.",
                 )
 
-            # Check duplicate application
+
             existing = await uow.applications.get_by_student_and_internship(
                 student_profile_id, internship_id
             )
@@ -168,7 +168,7 @@ class InternshipService:
                     detail="Kamu sudah mendaftar ke lowongan ini.",
                 )
 
-            # Validate the submitted CV document exists
+
             cv_doc = await uow.documents.get_by_id(submitted_cv_id)
             if not cv_doc:
                 raise HTTPException(
@@ -184,7 +184,7 @@ class InternshipService:
             )
             saved_app = await uow.applications.save(application)
 
-            # Auto-create initial status history
+
             history = ApplicationStatusHistory(
                 application_id=saved_app.id,
                 previous_status=None,
@@ -203,7 +203,7 @@ class InternshipService:
             application_time=saved_app.application_time,
         )
 
-    # ==================== HR-facing ====================
+
 
     async def list_hr_internships(
         self,
@@ -349,7 +349,7 @@ class InternshipService:
                     detail="Anda tidak memiliki akses ke lowongan ini.",
                 )
 
-            # Guard: refuse deletion if any applicants exist
+
             application_count = await uow.applications.count_by_internship(internship_id)
             if application_count > 0:
                 raise HTTPException(
@@ -407,3 +407,4 @@ class InternshipService:
             **saved.model_dump(exclude={"company_id"}),
             company=company_summary,
         )
+

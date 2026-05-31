@@ -4,8 +4,6 @@ import { Users, Clock, RefreshCw, AlertCircle, TrendingUp } from 'lucide-react';
 import AvatarSquare from '@/components/atoms/AvatarSquare';
 import { useCareerMapping } from '@/hooks/useCareerMapping';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function getInitials(name) {
   if (!name) return '?';
   return name
@@ -25,8 +23,6 @@ function colorFor(name = '') {
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
   return PALETTE[h % PALETTE.length];
 }
-
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 const Shimmer = ({ className = '', style = {} }) => (
   <div
@@ -79,15 +75,13 @@ function CareerMappingSkeleton() {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
 export default function CareerMapping() {
   const { data, isLoading, error, refresh } = useCareerMapping();
 
-  // ── Loading ──
+
   if (isLoading) return <CareerMappingSkeleton />;
 
-  // ── Error ──
+
   if (error) {
     return (
       <div className="flex flex-col gap-6">
@@ -116,7 +110,7 @@ export default function CareerMapping() {
     );
   }
 
-  // ── No data yet (empty distributions) ──
+
   const companies = data?.company_distributions ?? [];
   const grandTotal = data?.grand_total_students ?? 0;
   const faculty = data?.faculty ?? '';

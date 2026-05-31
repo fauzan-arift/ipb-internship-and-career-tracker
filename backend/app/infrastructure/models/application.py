@@ -21,7 +21,7 @@ class ApplicationORM(Base):
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # Relationships
+
     student = relationship("StudentORM", back_populates="applications")
     internship = relationship("InternshipORM", back_populates="applications")
     cv = relationship("DocumentORM", foreign_keys=[submitted_cv_id])

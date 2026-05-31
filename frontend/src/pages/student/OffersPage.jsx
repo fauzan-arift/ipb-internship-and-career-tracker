@@ -3,9 +3,7 @@ import OfferCard from '@/components/organisms/OfferCard';
 import ConfirmationDialog from '@/components/organisms/ConfirmationDialog';
 import { useOffers } from '@/hooks/useOffers';
 
-// ---------------------------------------------------------------------------
-// Skeleton primitives
-// ---------------------------------------------------------------------------
+
 
 const Shimmer = ({ className = '', style = {} }) => (
   <div
@@ -27,7 +25,7 @@ const Shimmer = ({ className = '', style = {} }) => (
 
 const OfferCardSkeleton = () => (
   <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col gap-5">
-    {/* Company header */}
+
     <div className="flex items-center gap-4">
       <Shimmer className="w-14 h-14 rounded-xl flex-shrink-0" />
       <div className="flex flex-col gap-2 flex-1">
@@ -39,7 +37,7 @@ const OfferCardSkeleton = () => (
 
     <div className="border-t border-gray-100" />
 
-    {/* Info grid */}
+
     <div className="grid grid-cols-2 gap-4">
       {[['w-16', 'w-32'], ['w-20', 'w-28'], ['w-14', 'w-36'], ['w-18', 'w-24']].map(([lw, vw], i) => (
         <div key={i} className="flex flex-col gap-1.5">
@@ -51,7 +49,7 @@ const OfferCardSkeleton = () => (
 
     <div className="border-t border-gray-100" />
 
-    {/* Description lines */}
+
     <div className="flex flex-col gap-2">
       <Shimmer className="h-3 w-28 rounded-full" />
       <div className="flex flex-col gap-1.5 mt-1">
@@ -61,7 +59,7 @@ const OfferCardSkeleton = () => (
       </div>
     </div>
 
-    {/* Action buttons */}
+
     <div className="flex gap-3 pt-1">
       <Shimmer className="h-10 flex-1 rounded-lg" />
       <Shimmer className="h-10 flex-1 rounded-lg" />
@@ -80,9 +78,7 @@ const OffersPageSkeleton = () => (
   </div>
 );
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
+
 
 function OffersPage() {
   const { offers, isLoading, error, acceptOffer, rejectOffer, refetch } = useOffers();
@@ -130,7 +126,7 @@ function OffersPage() {
     <div className="h-full p-0">
       <h1 className="text-2xl font-bold mb-6 text-gray-900">Tawaran Lowongan</h1>
 
-      {/* Non-fatal error (e.g. accept/reject failed) */}
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6 flex items-center justify-between gap-4">
           <span className="text-sm">{error}</span>

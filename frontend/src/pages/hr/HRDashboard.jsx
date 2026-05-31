@@ -37,10 +37,7 @@ function HRDashboard() {
     initialSearch: '', initialPage: 1, initialLimit: ITEMS_PER_PAGE
   });
 
-  // Debug: log items to inspect backend response shape (remove in production)
-  React.useEffect(() => {
-    console.debug('HR internships fetched:', items);
-  }, [items]);
+
 
   function onSearchChange(event) {
     const q = event.target.value;
@@ -70,7 +67,7 @@ function HRDashboard() {
     setDialogOpen(true);
   }
 
-  // Real-time validation
+
   React.useEffect(() => {
     if (pendingAction.action === 'reopen' && reopenDate && pendingStartDate) {
       const d = new Date(reopenDate.toISOString().split('T')[0]);
