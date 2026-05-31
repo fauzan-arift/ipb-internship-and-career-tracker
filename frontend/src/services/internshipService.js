@@ -15,7 +15,7 @@ export const internshipService = {
     return response.data;
   },
  
-  // submitted_cv_id is required by the backend
+
   apply: async (internshipId, cvId) => {
     const response = await api.post(`${BASE_PATH}/${internshipId}/apply`, {
       submitted_cv_id: cvId,

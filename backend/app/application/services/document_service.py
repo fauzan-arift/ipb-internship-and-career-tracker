@@ -1,8 +1,3 @@
-"""
-DocumentService — thin wrapper around FileService for the upload endpoint.
-Delegates the actual upload + DB save to FileService, then returns the
-DocumentResponse schema for the API layer.
-"""
 from app.domain.entities.enums import DocumentType
 from app.domain.unit_of_work import IUnitOfWork
 from app.infrastructure.file_service import FileService
@@ -20,7 +15,6 @@ class DocumentService:
         Validate document_type, delegate upload to FileService, commit, and
         return the saved Document domain entity.
         """
-        # Validate that document_type is a known enum value
         try:
             doc_type = DocumentType(document_type)
         except ValueError:

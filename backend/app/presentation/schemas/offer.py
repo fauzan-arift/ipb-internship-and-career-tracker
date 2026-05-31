@@ -7,7 +7,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-# ===================== Request Schemas =====================
+
 
 class OfferCreateRequest(BaseModel):
     offer_date: date
@@ -18,7 +18,7 @@ class OfferCreateRequest(BaseModel):
     offering_file_id: UUID
 
 
-# ===================== Response Schemas =====================
+
 
 class OfferResponse(BaseModel):
     id: UUID
@@ -35,7 +35,7 @@ class OfferResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ===================== Student Offer Response Schemas =====================
+
 
 class OfferInternshipBrief(BaseModel):
     """Minimal internship info embedded in an offer card."""
@@ -64,7 +64,7 @@ class StudentOfferListResponse(BaseModel):
     offers: List[StudentOfferListItem]
 
 
-# ===================== Student Offer Action Schemas =====================
+
 
 class OfferRespondRequest(BaseModel):
     """Body for PATCH /students/offers/{offer_id}/respond."""

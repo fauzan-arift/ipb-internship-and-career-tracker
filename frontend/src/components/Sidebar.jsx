@@ -3,8 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import { offerService } from "@/services/offerService";
 import { hrApplicationService } from "@/services/hrApplicationService";
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-
 const BriefcaseIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 12H12.01M16 6V4C16 3.46957 15.7893 2.96086 15.4142 2.58579C15.0391 2.21071 14.5304 2 14 2H10C9.46957 2 8.96086 2.21071 8.58579 2.58579C8.21071 2.96086 8 3.46957 8 4V6M22 13C19.0328 14.959 15.5555 16.0033 12 16.0033C8.44445 16.0033 4.96721 14.959 2 13M4 6H20C21.1046 6 22 6.89543 22 8V18C22 19.1046 21.1046 20 20 20H4C2.89543 20 2 19.1046 2 18V8C2 6.89543 2.89543 6 4 6Z"
@@ -47,7 +45,7 @@ const UserIcon = () => (
   </svg>
 );
 
-// Admin icons
+
 const GridIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3 3H10V10H3V3ZM14 3H21V10H14V3ZM3 14H10V21H3V14ZM14 14H21V21H14V14Z"
@@ -76,8 +74,6 @@ const BuildingIcon = () => (
       stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
-
-// ─── Menu Data ────────────────────────────────────────────────────────────────
 
 const sidebarMenus = {
   student: [
@@ -108,14 +104,7 @@ const sidebarMenus = {
 
 };
 
-// ─── Sidebar Component ────────────────────────────────────────────────────────
 
-/**
- * Sidebar — role-aware, collapsible, normal document flow (NOT fixed/sticky)
- *
- * Props:
- *   role: "student" | "hr" | "company" | "admin"  (default: "student")
- */
 export default function Sidebar({ role = "student" }) {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
@@ -172,8 +161,8 @@ export default function Sidebar({ role = "student" }) {
         borderRight: "1px solid #E5E7EB",
         display: "flex",
         flexDirection: "column",
-        position: "relative",   // ✅ in normal flow — NOT fixed/sticky
-        alignSelf: "stretch",   // ✅ grows with page content height
+        position: "relative",
+        alignSelf: "stretch",
       }}
     >
       {/* Toggle button */}
@@ -245,7 +234,7 @@ export default function Sidebar({ role = "student" }) {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "12px", overflow: "hidden" }}>
-                {/* Icon inherits color from parent via currentColor */}
+
                 <span style={{ flexShrink: 0, display: "flex", position: "relative" }}>
                   {item.icon}
                   {collapsed && hasBadge && (

@@ -1,10 +1,3 @@
-"""
-Student Router
-GET  /api/v1/students/profile               — get own profile
-PUT  /api/v1/students/profile               — update own profile (partial)
-GET  /api/v1/students/applications          — list my applications + stats
-GET  /api/v1/students/applications/{id}     — detail of a single application (with timeline & offer)
-"""
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -64,7 +57,6 @@ async def get_my_profile(
     current_user=Depends(require_role("STUDENT")),
     svc: StudentService = Depends(get_student_service),
 ):
-    """Mengembalikan profil lengkap mahasiswa yang sedang login."""
     student, cv_url, photo_url = await svc.get_profile(user_id=current_user.id)
     return StudentProfileResponse(
         **student.model_dump(),
@@ -83,11 +75,6 @@ async def update_my_profile(
     current_user=Depends(require_role("STUDENT")),
     svc: StudentService = Depends(get_student_service),
 ):
-    """
-    Update parsial profil mahasiswa.
-    Hanya field yang dikirim yang akan diubah.
-    Gunakan `cv_id` dan `photo_profile_id` dari hasil endpoint `/documents/upload`.
-    """
     data = body.model_dump(exclude_unset=True)
     student, cv_url, photo_url = await svc.update_profile(user_id=current_user.id, payload=data)
     return StudentProfileResponse(
@@ -107,10 +94,6 @@ async def get_my_applications(
     current_user=Depends(require_role("STUDENT")),
     svc: ApplicationService = Depends(get_application_service),
 ):
-    """
-    Mengembalikan semua lamaran yang sudah dikirimkan oleh mahasiswa yang login,
-    lengkap dengan statistik (total, diproses, diterima, ditolak).
-    """
     return await svc.get_student_applications(student_user_id=current_user.id)
 
 
@@ -125,21 +108,14 @@ async def get_my_application_detail(
     current_user=Depends(require_role("STUDENT")),
     svc: ApplicationService = Depends(get_application_service),
 ):
-    """
-    Mengembalikan detail satu lamaran termasuk:
-    - Info lowongan & perusahaan
-    - Timeline riwayat status (terbaru di atas)
-    - Detail penawaran (jika sudah ada)
-    """
     return await svc.get_student_application_detail(
         student_user_id=current_user.id,
         application_id=application_id,
     )
 
 
-# ─────────────────────────────────────────────────────────────
-# Offer endpoints
-# ─────────────────────────────────────────────────────────────
+
+
 
 @router.get(
     "/offers",
@@ -155,10 +131,6 @@ async def get_my_offers(
     current_user=Depends(require_role("STUDENT")),
     svc: OfferService = Depends(get_offer_service),
 ):
-    """
-    Mengembalikan semua penawaran yang diterima mahasiswa yang login.
-    Gunakan query param `?status=Pending` (atau Accepted / Rejected) untuk memfilter.
-    """
     return await svc.get_student_offers(
         student_user_id=current_user.id,
         status_filter=status,
@@ -202,9 +174,8 @@ async def respond_to_offer(
     )
 
 
-# ─────────────────────────────────────────────────────────────
-# Career Mapping endpoint
-# ─────────────────────────────────────────────────────────────
+
+
 
 @router.get(
     "/career-mapping",

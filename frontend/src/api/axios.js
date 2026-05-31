@@ -7,7 +7,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add Authorization header
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -21,13 +21,13 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle 401 Unauthorized
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
-      // Redirect handled at a higher level or reload
+
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

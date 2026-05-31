@@ -1,6 +1,3 @@
-"""
-StudentService — handles student-facing profile operations.
-"""
 import logging
 from typing import Optional
 from uuid import UUID
@@ -46,7 +43,7 @@ class StudentService:
         commits, and returns the updated Student domain entity + resolved URLs.
         """
         async with self.uow as uow:
-            # Validate cv_id if provided
+
             if "cv_id" in payload and payload["cv_id"] is not None:
                 doc = await uow.documents.get_by_id(payload["cv_id"])
                 if not doc:
@@ -55,7 +52,7 @@ class StudentService:
                         detail="Dokumen CV tidak ditemukan. Upload terlebih dahulu.",
                     )
 
-            # Validate photo_profile_id if provided
+
             if "photo_profile_id" in payload and payload["photo_profile_id"] is not None:
                 doc = await uow.documents.get_by_id(payload["photo_profile_id"])
                 if not doc:

@@ -6,8 +6,6 @@ import SelectInput from '@/components/atoms/SelectInput'
 import FormField from '@/components/molecules/FormField'
 import UploadZone from '@/components/atoms/UploadZone'
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
 const SkillChip = ({ label, onRemove }) => (
   <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#E8F0FE]">
     <span className="text-[#3730A3] font-medium text-xs leading-4">{label}</span>
@@ -151,8 +149,6 @@ const ProfileSkeleton = () => (
   </div>
 )
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
-
 const EditIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <path d="M12 3.00023H5C4.46957 3.00023 3.96086 3.21094 3.58579 3.58601C3.21071 3.96109 3 4.46979 3 5.00023V19.0002C3 19.5307 3.21071 20.0394 3.58579 20.4144C3.96086 20.7895 4.46957 21.0002 5 21.0002H19C19.5304 21.0002 20.0391 20.7895 20.4142 20.4144C20.7893 20.0394 21 19.5307 21 19.0002V12.0002M18.375 2.62523C18.7728 2.2274 19.3124 2.00391 19.875 2.00391C20.4376 2.00391 20.9772 2.2274 21.375 2.62523C21.7728 3.02305 21.9963 3.56262 21.9963 4.12523C21.9963 4.68784 21.7728 5.2274 21.375 5.62523L12.362 14.6392C12.1245 14.8765 11.8312 15.0501 11.509 15.1442L8.636 15.9842C8.54995 16.0093 8.45874 16.0108 8.37191 15.9886C8.28508 15.9663 8.20583 15.9212 8.14245 15.8578C8.07907 15.7944 8.03389 15.7151 8.01164 15.6283C7.9894 15.5415 7.9909 15.4503 8.016 15.3642L8.856 12.4912C8.95053 12.1693 9.12453 11.8763 9.362 11.6392L18.375 2.62523Z"
@@ -194,10 +190,8 @@ const PlusIcon = () => (
   </svg>
 )
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
 export default function StudentProfile() {
-  // ── Server state ──
+
   const [profile, setProfile]       = useState(null)
   const [isLoading, setIsLoading]   = useState(true)
   const [isSaving, setIsSaving]     = useState(false)
@@ -205,7 +199,7 @@ export default function StudentProfile() {
   const [errorMsg, setErrorMsg]     = useState('')
   const [successMsg, setSuccessMsg] = useState('')
 
-  // ── Form fields ──
+
   const [fullName, setFullName]             = useState('')
   const [email, setEmail]                   = useState('')
   const [nim, setNim]                       = useState('')
@@ -218,7 +212,7 @@ export default function StudentProfile() {
   const [skillInput, setSkillInput]         = useState('')
   const [globalSkills, setGlobalSkills]     = useState([])
 
-  // ── File state ──
+
   const [cvUrl, setCvUrl]               = useState(null)
   const [newCvFile, setNewCvFile]       = useState(null)
   const [isDragging, setIsDragging]     = useState(false)
@@ -228,10 +222,10 @@ export default function StudentProfile() {
   const fileInputRef  = useRef(null)
   const photoInputRef = useRef(null)
 
-  // ── Derived ──
+
   const majorOptions = IPB_FACULTIES.find((f) => f.name === faculty)?.majors ?? []
 
-  // ── Fetch on mount ──
+
   useEffect(() => {
     const fetch = async () => {
       setIsLoading(true)
@@ -269,13 +263,13 @@ export default function StudentProfile() {
     fetchSkills()
   }, [])
 
-  // ── Faculty change resets major ──
+
   const handleFacultyChange = (e) => {
     setFaculty(e.target.value)
     setMajor('')
   }
 
-  // ── Skills ──
+
   const addSkill = (skillToAdd) => {
   const trimmed = (skillToAdd ?? skillInput).trim()
   if (!trimmed || skills.includes(trimmed)) return
@@ -287,7 +281,7 @@ export default function StudentProfile() {
     if (e.key === 'Enter') { e.preventDefault(); addSkill() }
   }
 
-  // ── CV ──
+
   const handleDrop = (e) => {
     e.preventDefault()
     setIsDragging(false)
@@ -302,7 +296,7 @@ export default function StudentProfile() {
     }
   }
 
-  // ── Photo ──
+
   const handlePhotoFile = (file) => {
     if (!file) return
     setNewPhotoFile(file)
@@ -311,7 +305,7 @@ export default function StudentProfile() {
     reader.readAsDataURL(file)
   }
 
-  // ── Save ──
+
   const handleSave = async () => {
     setIsSaving(true)
     setErrorMsg('')
@@ -386,14 +380,14 @@ export default function StudentProfile() {
     }
   }
 
-  // ── Loading ──
+
   if (isLoading) return (
     <div className="p-0 max-w-5x1 mx-auto">
       <ProfileSkeleton />
     </div>
   )
 
-  // ── Error ──
+
   if (isError) return (
     <div className="p-0 max-w-5x1 mx-auto flex flex-col items-center gap-4 mt-16">
       <p className="text-[#1B1B21] text-lg font-semibold">Gagal memuat profil</p>
@@ -407,7 +401,7 @@ export default function StudentProfile() {
     </div>
   )
 
-  // ── Render ──
+
   return (
     <div className="p-0 max-w-250 mx-auto flex flex-col gap-6">
 

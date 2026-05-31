@@ -5,7 +5,7 @@ const dummyApplicants = [
     major: 'Ilmu Komputer',
     appliedDate: '2023-10-12',
     status: 'Melamar Posisi',
-    // Detail lengkap
+
     fullName: 'Muhammad Arif Agung Wijaya',
     nim: 'G64190012',
     faculty: 'SSMI',

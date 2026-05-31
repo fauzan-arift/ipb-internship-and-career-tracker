@@ -5,8 +5,6 @@ import { applicationService } from '@/services/applicationService'
 import api from '@/api/axios'
 import Breadcrumb from '@/components/molecules/Breadcrumb';
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
   return new Date(dateStr).toLocaleDateString('id-ID', {
@@ -42,8 +40,6 @@ const getPaymentStatusBadge = (status) => {
   return map[status] ?? { label: status, className: 'bg-gray-100 text-gray-600' }
 }
 
-// Maps application status → button appearance
-// Status values match what the API returns: Pending, Diproses, Review HR, Interview, Diterima, Ditolak, Ditawarkan
 const APPLICATION_STATUS_CONFIG = {
   'Pending':    { label: 'Lamaran Terkirim', className: 'bg-[#FFF2DF] text-[#A65E34] border border-[#F6C28B]', disabled: true },
   'Diproses':   { label: 'Sedang Diproses', className: 'bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD]', disabled: true },
@@ -53,8 +49,6 @@ const APPLICATION_STATUS_CONFIG = {
   'Ditolak':    { label: 'Lamaran Ditolak', className: 'bg-[#FEE2E2] text-[#991B1B] border border-[#FCA5A5]', disabled: true },
   'Ditawarkan': { label: 'Ada Penawaran!', className: 'bg-[#D1FAE5] text-[#065F46] border border-[#6EE7B7]', disabled: true },
 }
-
-// ─── Icons ───────────────────────────────────────────────────────────────────
 
 const FileTextIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -105,8 +99,6 @@ const AlertCircleIcon = () => (
     <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
 
 const HeroSkeleton = () => (
   <div className="flex items-center justify-between bg-white rounded-xl border border-[#DBD9E1] p-6 gap-4 animate-pulse">
@@ -163,7 +155,6 @@ const TextBlock = ({ text }) => {
   )
 }
 
-// Company logo: real photo_profile_url if set, else initial fallback
 const CompanyLogo = ({ company }) => (
   <div className="w-20 h-20 rounded-2xl border border-[#E5E1EB] bg-white shadow-sm shrink-0 overflow-hidden flex items-center justify-center">
     {company?.photo_profile_url
@@ -173,7 +164,6 @@ const CompanyLogo = ({ company }) => (
   </div>
 )
 
-// Auto-dismissing toast
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
     const t = setTimeout(onClose, 5000)
@@ -194,8 +184,6 @@ const Toast = ({ message, type, onClose }) => {
   )
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
 export default function InternshipDetail() {
   const { internship_id } = useParams()
   const navigate = useNavigate()
@@ -205,18 +193,18 @@ export default function InternshipDetail() {
   const [isError, setIsError]       = useState(false)
   const [error, setError]           = useState(null)
 
-  // Student CV — from GET /students/profile
+
   const [studentCvId, setStudentCvId]   = useState(null)
   const [studentCvUrl, setStudentCvUrl] = useState(null)
 
-  // Apply
+
   const [isApplying, setIsApplying]               = useState(false)
   const [applicationStatus, setApplicationStatus] = useState(null) // null = not yet applied
 
   const [toast, setToast] = useState(null)
   const showToast = (message, type = 'success') => setToast({ message, type })
 
-  // ── 1. Internship detail ──
+
   useEffect(() => {
     if (!internship_id) return
     const run = async () => {
@@ -235,7 +223,7 @@ export default function InternshipDetail() {
     run()
   }, [internship_id])
 
-  // ── 2. Student profile → cv_id ──
+
   useEffect(() => {
     const run = async () => {
       try {
@@ -249,7 +237,7 @@ export default function InternshipDetail() {
     run()
   }, [])
 
-  // ── 3. Check existing application for this internship ──
+
   useEffect(() => {
     if (!internship_id) return
     const run = async () => {
@@ -268,7 +256,7 @@ export default function InternshipDetail() {
     run()
   }, [internship_id])
 
-  // ── Apply handler ──
+
   const handleApply = async () => {
     if (!studentCvId) {
       showToast('CV belum diupload. Lengkapi profilmu terlebih dahulu.', 'warning')
@@ -292,7 +280,7 @@ export default function InternshipDetail() {
     }
   }
 
-  // ── Button state ──
+
   const appConfig  = APPLICATION_STATUS_CONFIG[applicationStatus] ?? null
   const isInactive = internship && !internship.is_active
   const isFull     = internship && internship.filled_quota >= internship.quota

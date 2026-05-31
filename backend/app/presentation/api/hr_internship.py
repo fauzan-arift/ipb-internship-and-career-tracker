@@ -62,7 +62,6 @@ async def list_hr_internships(
     company_id: UUID = Depends(_resolve_company_id),
     svc: InternshipService = Depends(get_internship_service),
 ):
-    """Mengembalikan semua lowongan yang pernah dibuat oleh perusahaan HR (aktif maupun tutup)."""
     return await svc.list_hr_internships(
         company_id=company_id, page=page, limit=limit, search=search
     )
@@ -80,10 +79,6 @@ async def create_internship(
     company_id: UUID = Depends(_resolve_company_id),
     svc: InternshipService = Depends(get_internship_service),
 ):
-    """
-    Buat lowongan magang baru untuk perusahaan HR yang sedang login.
-    Lowongan langsung aktif dan bisa ditemukan mahasiswa setelah dibuat.
-    """
     return await svc.create_internship(company_id=company_id, payload=body)
 
 
@@ -99,7 +94,6 @@ async def update_internship(
     company_id: UUID = Depends(_resolve_company_id),
     svc: InternshipService = Depends(get_internship_service),
 ):
-    """Update data lowongan. Hanya HR pemilik lowongan yang bisa mengubah."""
     return await svc.update_internship(
         internship_id=internship_id, company_id=company_id, payload=body
     )
@@ -116,10 +110,6 @@ async def close_internship(
     company_id: UUID = Depends(_resolve_company_id),
     svc: InternshipService = Depends(get_internship_service),
 ):
-    """
-    Tutup lowongan sehingga tidak lagi muncul di daftar pencarian mahasiswa.
-    Data lowongan tidak dihapus (soft close). Bisa dibuka kembali via endpoint `/reopen`.
-    """
     return await svc.close_internship(
         internship_id=internship_id, company_id=company_id
     )
@@ -136,10 +126,6 @@ async def delete_internship(
     company_id: UUID = Depends(_resolve_company_id),
     svc: InternshipService = Depends(get_internship_service),
 ):
-    """
-    Hapus permanen lowongan. **Hanya bisa dilakukan jika belum ada pelamar.**
-    Jika sudah ada pelamar, gunakan endpoint `/close` sebagai gantinya.
-    """
     await svc.delete_internship(internship_id=internship_id, company_id=company_id)
 
 
@@ -155,10 +141,6 @@ async def reopen_internship(
     company_id: UUID = Depends(_resolve_company_id),
     svc: InternshipService = Depends(get_internship_service),
 ):
-    """
-    Buka kembali lowongan yang sebelumnya ditutup.
-    Body berisi `close_date` baru opsional untuk memperpanjang masa pendaftaran.
-    """
     return await svc.reopen_internship(
         internship_id=internship_id, company_id=company_id, payload=body
     )

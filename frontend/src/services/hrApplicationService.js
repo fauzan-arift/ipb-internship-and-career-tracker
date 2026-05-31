@@ -21,7 +21,7 @@ export const hrApplicationService = {
   uploadDocument: async (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('document_type', 'OTHER'); // Tambahkan document_type yang diminta backend
+    formData.append('document_type', 'OTHER');
     const response = await axios.post('/documents/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

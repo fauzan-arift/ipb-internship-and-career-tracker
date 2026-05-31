@@ -10,12 +10,11 @@ function formatDate(dateStr) {
   });
 }
 
-// Maps the exact API response shape → OfferCard props
+
 function mapOffer(raw) {
   return {
     id:             raw.id,
     status:         raw.status ?? 'Pending',
-    // OfferCard props
     companyInitial: raw.internship?.company_name?.charAt(0).toUpperCase() ?? '?',
     companyLogoUrl: raw.internship?.photo_profile_url,
     companyName:    raw.internship?.company_name ?? '-',

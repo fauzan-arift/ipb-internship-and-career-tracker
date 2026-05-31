@@ -19,6 +19,5 @@ class SkillResponse(BaseModel):
     response_model=List[SkillResponse],
 )
 async def get_all_skills(svc: SkillService = Depends(get_skill_service)):
-    """Mengembalikan daftar semua skill yang pernah ditambahkan."""
     skills = await svc.get_all_skills()
     return [SkillResponse(id=str(s.id), name=s.name) for s in skills]

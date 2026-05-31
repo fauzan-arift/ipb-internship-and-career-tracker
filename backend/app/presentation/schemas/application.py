@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from app.domain.entities.enums import ApplicationStatus
 
 
-# ===================== Request Schemas =====================
+
 
 class ApplicationCreateRequest(BaseModel):
     submitted_cv_id: UUID
@@ -19,7 +19,7 @@ class ApplicationStatusUpdateRequest(BaseModel):
     new_status: str
 
 
-# ===================== Nested Summary Schemas =====================
+
 
 class CompanyBrief(BaseModel):
     company_name: str
@@ -78,7 +78,7 @@ class StudentDetail(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ===================== History Schema =====================
+
 
 class ApplicationStatusHistoryResponse(BaseModel):
     id: UUID
@@ -89,7 +89,7 @@ class ApplicationStatusHistoryResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ===================== Base Application Response =====================
+
 
 class ApplicationResponse(BaseModel):
     id: UUID
@@ -102,7 +102,7 @@ class ApplicationResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ===================== Student-facing Response Schemas =====================
+
 
 class ApplicationStats(BaseModel):
     total_applications: int
@@ -136,7 +136,7 @@ class StudentApplicationDetailResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ===================== HR-facing Response Schemas =====================
+
 
 class HRApplicantListItem(BaseModel):
     id: UUID

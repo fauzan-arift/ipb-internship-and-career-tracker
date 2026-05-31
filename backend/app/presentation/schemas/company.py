@@ -41,7 +41,6 @@ class CompanyProfileResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ─── HR Personal Profile Schemas ─────────────────────────────────────────────
 
 class HRProfileResponse(BaseModel):
     """HR's own personal profile (not the company profile)."""

@@ -1,6 +1,6 @@
-# IPB Internship & Career Tracker
+# IPB Internship
 
-Sistem tracking magang dan karier untuk mahasiswa IPB.
+Sistem informasi magang berbasis web untuk mahasiswa IPB University.
 
 ## Contributors
 
@@ -18,50 +18,73 @@ Institut Pertanian Bogor (IPB University)
 
 ## Tentang
 
-IPB Internship & Career Tracker adalah sistem informasi berbasis web yang dirancang untuk:
+IPB Internship adalah sistem informasi berbasis web yang menghubungkan mahasiswa IPB dengan perusahaan mitra untuk program magang. Sistem ini memiliki tiga peran pengguna:
 
-- **Mahasiswa**: Melacak status lamaran magang, mencatat aktivitas MBKM, dan mengelola deadline laporan
-- **HR**: Memposting lowongan magang dan mengelola pelamar
-- **Admin**: Mengawasi seluruh proses dan manajemen pengguna
-
-### Permasalahan yang Diselesaikan
-- Mahasiswa kesulitan melacak status lamaran magang
-- Tidak ada sistem terpusat untuk program MBKM
-- Sering terlewat deadline pelaporan dan konversi SKS
-- **Solusi**: Sistem tracking terpusat
+- **Student** — Mencari lowongan magang, melamar, menerima/menolak penawaran, dan melihat peta karir alumni
+- **HR** — Membuat lowongan magang, mengelola lamaran, mengubah status lamaran, dan membuat penawaran
+- **Admin** — Memverifikasi registrasi HR dan perusahaan (approve/reject)
 
 ---
 
-## Fitur Utama
+## Fitur
 
-### Saat Ini 
-- **Clean Architecture & DDD**: Strict separation of concerns (Domain, Application, Infrastructure, Presentation)
-- **Multi-role Authentication**: Admin, Student, HR
-- **Async Database Operations**: Performa tinggi dengan *asyncpg*
-- **External Integrations**: Brevo (Email Verification & Notifications) & Cloudinary (Cloud Document Storage)
-- **Role-based Access Control & JWT Security**: Akses berdasarkan spesifik role pengguna
+### Autentikasi & Otorisasi
+- Registrasi Student (validasi email `@apps.ipb.ac.id`) dan HR (upload NPWP)
+- Verifikasi email melalui Brevo
+- Login dengan JWT & role-based access control (Student, HR, Admin)
+
+### Student
+- Cari & filter lowongan magang aktif
+- Lihat detail lowongan beserta informasi perusahaan
+- Lamar ke lowongan magang (dengan CV)
+- Lihat status lamaran & riwayat perubahan status
+- Terima/tolak penawaran (offer)
+- Peta karir alumni per jurusan per perusahaan
+- Kelola profil, upload CV & foto profil
+- Kelola skill
+
+### HR
+- Dashboard lowongan magang
+- Buat, edit, tutup, dan buka ulang lowongan magang
+- Kelola profil perusahaan & upload foto perusahaan
+- Lihat daftar pelamar per lowongan
+- Update status lamaran (Pending → Review → Interview → Accepted/Rejected)
+- Buat penawaran (offer) untuk pelamar yang diterima
+
+### Admin
+- Lihat daftar HR yang menunggu verifikasi
+- Lihat detail HR & dokumen NPWP perusahaan
+- Approve/reject registrasi HR
+- Lihat riwayat keputusan (verified/rejected)
+
+### Integrasi Eksternal
+- **Brevo** — Email verifikasi & notifikasi (approval, rejection, penawaran)
+- **Cloudinary** — Upload & penyimpanan dokumen (CV, NPWP, foto profil, offering letter)
+
+---
 
 ## Teknologi
 
 ### Backend
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **FastAPI** | 0.109.0 | REST API framework |
-| **PostgreSQL & asyncpg** | 14+ | Async Database Driver |
-| **SQLAlchemy** | 2.0.25 | Async ORM |
-| **Pydantic** | 2.5.3 | Data validation |
-| **Brevo API** | - | Transactional Emails |
-| **Cloudinary API**| - | Cloud File Storage |
-| **JWT & Bcrypt** | - | Authentication & Security |
+| Teknologi | Purpose |
+|-----------|---------|
+| **FastAPI** | REST API framework |
+| **PostgreSQL + asyncpg** | Database (async) |
+| **SQLAlchemy 2.0** | Async ORM |
+| **Alembic** | Database migration |
+| **Pydantic** | Data validation & serialization |
+| **Brevo API** | Transactional email |
+| **Cloudinary API** | Cloud file storage |
+| **JWT + Bcrypt** | Authentication & security |
 
 ### Frontend
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **React** | 18.2.0 | UI framework |
-| **Vite** | 5.0.8 | Build tool |
-| **React Router** | 6.21.1 | Routing |
-| **Axios** | 1.6.5 | HTTP client |
-| **TanStack Query** | 5.17.9 | Data fetching |
+| Teknologi | Purpose |
+|-----------|---------|
+| **React 18** | UI framework |
+| **Vite** | Build tool & dev server |
+| **React Router 6** | Client-side routing |
+| **Axios** | HTTP client |
+| **TanStack Query** | Server state management |
 
 ---
 
@@ -69,29 +92,43 @@ IPB Internship & Career Tracker adalah sistem informasi berbasis web yang diranc
 
 ```
 ipb-internship-and-career-tracker/
-├── backend/                 # FastAPI Backend
-│   ├── alembic/            # Database Migrations (Async)
+├── backend/
+│   ├── alembic/                    # Database migrations
 │   ├── app/
-│   │   ├── application/    # Business services (Use Cases)
-│   │   ├── core/           # Config & security
-│   │   ├── db/             # Database Seeder
-│   │   ├── domain/         # Entities, Enums, Interfaces, UoW
-│   │   ├── infrastructure/ # DB connections, SQLAlchemy ORMs, Cloudinary, Brevo
-│   │   ├── presentation/   # FastAPI Routes, Schemas, Dependencies
-│   │   └── main.py         # App entry point
-│   ├── .env.example
-│   ├── requirements.txt
-│   └── README.md           # Backend documentation
+│   │   ├── application/
+│   │   │   └── services/           # Business logic (use cases)
+│   │   ├── core/                   # Config & security
+│   │   ├── db/                     # Database seeder
+│   │   ├── domain/
+│   │   │   ├── entities/           # Pydantic entities & enums
+│   │   │   └── repositories/      # Repository interfaces
+│   │   ├── infrastructure/
+│   │   │   ├── models/             # SQLAlchemy ORM models
+│   │   │   └── repositories/      # Repository implementations
+│   │   ├── presentation/
+│   │   │   ├── api/                # FastAPI routers
+│   │   │   └── schemas/            # Request/response schemas
+│   │   └── main.py
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   └── requirements.txt
 │
-├── frontend/               # React Frontend
+├── frontend/
 │   ├── src/
-│   │   ├── components/     # Reusable components
-│   │   ├── context/        # React Context (state)
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API calls
+│   │   ├── api/                    # Axios instance
+│   │   ├── components/             # UI components (atoms, molecules, organisms)
+│   │   ├── constants/              # Data constants
+│   │   ├── context/                # React Context (AuthContext)
+│   │   ├── hooks/                  # Custom hooks (TanStack Query)
+│   │   ├── layouts/                # Layout components
+│   │   ├── pages/
+│   │   │   ├── auth/               # Login, Register, VerifyEmail
+│   │   │   ├── student/            # Student pages
+│   │   │   ├── hr/                 # HR pages
+│   │   │   └── admin/              # Admin pages
+│   │   ├── services/               # API service functions
 │   │   └── App.jsx
-│   ├── package.json
-│   └── README.md           # Frontend documentation
+│   └── package.json
 └── README.md
 ```
 
@@ -100,10 +137,9 @@ ipb-internship-and-career-tracker/
 ## Quick Start
 
 ### Prerequisites
-- **Python** 3.9+
-- **Node.js** 16+
-- **PostgreSQL** 14+
-- **Git**
+- Python 3.9+
+- Node.js 16+
+- PostgreSQL 14+
 
 ### 1. Clone Repository
 ```bash
@@ -115,134 +151,69 @@ cd ipb-internship-and-career-tracker
 ```bash
 cd backend
 python -m venv venv
-venv\Scripts\activate        
+venv\Scripts\activate
 
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env dengan database credentials
+# Edit .env dengan database credentials, SECRET_KEY, BREVO_API_KEY, ADMIN_PASSWORD
 
-# Buat database PostgreSQL
-createdb ipb_internship_tracker
-
-# Run migration (create tables)
 alembic upgrade head
-
-# Seed default admin account
 python -m app.db.seed
-
-# Run server
 uvicorn app.main:app --reload
 ```
 
-### 2a. Setup Backend (Docker Compose)
+Backend: **http://localhost:8000**  
+API Docs: **http://localhost:8000/docs**
+
+### 2a. Setup Backend (Docker)
 ```bash
-# dari folder backend
 cd backend
 cp .env.example .env
-# edit .env dan set DATABASE_URL ke host db
-# contoh: postgresql://ipb:ipb@db:5432/ipb_internship_tracker
+# Edit .env (DATABASE_URL: postgresql://ipb:ipb@db:5432/ipb_internship_tracker)
 
 docker compose up --build
-```
-Pastikan variabel ini terisi: SECRET_KEY, BREVO_API_KEY, ADMIN_PASSWORD.
-
-```bash
-# Run migration (create tables)
 docker compose exec backend alembic upgrade head
-
-# Seed default admin account
 docker compose exec backend python -m app.db.seed
 ```
-Backend running di: **http://localhost:8000**  
-API Docs: **http://localhost:8000/docs**
 
 ### 3. Setup Frontend
 ```bash
 cd frontend
 npm install
 cp .env.example .env
-
 npm run dev
 ```
-Frontend running di: **http://localhost:3000**
+
+Frontend: **http://localhost:3000**
 
 ---
 
 ## Architecture
 
-Project ini menggunakan **Clean Architecture** dengan **Domain-Driven Design (DDD)**:
+Backend menggunakan **Clean Architecture**:
 
-Aturan Utama: Dependency/Ketergantungan **HANYA BISA** mengarah ke dalam (menuju Core Domain Layer).
-
-### Layer Architecture
 ```
 ┌───────────────────────────────────────────────┐
-│              Presentation Layer               │  ← FastAPI Routes, Pydantic Schemas, Dependencies
+│              Presentation Layer               │  FastAPI Routers & Schemas
 ├───────────────────────────────────────────────┤
-│              Application Layer                │  ← Use case flow orchestration (Services)
+│              Application Layer                │  Services (business logic)
 ├───────────────────────────────────────────────┤
-│                 Domain Layer                  │  ← Pure Python Entities & Interfaces
+│                 Domain Layer                  │  Pydantic Entities & Interfaces
 ├───────────────────────────────────────────────┤
-│             Infrastructure Layer              │  ← SQLAlchemy ORMs, Brevo, Cloudinary
+│             Infrastructure Layer              │  SQLAlchemy ORM, Brevo, Cloudinary
 └───────────────────────────────────────────────┘
 ```
 
-### Key Patterns
-- **Rich Domain Model**: *Business logic* & validasi berada di dalam *Entity* murni Pydantic (tidak ada SQLAlchemy).
-- **Unit of Work (UoW)**: Mengontrol integritas dan *rollback transactions* secara *asynchronous* dari service hingga model.
-- **Repository Pattern**: Abstraksi akses database menggunakan *Interfaces* (memisahkan query DB dari logika).
-- **Dependency Injection**: *Loosely coupled components* (mudah untuk keperluan testing).
-- **External Client Isolation**: Alat 3rd party seperti *Brevo* dan *Cloudinary* tidak masuk ke layer aplikasi, melainkan masuk ke *Infrastructure* yang digunakan lewat abstraksi.
-### Referensi Arsitektur
-- Pembangunan *Clean Architecture* Backend ini disusun mengacu pada: [How to Implement Clean Architecture in FastAPI: A Step-by-Step Guide](https://medium.com/@bhagyasithumini/how-to-implement-clean-architecture-in-fastapi-a-step-by-step-guide-8b73a75c650b)
+**Patterns yang digunakan:**
+- **Unit of Work** — Kontrol transaksi database secara atomik
+- **Repository Pattern** — Abstraksi akses database melalui interfaces
+- **Dependency Injection** — Loosely coupled components
+- **Domain Entity** — Business logic & validasi di Pydantic model (terpisah dari ORM)
 
----
-
-## Development
-
-### Backend Development
-```bash
-cd backend
-
-# Activate virtual environment
-venv\Scripts\activate
-
-# Run with auto-reload
-uvicorn app.main:app --reload --port 8000
-
-# Seed admin account
-python -m app.db.seed
-
-# Run tests
-pytest
-
-# Check code quality
-pylint app/
-```
-
-### Frontend Development
-```bash
-cd frontend
-
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
-```
 ---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 Copyright (c) 2026 Kelompok 5 Paralel P3 - Analisis dan Desain Sistem
-
----
-

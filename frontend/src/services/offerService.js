@@ -8,7 +8,7 @@ export const offerService = {
 
   respondOffer: async (offerId, responseStatus) => {
     const response = await axios.patch(`/students/offers/${offerId}/respond`, {
-      response_status: responseStatus, // "Accepted" atau "Rejected"
+      response_status: responseStatus,
     });
     return response.data;
   },

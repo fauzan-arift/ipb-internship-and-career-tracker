@@ -146,7 +146,6 @@ class EmailService:
           - Red    → Ditolak / Rejected
           - Blue   → everything else (in-progress)
         """
-        # Determine badge colour
         _green = {"Diterima", "Accepted", "Ditawarkan"}
         _red   = {"Ditolak", "Rejected"}
         if new_status in _green:

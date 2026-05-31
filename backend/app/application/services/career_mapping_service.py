@@ -1,7 +1,3 @@
-"""
-Application Service — CareerMappingService
-Fetches and aggregates career mapping data for the authenticated student's major.
-"""
 import logging
 from uuid import UUID
 
@@ -33,7 +29,7 @@ class CareerMappingService:
         4. Aggregate grand_total and most-recent last_updated.
         """
         async with self.uow as uow:
-            # 1. Resolve student profile
+
             student = await uow.users.get_student_profile_by_user_id(student_user_id)
             if not student:
                 raise HTTPException(status_code=404, detail="Profil mahasiswa tidak ditemukan.")
@@ -47,13 +43,13 @@ class CareerMappingService:
                     detail="Profil mahasiswa belum memiliki data fakultas atau jurusan.",
                 )
 
-            # 2. Fetch all career mapping rows for this faculty+major
+
             rows = await uow.career_mappings.list_by_faculty_major(
                 faculty=faculty,
                 major=major,
             )
 
-            # 3. Aggregate totals
+
             grand_total = sum(r.total_alumni for r in rows)
             last_updated = (
                 max((r.last_updated for r in rows if r.last_updated), default=None)
@@ -61,7 +57,7 @@ class CareerMappingService:
                 else None
             )
 
-            # 4. Build company distribution list
+
             distributions: list[CompanyDistributionItem] = []
             for row in sorted(rows, key=lambda r: r.total_alumni, reverse=True):
                 company = await uow.companies.get_by_id(row.company_id)
@@ -69,7 +65,7 @@ class CareerMappingService:
                     logger.warning("CareerMapping row references missing company_id=%s", row.company_id)
                     continue
 
-                # Resolve logo URL from document
+
                 logo_url: str | None = None
                 if company.photo_profile_id:
                     doc = await uow.documents.get_by_id(company.photo_profile_id)
@@ -85,7 +81,7 @@ class CareerMappingService:
                     )
                 )
 
-            # Build response inside the block while all variables are guaranteed assigned
+
             return CareerMappingResponse(
                 faculty=faculty,
                 major=major,

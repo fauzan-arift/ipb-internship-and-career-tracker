@@ -41,7 +41,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 function AppRoutes() {
   return (
     <Routes>
-      {/* ── Public / Auth ── */}
+
       <Route path="/login" element={<Login />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
 
@@ -62,10 +62,10 @@ function AppRoutes() {
         }
       />
 
-      {/* ── Home ── */}
+
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* ── Admin ── */}
+
       <Route
         path="/admin/dashboard"
         element={(
@@ -87,7 +87,7 @@ function AppRoutes() {
         )}
       />
 
-      {/* ── Student ── */}
+
       <Route
         path="/internship"
         element={(
@@ -149,7 +149,7 @@ function AppRoutes() {
         )}
       />
 
-      {/* ── HR ── */}
+
       <Route
         path="/hr/dashboard"
         element={(
